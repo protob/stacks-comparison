@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import Button from '../common/Button';
 import SchemaForm from '../common/SchemaForm';
-import type { Item, Priority } from '@/types';
+import type { Item } from '@/types';
 
 interface ItemFormProps {
   item?: Item | null;

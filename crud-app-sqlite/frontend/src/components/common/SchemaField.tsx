@@ -178,7 +178,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
             aria-invalid={!!error}
           >
             {!isRequired && <option value="">-- Optional --</option>}
-            {enumOptions.map((option) => (
+            {enumOptions.map((option: { value: string; label: string }) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

@@ -182,7 +182,7 @@ const SchemaForm = ({
         `grid-cols-1 ${columnClass}`
       )}>
         {/* Schema-generated fields */}
-        {Object.entries(sortedFields).map(([key, field]) => 
+        {Object.entries(sortedFields).map(([key, _field]) =>
           shouldRenderField(key) ? (
             <SchemaField
               key={key}

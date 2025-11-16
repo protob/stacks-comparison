@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { Item, Priority, SingleCategory } from '@/types';
+import type { Item } from '@/types';
 import * as itemApi from '@/api/itemApi';
 import { useUiStore } from './useUiStore';
 import { slugify } from '@/utils/slugify';
