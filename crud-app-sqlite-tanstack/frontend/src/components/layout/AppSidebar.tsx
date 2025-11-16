@@ -2,21 +2,18 @@ import { Sun, Moon, Tags, Search } from 'lucide-react';
 import { useUiStore } from '@/stores/useUiStore';
 import { useItemFilters } from '@/hooks/useItemFilters';
 import { useGetItemTree } from '@/hooks/useItemsApi';
+import { useSearch } from '@/App';
 
-interface AppSidebarProps {
-  searchQuery: string;
-  onSearchQueryChange: (query: string) => void;
-}
-
-export default function AppSidebar({ searchQuery, onSearchQueryChange }: AppSidebarProps) {
-        const { theme, toggleTheme } = useUiStore();
-        const { data: itemTree = {} } = useGetItemTree();
-        const { allTags } = useItemFilters(itemTree, {
-            searchQuery: '',
-            selectedPriority: 'all',
-            showCompleted: true,
-            selectedTags: [],
-        });
+export function AppSidebar() {
+    const { theme, toggleTheme } = useUiStore();
+    const { searchQuery, setSearchQuery, selectedTags, setSelectedTags, setAvailableTags, toggleTag, clearSearch, clearTags } = useSearch();
+    const { data: itemTree = {} } = useGetItemTree();
+    const { allTags: availableTags } = useItemFilters(itemTree, {
+        searchQuery: '',
+        selectedPriority: 'all',
+        showCompleted: true,
+        selectedTags: [],
+    });
 
         return (
             <aside className="w-[--sidebar-width] bg-surface flex flex-col p-4 border-r border-border">
@@ -27,14 +24,22 @@ export default function AppSidebar({ searchQuery, onSearchQueryChange }: AppSide
                             type="text"
                             placeholder="Search items..."
                             value={searchQuery}
-                            onChange={(e) => onSearchQueryChange(e.target.value)}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                     <div>
                         <h2 className="text-size-sm font-semibold text-text-muted mb-2 flex items-center gap-2"><Tags size={16} /> Tags</h2>
                         <div className="flex flex-wrap gap-2">
-                            {allTags.map(tag => (
-                                <button key={tag} className="tag-sm bg-surface-hover text-text-secondary rounded-button hover:bg-surface-active">
+                            {availableTags.map(tag => (
+                                <button 
+                                    key={tag} 
+                                    className={`tag-sm rounded-button hover:bg-surface-active ${
+                                        selectedTags.includes(tag) 
+                                            ? 'bg-primary text-primary-foreground' 
+                                            : 'bg-surface-hover text-text-secondary'
+                                    }`}
+                                    onClick={() => toggleTag(tag)}
+                                >
                                     {tag}
                                 </button>
                             ))}
@@ -47,5 +52,5 @@ export default function AppSidebar({ searchQuery, onSearchQueryChange }: AppSide
                     </button>
                 </div>
             </aside>
-        );
+    );
 }

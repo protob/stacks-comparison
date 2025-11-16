@@ -1,9 +1,7 @@
-import { Outlet } from '@tanstack/react-router';
-import AppSidebar from './components/layout/AppSidebar';
-import Notifications from './components/common/Notifications';
-import TopBar from './components/layout/TopBar';
-import { useUiStore } from './stores/useUiStore';
-import { useEffect, useState, createContext, useContext } from 'react';
+import { MainLayout } from '@/components/layout/MainLayout';
+import Notifications from '@/components/common/Notifications';
+import { useThemeUpdater } from '@/hooks/useThemeUpdater';
+import { useState, createContext, useContext } from 'react';
 
 // Create context for search state
 const SearchContext = createContext<{
@@ -31,7 +29,9 @@ const SearchContext = createContext<{
 export const useSearch = () => useContext(SearchContext);
 
 function App() {
-  const { theme } = useUiStore();
+  // This custom hook handles applying the theme to the document.
+  useThemeUpdater();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
@@ -47,17 +47,6 @@ function App() {
   const clearSearch = () => setSearchQuery('');
   const clearTags = () => setSelectedTags([]);
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
-  }, [theme]);
-
   return (
     <SearchContext.Provider value={{
       searchQuery,
@@ -70,19 +59,11 @@ function App() {
       clearSearch,
       clearTags
     }}>
-      <div className="flex h-screen bg-background text-text-primary">
-          <AppSidebar 
-            searchQuery={searchQuery} 
-            onSearchQueryChange={setSearchQuery} 
-          />
-        <main className="flex-1 flex flex-col overflow-y-auto p-4 md:p-6 lg:p-8">
-            <TopBar />
-            <div className="flex-1">
-              <Outlet />
-            </div>
-        </main>
+      <>
+        <MainLayout />
+        {/* Notifications are kept outside the main layout to overlay everything. */}
         <Notifications />
-      </div>
+      </>
     </SearchContext.Provider>
   );
 }
