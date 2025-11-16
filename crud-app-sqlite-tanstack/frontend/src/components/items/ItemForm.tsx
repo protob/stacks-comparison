@@ -1,5 +1,4 @@
 import { useForm } from '@tanstack/react-form';
-import { zodValidator } from '@tanstack/zod-form-adapter';
 import { itemFormSchema } from '@/schemas/itemSchema';
 import { FormFieldWrapper } from '@/components/common/FormFieldWrapper';
 import type { Item } from '@/types';
@@ -23,27 +22,25 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
       tags: [] as string[],
       categories: [''] as [string],
     },
-    validators: {
-      onChange: zodValidator({ schema: itemFormSchema }),
-    },
     onSubmit: async ({ value }) => {
-      console.log('🔥 FORM.onSubmit FIRED!', value);
+      // Validate on submit
+      const result = itemFormSchema.safeParse(value);
+      if (!result.success) {
+        // Show validation errors
+        console.error('Validation errors:', result.error.flatten());
+        return;
+      }
+      
       await onSubmit(value);
     },
   });
 
   return (
     <form
-      onSubmit={async (e) => {
-        console.log('🎯 HTML FORM SUBMIT EVENT FIRED');
+      onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('⚡ Calling form.handleSubmit()');
-        
-        // TRY THIS - await the submission
-        await form.handleSubmit();
-        
-        console.log('✅ handleSubmit completed');
+        form.handleSubmit();
       }}
       className="space-y-4"
     >
@@ -126,7 +123,7 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
                   <input
                     type="radio"
                     checked={field.state.value === p}
-                    onChange={() => field.handleChange(p as any)}
+                    onChange={() => field.handleChange(p)}
                     onBlur={field.handleBlur}
                   />
                   <span className="text-sm">{p.charAt(0).toUpperCase() + p.slice(1)}</span>
@@ -137,20 +134,6 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
         )}
       />
 
-      {/* Add this RIGHT BEFORE the submit button */}
-      <div>
-        {console.log('=== FORM STATE ===', {
-          canSubmit: form.state.canSubmit,
-          isSubmitting: form.state.isSubmitting,
-          isValid: form.state.isValid,
-          isDirty: form.state.isDirty,
-          errors: form.state.errors,
-          errorText: JSON.stringify(form.state.errors), // <-- ADD THIS to see the error text
-          fieldMeta: form.state.fieldMeta,
-          values: form.state.values,
-        })}
-      </div>
-
       <div className="flex justify-end gap-2">
         <Button
           type="button"
@@ -159,23 +142,17 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
         >
           Cancel
         </Button>
-        <Button
-          type="button" // Change to button temporarily
-          disabled={!form.state.canSubmit || form.state.isSubmitting}
-          onClick={async () => {
-            console.log('🔘 BUTTON CLICKED - DIRECT SUBMIT');
-            // Call onSubmit directly, baypassing TanStack Form
-            await onSubmit({
-              name: form.state.values.name,
-              text: form.state.values.text,
-              priority: form.state.values.priority,
-              tags: form.state.values.tags,
-              categories: form.state.values.categories,
-            });
-          }}
-        >
-          {form.state.isSubmitting ? 'Adding...' : 'Add Item'}
-        </Button>
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Adding...' : 'Add Item'}
+            </Button>
+          )}
+        />
       </div>
     </form>
   );
