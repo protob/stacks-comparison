@@ -166,31 +166,31 @@ Communication with the backend REST API is handled by a robust, type-safe client
 
 ### 7.1. Prerequisites
 
-*   Node.js `v18.0` or higher.
+*   Bun runtime installed.
 *   A running instance of the backend API (defaults to `http://localhost:3000`).
 
 ### 7.2. Getting Started
 
-1.  **Navigate to the frontend directory:**
+1.  **Navigate to frontend directory:**
     ```bash
     cd frontend
     ```
 2.  **Install dependencies:**
     ```bash
-    npm install
+    bun install
     ```
-3.  **Configure Environment:** Create a `.env` file in the `frontend` root and add the API URL:
+3.  **Configure Environment:** Create a `.env` file in `frontend` root and add API URL:
     ```env
     VITE_API_BASE_URL=http://localhost:3000/api
     ```
-4.  **Start the development server:**
+4.  **Start development server:**
     ```bash
-    npm run dev
+    bun run dev
     ```    The application will be accessible at `http://localhost:5173`.
 
 ### 7.3. Available Scripts
 
-*   `npm run dev`: Starts the Vite development server with HMR.
-*   `npm run build`: Type-checks and builds the application for production in the `dist/` directory.
-*   `npm run preview`: Serves the production build locally for testing.
-*   `npm run type-check`: Runs the TypeScript compiler to check for type errors without generating output.
+*   `bun run dev`: Starts the Vite development server with HMR.
+*   `bun run build`: Type-checks and builds the application for production in the `dist/` directory.
+*   `bun run preview`: Serves the production build locally for testing.
+*   `bun run type-check`: Runs the TypeScript compiler to check for type errors without generating output.
