@@ -8,6 +8,7 @@ import (
 	"items-api/internal/services"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
@@ -17,6 +18,8 @@ import (
 )
 
 func main() {
+	startTime := time.Now()
+
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -70,6 +73,9 @@ func main() {
 
 	// Register routes
 	itemHandler.RegisterRoutes(humaAPI, router)
+
+	// Root endpoint - API info
+	router.Get("/", api.GetInfo(cfg, startTime))
 
 	// Health check endpoint
 	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
