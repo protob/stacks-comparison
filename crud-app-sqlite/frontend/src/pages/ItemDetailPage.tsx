@@ -50,9 +50,9 @@ const ItemDetailPage = () => {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center max-w-md px-4">
-          <Icon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 text-danger" />
-          <h2 className="text-2xl font-semibold mb-2 text-text-primary">Item Not Found</h2>
-          <p className="text-text-secondary mb-6">{error || 'The requested item could not be found.'}</p>
+          <Icon name="AlertCircle" className="w-12 h-12 mx-auto mb-3 text-danger" />
+          <h2 className="text-xl font-semibold mb-2 text-text-primary">Item Not Found</h2>
+          <p className="text-sm text-text-secondary mb-4">{error || 'The requested item could not be found.'}</p>
           <Link to="/">
             <Button variant="primary">Back to Items</Button>
           </Link>
@@ -69,35 +69,35 @@ const ItemDetailPage = () => {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="container max-w-3xl px-4 py-8 mx-auto">
+      <div className="container max-w-3xl px-4 py-4 mx-auto">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-4">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors mb-4"
+            className="inline-flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors mb-3 text-sm"
           >
-            <Icon name="ChevronLeft" className="w-4 h-4" />
+            <Icon name="ChevronLeft" className="w-3 h-3" />
             <span>Back</span>
           </button>
 
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-text-primary mb-2">{item.name}</h1>
+              <h1 className="text-2xl font-bold text-text-primary mb-2">{item.name}</h1>
               <div className="flex flex-wrap items-center gap-3 text-sm text-text-secondary">
                 <span className="flex items-center gap-1">
-                  <Icon name="Folder" className="w-4 h-4" />
+                  <Icon name="Folder" className="w-3 h-3" />
                   {item.categories[0]}
                 </span>
                 <span className={`flex items-center gap-1 font-medium ${priorityColors[item.priority]}`}>
-                  <Icon name="Flag" className="w-4 h-4" />
-                  {item.priority.charAt(0).toUpperCase() + item.priority.slice(1)} Priority
+                  <Icon name="Flag" className="w-3 h-3" />
+                  {item.priority.charAt(0).toUpperCase() + item.priority.slice(1)}
                 </span>
               </div>
             </div>
 
             {item.isCompleted && (
-              <div className="shrink-0 px-3 py-1 bg-success/20 text-success rounded-full text-sm font-medium flex items-center gap-1">
-                <Icon name="CheckCircle2" className="w-4 h-4" />
+              <div className="shrink-0 px-2 py-1 bg-success/20 text-success rounded-full text-xs font-medium flex items-center gap-1">
+                <Icon name="CheckCircle2" className="w-3 h-3" />
                 Completed
               </div>
             )}
@@ -105,26 +105,26 @@ const ItemDetailPage = () => {
         </div>
 
         {/* Content */}
-        <div className="space-y-6">
+        <div className="space-y-3">
           {/* Description */}
           {item.text && (
-            <section className="p-6 bg-surface rounded-lg border border-border">
-              <h2 className="text-lg font-semibold mb-3 text-text-primary flex items-center gap-2">
-                <Icon name="FileText" className="w-5 h-5" />
+            <section className="p-card bg-surface rounded-card border border-border">
+              <h2 className="text-sm font-semibold mb-2 text-text-primary flex items-center gap-1">
+                <Icon name="FileText" className="w-3 h-3" />
                 Description
               </h2>
-              <p className="text-text-secondary leading-relaxed whitespace-pre-wrap">{item.text}</p>
+              <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">{item.text}</p>
             </section>
           )}
 
           {/* Tags */}
           {item.tags && item.tags.length > 0 && (
-            <section className="p-6 bg-surface rounded-lg border border-border">
-              <h2 className="text-lg font-semibold mb-3 text-text-primary flex items-center gap-2">
-                <Icon name="Tag" className="w-5 h-5" />
+            <section className="p-card bg-surface rounded-card border border-border">
+              <h2 className="text-sm font-semibold mb-2 text-text-primary flex items-center gap-1">
+                <Icon name="Tag" className="w-3 h-3" />
                 Tags
               </h2>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1">
                 {item.tags.map((tag, index) => (
                   <span
                     key={`${tag}-${index}`}
@@ -138,25 +138,25 @@ const ItemDetailPage = () => {
           )}
 
           {/* Metadata */}
-          <section className="p-6 bg-surface rounded-lg border border-border">
-            <h2 className="text-lg font-semibold mb-3 text-text-primary flex items-center gap-2">
-              <Icon name="Info" className="w-5 h-5" />
+          <section className="p-card bg-surface rounded-card border border-border">
+            <h2 className="text-sm font-semibold mb-2 text-text-primary flex items-center gap-1">
+              <Icon name="Info" className="w-3 h-3" />
               Details
             </h2>
-            <dl className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-border">
+            <dl className="space-y-2 text-sm">
+              <div className="flex justify-between py-1 border-b border-border">
                 <dt className="text-text-secondary">Item ID</dt>
-                <dd className="font-mono text-sm text-text-primary">{item.id}</dd>
+                <dd className="font-mono text-xs text-text-primary truncate ml-2">{item.id}</dd>
               </div>
-              <div className="flex justify-between py-2 border-b border-border">
+              <div className="flex justify-between py-1 border-b border-border">
                 <dt className="text-text-secondary">Slug</dt>
-                <dd className="font-mono text-sm text-text-primary">{item.slug}</dd>
+                <dd className="font-mono text-xs text-text-primary">{item.slug}</dd>
               </div>
-              <div className="flex justify-between py-2 border-b border-border">
+              <div className="flex justify-between py-1 border-b border-border">
                 <dt className="text-text-secondary">Created</dt>
                 <dd className="text-text-primary">{new Date(item.createdAt).toLocaleString()}</dd>
               </div>
-              <div className="flex justify-between py-2">
+              <div className="flex justify-between py-1">
                 <dt className="text-text-secondary">Last Updated</dt>
                 <dd className="text-text-primary">{new Date(item.updatedAt).toLocaleString()}</dd>
               </div>
