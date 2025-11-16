@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { z } from 'zod';
 import Button from '../common/Button';
 import SchemaForm from '../common/SchemaForm';
+import { slugify } from '@/utils/slugify';
 import type { Item } from '@/types';
 
 interface ItemFormProps {
@@ -107,12 +108,15 @@ const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, o
       return;
     }
 
+    // Convert category name to slug for backend
+    const categorySlug = slugify(categoryValue);
+
     const submissionPayload: any = {
       name: validatedData.name,
       text: validatedData.text,
       priority: validatedData.priority || 'mid',
       tags: validatedData.tags || [],
-      categories: [categoryValue], // Always send as single-element array
+      categories: [categorySlug], // Always send as single-element array with slugified value
     };
 
     // Only include isCompleted for existing items
