@@ -12,7 +12,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         ref={ref}
         className={`
           w-checkbox h-checkbox rounded-checkbox border border-border bg-surface
-          text-primary focus-visible:outline-primary transition appearance-none
+          checked:bg-primary checked:border-primary checked:text-inverse
+          focus-visible:outline-primary transition appearance-none
           ${className}
         `.trim()}
         {...props}

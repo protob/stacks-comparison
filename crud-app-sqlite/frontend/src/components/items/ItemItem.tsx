@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import clsx from 'clsx';
 import Button from '../common/Button';
+import { Checkbox } from '../common/Checkbox';
 import type { Item, Priority } from '@/types';
 
 interface ItemItemProps {
@@ -36,11 +37,10 @@ const ItemItem = ({ item, onToggleComplete, onEdit, onDelete }: ItemItemProps) =
     <div className="p-card bg-modal-bg border border-modal-border rounded-card">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start flex-1 min-w-0 gap-component">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={item.isCompleted}
             onChange={handleToggleComplete}
-            className="mt-1 w-4 h-4 rounded border-border bg-surface text-primary focus:ring-primary focus:ring-1"
+            className="mt-1"
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-component mb-2">

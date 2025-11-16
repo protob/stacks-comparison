@@ -12,7 +12,8 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
         ref={ref}
         className={`
           w-radio h-radio rounded-full border border-border bg-surface
-          text-primary focus-visible:outline-primary transition appearance-none
+          checked:bg-primary checked:border-primary checked:text-inverse
+          focus-visible:outline-primary transition appearance-none
           ${className}
         `.trim()}
         {...props}
