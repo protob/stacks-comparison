@@ -132,7 +132,7 @@ const ItemPage = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
       <AppSidebar
         searchQuery={searchQuery}
@@ -146,13 +146,13 @@ const ItemPage = () => {
       />
 
       {/* Main Content */}
-      <div className="flex-1">
+      <div className="flex-1 overflow-y-auto">
         <div className="container max-w-4xl px-4 py-6 mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-neutral-100 mb-1">Items</h1>
-              <p className="text-neutral-400">
+              <h1 className="text-2xl font-bold text-text-primary mb-1">Items</h1>
+              <p className="text-text-secondary">
                 {hasActiveFilters ? `${totalFilteredItems} of ${totalItems}` : `${totalItems} total`} items
               </p>
             </div>
@@ -178,16 +178,16 @@ const ItemPage = () => {
           {/* Loading State */}
           {isLoading && Object.keys(itemTree).length === 0 && (
             <div className="py-12 text-center">
-              <Icon name="Loader2" className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-2" />
-              <p className="text-neutral-400">Loading items...</p>
+              <Icon name="Loader2" className="w-8 h-8 animate-spin text-primary mx-auto mb-2" />
+              <p className="text-text-secondary">Loading items...</p>
             </div>
           )}
           
           {/* Error State */}
           {error && (
-            <div className="p-6 text-center bg-red-900/20 border border-red-800 rounded">
-              <Icon name="AlertTriangle" className="w-8 h-8 text-red-400 mx-auto mb-2" />
-              <p className="text-red-300 mb-3">{error}</p>
+            <div className="p-6 text-center bg-danger-light border border-danger rounded">
+              <Icon name="AlertTriangle" className="w-8 h-8 text-danger mx-auto mb-2" />
+              <p className="text-danger mb-3">{error}</p>
               <Button onClick={retryFetch} variant="danger" size="sm">Retry</Button>
             </div>
           )}
@@ -195,11 +195,11 @@ const ItemPage = () => {
           {/* Empty State */}
           {!isLoading && !error && Object.keys(filteredItemTree).length === 0 && (
             <div className="py-12 text-center">
-              <Icon name="ClipboardList" className="w-16 h-16 text-neutral-600 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-neutral-300 mb-2">
+              <Icon name="ClipboardList" className="w-16 h-16 text-text-muted mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-text-secondary mb-2">
                 {hasActiveFilters ? 'No matching items' : 'No items yet'}
               </h2>
-              <p className="text-neutral-500 mb-4">
+              <p className="text-text-muted mb-4">
                 {hasActiveFilters ? 'Try adjusting your filters' : 'Create your first item to get started'}
               </p>
               {hasActiveFilters ? (
@@ -220,17 +220,17 @@ const ItemPage = () => {
               {Object.entries(filteredItemTree).map(([categoryName, categoryItems]) => (
                 <div key={categoryName}>
                   {/* Category Header */}
-                  <div className="flex items-center gap-3 pb-2 border-b border-neutral-700">
-                    <Button 
-                      variant="text" 
-                      size="sm" 
-                      icon="Plus" 
+                  <div className="flex items-center gap-3 pb-2 border-b border-border">
+                    <Button
+                      variant="text"
+                      size="sm"
+                      icon="Plus"
                       onClick={() => openAddModal(categoryName)}
-                      className="text-neutral-400 hover:text-neutral-200"
+                      className="text-text-secondary hover:text-text-primary"
                       aria-label={`Add item to ${categoryName}`}
                     />
-                    <h2 className="text-lg font-medium text-neutral-200">{categoryName}</h2>
-                    <span className="text-sm text-neutral-500">({categoryItems.length})</span>
+                    <h2 className="text-lg font-medium text-text-primary">{categoryName}</h2>
+                    <span className="text-sm text-text-muted">({categoryItems.length})</span>
                   </div>
                   
                   {/* Items in this category */}

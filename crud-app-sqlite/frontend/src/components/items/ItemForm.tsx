@@ -113,32 +113,34 @@ const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, o
   }, [item, onSubmit]);
 
   return (
-    <SchemaForm
-      schema={itemZodSchema}
-      value={formData}
-      onChange={setFormData}
-      layoutHints={layoutHints}
-      columns={1}
-      onSubmit={handleSubmit}
-      onCancel={onCancel}
-      showErrors={true}
-      footer={({ submit }) => (
-        <div className="flex justify-end pt-4 gap-component">
-          <Button type="button" variant="secondary" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            loading={isLoading}
-            onClick={submit}
-            icon={item?.id ? 'Save' : 'Plus'}
-          >
-            {item?.id ? 'Update Item' : 'Create Item'}
-          </Button>
-        </div>
-      )}
-    />
+    <div className="max-w-2xl mx-auto">
+      <SchemaForm
+        schema={itemZodSchema}
+        value={formData}
+        onChange={setFormData}
+        layoutHints={layoutHints}
+        columns={1}
+        onSubmit={handleSubmit}
+        onCancel={onCancel}
+        showErrors={true}
+        footer={({ submit }) => (
+          <div className="flex justify-end pt-4 gap-component">
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              loading={isLoading}
+              onClick={submit}
+              icon={item?.id ? 'Save' : 'Plus'}
+            >
+              {item?.id ? 'Update Item' : 'Create Item'}
+            </Button>
+          </div>
+        )}
+      />
+    </div>
   );
 };
 

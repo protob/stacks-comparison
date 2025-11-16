@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { Clock } from '@/components/common/Clock';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 interface AppSidebarProps {
@@ -24,7 +23,7 @@ const AppSidebar = ({
   tagPrefix = '#'
 }: AppSidebarProps) => {
   return (
-    <aside className="w-[--sidebar-width] bg-surface border-r border-border p-[--nav-padding] flex flex-col gap-[--gap-component-internal]">
+    <aside className="w-[--sidebar-width] h-full bg-surface border-r border-border p-nav overflow-y-auto flex flex-col gap-component">
       {/* Search Section */}
       <div>
         <h3 className="text-size-sm font-medium text-text-secondary mb-3">Search</h3>
@@ -62,9 +61,8 @@ const AppSidebar = ({
         </div>
       )}
 
-      {/* Theme Toggle and Clock */}
-      <div className="mt-auto flex items-center justify-between">
-        <Clock />
+      {/* Theme Toggle */}
+      <div className="mt-auto pt-4 flex items-center justify-end">
         <ThemeToggle />
       </div>
     </aside>
