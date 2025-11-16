@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 20:13:25 CET
+**Generated on:** nie, 16 lis 2025, 20:28:59 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
 
 ---
@@ -1559,6 +1559,7 @@ export const useUiStore = create<UiState>()(
 ## `src/schemas/itemSchema.ts`
 ```
 import { z } from 'zod';
+import type { SingleCategory } from '@/types';
 
 export const itemFormSchema = z.object({
   name: z.string()
@@ -1570,7 +1571,7 @@ export const itemFormSchema = z.object({
     errorMap: () => ({ message: 'Please select a priority' })
   }),
   tags: z.array(z.string()).optional(),
-  categories: z.tuple([z.string().min(1, 'Category is required')]),
+  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
 });
 
 export type ItemFormData = z.infer<typeof itemFormSchema>;

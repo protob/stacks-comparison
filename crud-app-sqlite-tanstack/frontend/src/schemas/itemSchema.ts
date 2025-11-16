@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { SingleCategory } from '@/types';
 
 export const itemFormSchema = z.object({
   name: z.string()
@@ -10,7 +11,7 @@ export const itemFormSchema = z.object({
     errorMap: () => ({ message: 'Please select a priority' })
   }),
   tags: z.array(z.string()).optional(),
-  categories: z.tuple([z.string().min(1, 'Category is required')]),
+  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
 });
 
 export type ItemFormData = z.infer<typeof itemFormSchema>;

@@ -1,6 +1,7 @@
 import { useForm } from '@tanstack/react-form';
 import { itemFormSchema } from '@/schemas/itemSchema';
 import { FormFieldWrapper } from '@/components/common/FormFieldWrapper';
+import { TagInput } from '@/components/common/TagInput';
 import type { Item } from '@/types';
 import type { CreateItemPayload } from '@/api/itemApi';
 import Button from '../common/Button';
@@ -26,8 +27,7 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
       // Validate on submit
       const result = itemFormSchema.safeParse(value);
       if (!result.success) {
-        // Show validation errors
-        console.error('Validation errors:', result.error.flatten());
+        console.error('Validation failed:', result.error);
         return;
       }
       
@@ -96,18 +96,11 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
       <form.Field
         name="tags"
         children={(field) => (
-          <FormFieldWrapper field={field} label="Tags (comma-separated)">
-            <input
-              type="text"
-              value={field.state.value?.join(', ') || ''}
-              onBlur={field.handleBlur}
-              onChange={(e) => 
-                field.handleChange(
-                  e.target.value.split(',').map(t => t.trim()).filter(Boolean)
-                )
-              }
-              placeholder="e.g., urgent, frontend"
-              className="w-full"
+          <FormFieldWrapper field={field} label="Tags">
+            <TagInput
+              value={field.state.value}
+              onChange={(tags) => field.handleChange(tags)}
+              placeholder="Type and press Enter or comma"
             />
           </FormFieldWrapper>
         )}
