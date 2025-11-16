@@ -101,7 +101,7 @@ const TagInput = ({
         {value.map((tag, index) => (
           <span
             key={`${tag}-${index}`}
-            className="tag-sm bg-primary-light text-primary rounded-button inline-flex items-center whitespace-nowrap"
+            className="tag-sm bg-primary-light text-primary rounded-button whitespace-nowrap"
           >
             <span>{tag}</span>
             <button
@@ -111,10 +111,10 @@ const TagInput = ({
                 removeTag(index);
               }}
               tabIndex={-1}
-              className="btn-icon-xs inline-flex items-center justify-center ml-1 text-primary hover:text-danger hover:bg-danger/20 focus-visible:outline-none transition-colors"
+              className="btn-icon-xs text-primary hover:text-danger hover:bg-danger/20 focus-visible:outline-none transition-colors"
               aria-label={`Remove ${tag}`}
             >
-              <Icon name="X" className="w-2.5 h-2.5 leading-none" />
+              <Icon name="X" className="block w-3 h-3" />
             </button>
           </span>
         ))}

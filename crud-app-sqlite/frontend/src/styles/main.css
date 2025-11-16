@@ -456,7 +456,8 @@
 
   /* Tag/Chip Utilities */
   .tag-sm {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     vertical-align: middle;
     padding-left: var(--spacing-2);
     padding-right: var(--spacing-2);
@@ -466,12 +467,14 @@
     font-weight: var(--font-weight-medium);
     line-height: var(--line-height-tight);
     white-space: nowrap;
+    gap: var(--spacing-1);
   }
 
   /* Button Size Utilities - Icon Only */
   .btn-icon-xs {
     padding: 0;
     margin: 0;
+    margin-left: var(--spacing-1);
     border: none;
     background: none;
     border-radius: 50%;
@@ -479,7 +482,7 @@
     height: 1rem;
     min-width: 1rem;
     min-height: 1rem;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
