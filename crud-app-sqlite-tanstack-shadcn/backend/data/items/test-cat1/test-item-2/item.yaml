@@ -1,0 +1,12 @@
+id: 1dd4887c-f36b-4232-a8c5-c331a2efe247
+slug: test-item-2
+name: test item 2
+text: asfgsdrfgfasdgafsd
+isCompleted: false
+priority: mid
+tags:
+    - sdfgasdffgfasd
+categories:
+    - test-cat1
+createdAt: 2025-05-31T11:25:53.595039474Z
+updatedAt: 2025-05-31T11:25:53.595039474Z
