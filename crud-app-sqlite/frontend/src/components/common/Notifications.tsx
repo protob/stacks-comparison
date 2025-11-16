@@ -7,7 +7,7 @@ export default function Notifications() {
   return (
     <div className="fixed bottom-4 right-4 flex flex-col gap-spacing-2">
       {notifications.map(n => (
-        <div key={n.id} className={clsx('p-spacing-3 rounded-radius-md shadow-md', {
+        <div key={n.id} className={clsx('p-spacing-4 rounded-radius-md shadow-md text-base', {
           'bg-success text-inverse': n.type === 'success',
           'bg-danger text-inverse': n.type === 'error',
           'bg-primary text-inverse': n.type === 'info',

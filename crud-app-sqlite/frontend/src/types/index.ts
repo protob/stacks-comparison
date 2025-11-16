@@ -33,3 +33,23 @@ export interface Notification {
   duration?: number;
   timestamp: number;
 }
+
+export interface ItemTree {
+  [categorySlug: string]: Item[];
+}
+
+export interface CreateItemPayload {
+  name: string;
+  text: string;
+  priority: Priority;
+  tags: string[];
+  categories: SingleCategory<string>;
+}
+
+export interface UpdateItemPayload {
+  name?: string;
+  text?: string;
+  priority?: Priority;
+  tags?: string[];
+  isCompleted?: boolean;
+}

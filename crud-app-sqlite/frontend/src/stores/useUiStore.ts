@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { Notification, NotificationType } from '@/types'
 
 type Theme = 'light' | 'dark' | 'system'
 

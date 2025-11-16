@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @import "./styles/main.css";
 
 @layer base {
@@ -14,8 +15,9 @@
     padding: var(--input-padding-y) var(--input-padding-x);
     border: var(--input-border-width) solid var(--color-border);
     border-radius: var(--input-radius);
-    background-color: var(--color-surface);
-    color: var(--color-text-primary);
+    background-color: var(--color-input-bg, var(--color-surface));
+    color: var(--color-input-text, var(--color-text-primary));
+    border-color: var(--color-input-border, var(--color-border));
   }
 
   input:focus, textarea:focus, select:focus {
@@ -25,6 +27,10 @@
 
   input[type="checkbox"] {
     width: auto;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: var(--color-input-placeholder, var(--color-text-muted));
   }
 }
 

@@ -29,7 +29,7 @@ export default function AppSidebar({ allTags, selectedTags, onTagSelect, onSearc
       <h3 className="text-primary font-medium mb-spacing-2">Tags</h3>
       <div className="flex flex-wrap gap-spacing-2">
         {allTags.map(tag => (
-          <button key={tag} onClick={() => toggleTag(tag)} className={clsx('px-3 py-1 rounded-radius-md', selectedTags.includes(tag) ? 'bg-primary text-inverse' : 'bg-surface-hover text-secondary')}>
+          <button key={tag} onClick={() => toggleTag(tag)} className={clsx('px-4 py-2 rounded-radius-md', selectedTags.includes(tag) ? 'bg-primary text-inverse' : 'bg-surface-hover text-secondary')}>
             {tag}
           </button>
         ))}

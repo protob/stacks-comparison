@@ -18,28 +18,28 @@ export default function ItemItem({ item, categorySlug }: Props) {
   }[item.priority]
 
   return (
-    <div className="bg-surface rounded-card-radius p-card-padding shadow-card-shadow flex flex-col gap-spacing-2">
+    <div className="bg-surface rounded-card-radius p-card-padding shadow-card-shadow flex flex-col gap-spacing-3">
       <div className="flex justify-between items-start">
-        <div className="flex items-center gap-spacing-2">
+        <div className="flex items-center gap-spacing-3">
           <input
             type="checkbox"
             checked={item.isCompleted}
             onChange={() => toggleItemCompletion(categorySlug, item.slug)}
-            className="w-4 h-4"
+            className="w-5 h-5"
           />
-          <h3 className={clsx('font-medium', item.isCompleted ? 'line-through text-muted' : 'text-primary')}>{item.name}</h3>
+          <h3 className={clsx('font-medium text-lg', item.isCompleted ? 'line-through text-muted' : 'text-primary')}>{item.name}</h3>
         </div>
-        <span className={clsx('px-2 py-1 text-xs rounded-radius-sm', priorityColor)}>{item.priority}</span>
+        <span className={clsx('px-2 py-1 text-sm rounded-radius-sm', priorityColor)}>{item.priority}</span>
       </div>
-      <p className="text-muted text-sm">{item.text}</p>
-      <div className="flex flex-wrap gap-spacing-1">
+      <p className="text-muted text-base">{item.text}</p>
+      <div className="flex flex-wrap gap-spacing-2">
         {item.tags.map(tag => (
-          <span key={tag} className="bg-surface-hover text-muted text-xs px-2 py-1 rounded-radius-sm">{tag}</span>
+          <span key={tag} className="bg-surface-hover text-muted text-sm px-2 py-1 rounded-radius-sm">{tag}</span>
         ))}
       </div>
       <div className="flex justify-end mt-auto">
         <button onClick={() => deleteItem(categorySlug, item.slug)} className="text-danger">
-          <Icon name="Trash" className="w-4 h-4" />
+          <Icon name="Trash" className="w-5 h-5" />
         </button>
       </div>
     </div>

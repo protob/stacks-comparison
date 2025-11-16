@@ -1,4 +1,12 @@
 import clsx from 'clsx'
+import type { Priority } from '@/types'
+
+interface FilterOptions {
+  searchQuery: string
+  selectedPriority: 'all' | Priority
+  showCompleted: boolean
+  selectedTags: string[]
+}
 
 interface Props {
   filters: FilterOptions
@@ -17,7 +25,7 @@ export default function FilterBar({ filters, onChange }: Props) {
             key={p}
             onClick={() => onChange({ ...filters, selectedPriority: p })}
             className={clsx(
-              'w-5 h-5 rounded-full', /* Smaller size */
+              'w-6 h-6 rounded-full',
               p === 'all' ? 'bg-primary' : p === 'high' ? 'bg-danger' : p === 'mid' ? 'bg-warning' : 'bg-success',
               filters.selectedPriority === p ? 'ring-2 ring-border-focus' : ''
             )}

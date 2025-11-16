@@ -1,9 +1,5 @@
 import { useMemo } from 'react';
-import type { Item, Priority } from '@/types';
-
-export interface ItemTree {
-  [categorySlug: string]: Item[];
-}
+import type { Item, Priority, ItemTree } from '@/types';
 
 interface FilterOptions {
   searchQuery: string;
