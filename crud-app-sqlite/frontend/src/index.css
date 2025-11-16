@@ -15,15 +15,28 @@
     border-radius: var(--input-radius);
     background-color: var(--color-surface);
     color: var(--color-text-primary);
+    font-size: var(--input-font-size);
   }
 
   input:focus, textarea:focus, select:focus {
     border-color: var(--color-border-focus);
-    box-shadow: 0 0 0 1px var(--color-border-focus) / 50%;
+    outline: none;
+    box-shadow: 0 0 0 1px var(--color-border-focus);
+  }
+
+  input[type="checkbox"], input[type="radio"] {
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    padding: 0;
+    flex-shrink: 0;
   }
 
   input[type="checkbox"] {
-    width: auto;
+    border-radius: var(--checkbox-radius);
+  }
+
+  input[type="radio"] {
+    border-radius: 50%;
   }
 }
 
