@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ItemPage from './pages/ItemPage';
 import Notifications from './components/common/Notifications';
 

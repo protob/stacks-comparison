@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
+import tailwindcss from 'tailwindcss';
 import AutoImport from 'unplugin-auto-import/vite';
 import { fileURLToPath, URL } from 'node:url';
 
@@ -15,8 +15,8 @@ export default defineConfig({
       imports: [
         'react',
         {
-          'react-router': ['useNavigate', 'useParams', 'useLocation', 'useSearchParams'],
-          'zustand': [['create', 'create']],
+          'react-router-dom': ['useNavigate', 'useParams', 'useLocation', 'useSearchParams'],
+          'zustand': [['default', 'create']],
           'zustand/middleware': ['devtools', 'persist'],
           'clsx': [['default', 'clsx']],
         },
@@ -37,6 +37,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+  },
+  css: {
+    postcss: {
+      plugins: [tailwindcss],
+    },
   },
   server: {
     watch: {
