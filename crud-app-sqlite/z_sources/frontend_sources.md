@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 14:40:35 CET
+**Generated on:** nie, 16 lis 2025, 16:53:38 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite/frontend
 
 ---
@@ -332,6 +332,126 @@ Pre-defined tokens for consistent component styling:
 - **Cards:** `--card-radius`, `--card-padding`, `--card-shadow`
 - **Inputs:** `--input-radius`, `--input-padding-x/y`, `--input-border-width`
 - **Layout:** `--nav-height`, `--sidebar-width`, `--container-max`
+
+### Token Usage Guide
+
+**IMPORTANT:** Always use semantic design tokens instead of raw Tailwind utilities. This ensures consistent theming and makes the design system maintainable.
+
+#### Color Classes (Tailwind mapped to tokens)
+
+Use these semantic classes everywhere:
+
+```jsx
+// ✅ CORRECT - Using semantic tokens
+<div className="bg-surface text-text-primary border-border">
+<div className="bg-modal-bg border-modal-border">
+<button className="bg-primary text-text-inverse hover:bg-primary-hover">
+<span className="text-text-secondary">Secondary text</span>
+<span className="text-text-muted">Muted text</span>
+<div className="bg-danger text-danger">Error state</div>
+
+// ❌ WRONG - Using raw color values
+<div className="bg-gray-800 text-gray-100 border-gray-700">
+<div className="bg-neutral-800 border-neutral-600">
+<button className="bg-blue-600 text-white hover:bg-blue-700">
+```
+
+**Available semantic color tokens:**
+- **Backgrounds:** `bg-background`, `bg-surface`, `bg-surface-hover`, `bg-surface-active`, `bg-modal-bg`
+- **Text:** `text-text-primary`, `text-text-secondary`, `text-text-muted`, `text-text-inverse`
+- **Borders:** `border-border`, `border-border-hover`, `border-border-focus`, `border-modal-border`
+- **Brand:** `bg-primary`, `bg-primary-hover`, `bg-primary-active`, `text-primary`
+- **States:** `bg-success`, `bg-danger`, `bg-warning`, `text-success`, `text-danger`, `text-warning`
+- **State backgrounds:** `bg-success-light`, `bg-danger-light`, `bg-warning-light`
+
+#### Typography Classes
+
+Use token-based text size utilities:
+
+```jsx
+// ✅ CORRECT - Token-based sizes
+<h1 className="text-size-xl">Large heading</h1>
+<p className="text-size-base">Body text</p>
+<span className="text-size-sm">Small text</span>
+<span className="text-size-xs">Extra small text</span>
+
+// ❌ WRONG - Raw Tailwind sizes
+<h1 className="text-xl">Large heading</h1>
+<p className="text-base">Body text</p>
+```
+
+#### Spacing & Layout
+
+Use token-based spacing utilities:
+
+```jsx
+// ✅ CORRECT - Token-based spacing
+<div className="p-card">Card with padding</div>
+<div className="px-input-x py-input-y">Input padding</div>
+<div className="p-nav">Navigation padding</div>
+<div className="gap-component">Component gap</div>
+<div className="gap-grid">Grid gap</div>
+
+// ❌ WRONG - Raw spacing values
+<div className="p-4">Card with padding</div>
+<div className="px-3 py-2">Input padding</div>
+<div className="gap-2">Component gap</div>
+```
+
+#### Border Radius
+
+Use semantic radius classes:
+
+```jsx
+// ✅ CORRECT - Token-based radius
+<button className="rounded-button">Button</button>
+<div className="rounded-card">Card</div>
+<input className="rounded-input" />
+
+// ❌ WRONG - Raw radius values
+<button className="rounded-md">Button</button>
+<div className="rounded-lg">Card</div>
+```
+
+#### Button Sizing
+
+Buttons use custom utility classes for consistent sizing:
+
+```jsx
+// Icon-only buttons automatically use token-based sizing
+<Button size="sm" icon="Edit" />  // Uses .btn-icon-sm internally
+<Button size="md" icon="Plus" />  // Uses .btn-icon-md internally
+
+// Buttons with text also use token-based sizing
+<Button size="sm">Submit</Button>  // Uses .btn-sm internally
+<Button size="md">Submit</Button>  // Uses .btn-md internally
+```
+
+**Available button utilities:** `.btn-xs`, `.btn-sm`, `.btn-md`, `.btn-lg`, `.btn-icon-xs`, `.btn-icon-sm`, `.btn-icon-md`, `.btn-icon-lg`
+
+#### Tags & Badges
+
+Use the `.tag-sm` utility for consistent tag/badge styling:
+
+```jsx
+// ✅ CORRECT - Using tag utility
+<span className="tag-sm bg-surface-hover text-text-secondary rounded-button">
+  Tag
+</span>
+
+// ❌ WRONG - Raw padding and text size
+<span className="px-2 py-1 text-xs bg-gray-700">Tag</span>
+```
+
+#### Custom Token Utilities
+
+The design system provides these custom utilities (defined in `src/styles/main.css`):
+
+- **Text sizes:** `.text-size-xs`, `.text-size-sm`, `.text-size-base`, `.text-size-lg`, `.text-size-xl`
+- **Tags:** `.tag-sm` (includes padding and font-size)
+- **Buttons:** `.btn-xs`, `.btn-sm`, `.btn-md`, `.btn-lg` (with text), `.btn-icon-*` (icon-only)
+- **Container queries:** `.container-aware`, `.grid-auto-items`
+- **Performance:** `.contain-strict`, `.item-list`, `.hardware-accelerate`
 
 ### Responsive Design
 
@@ -853,7 +973,11 @@ export const useItemStore = create<ItemState>()(
       },
 
       toggleItemCompletion: async (item) => {
-        return get().updateItem(slugify(item.categories[0]), item.slug, { isCompleted: !item.isCompleted });
+        const categorySlug = slugify(item.categories[0]);
+        return get().updateItem(categorySlug, item.slug, {
+          isCompleted: !item.isCompleted,
+          categories: [categorySlug] // Always include current category
+        });
       },
 
       deleteItem: async (categorySlug, itemSlug) => {
@@ -1064,7 +1188,9 @@ export const useUiStore = create<UiState>()(
   --spacing-px: 1px;
   --spacing-0_5: clamp(0.125rem, 0.1rem + 0.125vw, 0.25rem);  /* 2-4px */
   --spacing-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);     /* 4-8px */
+  --spacing-1_5: clamp(0.375rem, 0.3rem + 0.375vw, 0.75rem);  /* 6-12px */
   --spacing-2: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);      /* 8-16px */
+  --spacing-2_5: clamp(0.625rem, 0.5rem + 0.625vw, 1.25rem);  /* 10-20px */
   --spacing-3: clamp(0.75rem, 0.6rem + 0.75vw, 1.5rem);     /* 12-24px */
   --spacing-4: clamp(1rem, 0.8rem + 1vw, 2rem);        /* 16-32px */
   --spacing-5: clamp(1.25rem, 1rem + 1.25vw, 2.5rem);     /* 20-40px */
@@ -1163,6 +1289,11 @@ export const useUiStore = create<UiState>()(
   --color-border-hover: var(--color-gray-300);
   --color-border-focus: var(--color-blue-500);
 
+  /* Modal & Overlay */
+  --color-backdrop: rgb(0 0 0 / 0.7);
+  --color-modal-bg: var(--color-surface);
+  --color-modal-border: var(--color-border);
+
   /* =========================
      3. COMPONENT TOKENS - Specific use for Todo app
      ========================= */
@@ -1171,6 +1302,33 @@ export const useUiStore = create<UiState>()(
   --button-radius: var(--radius-md);
   --button-font-weight: var(--font-weight-medium);
   --button-transition: 150ms;
+
+  /* Button Sizes - Icon Only */
+  --button-icon-xs: var(--spacing-1);
+  --button-icon-sm: var(--spacing-1_5);
+  --button-icon-md: var(--spacing-2);
+  --button-icon-lg: var(--spacing-2_5);
+
+  /* Button Sizes - With Text */
+  --button-xs-px: var(--spacing-2_5);
+  --button-xs-py: var(--spacing-1);
+  --button-xs-gap: var(--spacing-1);
+  --button-xs-text: var(--font-size-xs);
+
+  --button-sm-px: var(--spacing-3);
+  --button-sm-py: var(--spacing-1_5);
+  --button-sm-gap: var(--spacing-1_5);
+  --button-sm-text: var(--font-size-sm);
+
+  --button-md-px: var(--spacing-4);
+  --button-md-py: var(--spacing-2);
+  --button-md-gap: var(--spacing-2);
+  --button-md-text: var(--font-size-base);
+
+  --button-lg-px: var(--spacing-5);
+  --button-lg-py: var(--spacing-2_5);
+  --button-lg-gap: var(--spacing-2_5);
+  --button-lg-text: var(--font-size-lg);
 
   /* Card/Item Components */
   --card-radius: var(--radius-lg);
@@ -1182,6 +1340,12 @@ export const useUiStore = create<UiState>()(
   --input-padding-x: var(--spacing-3);
   --input-padding-y: var(--spacing-2);
   --input-border-width: 1px;
+  --input-font-size: var(--font-size-base);
+
+  /* Checkbox/Radio sizing */
+  --checkbox-size: 1.125rem; /* 18px - reasonable, accessible size */
+  --radio-size: 1.125rem;    /* 18px - same as checkbox for consistency */
+  --checkbox-radius: var(--radius-sm);  /* Subtle rounded corners for checkboxes */
 
   /* Navigation/Sidebar */
   --nav-height: clamp(3rem, 2.5rem + 2.5vw, 4rem);
@@ -1291,7 +1455,21 @@ export const useUiStore = create<UiState>()(
   --color-blue-800: oklch(0.35 0.175 240);
   --color-blue-900: oklch(0.30 0.150 240);
 
-  /* Green, Red, Amber as in example  look here  0_docs/sample-style.css*/
+  /* Green */
+  --color-green-50:  oklch(0.971 0.018 142);
+  --color-green-500: oklch(0.647 0.190 142);
+  --color-green-600: oklch(0.519 0.195 142);
+
+  /* Red */
+  --color-red-50:   oklch(0.971 0.018 27);
+  --color-red-500:  oklch(0.637 0.237 27);
+  --color-red-600:  oklch(0.577 0.237 27);
+  --color-red-700:  oklch(0.517 0.237 27);
+
+  /* Amber */
+  --color-amber-50:  oklch(0.987 0.021 91);
+  --color-amber-500: oklch(0.769 0.183 84);
+  --color-amber-600: oklch(0.659 0.181 75);
 }
 
 /* Dark mode overrides (class strategy) */
@@ -1304,7 +1482,7 @@ export const useUiStore = create<UiState>()(
   --color-text-primary: var(--color-gray-50);
   --color-text-secondary: var(--color-gray-400);
   --color-text-muted: var(--color-gray-500);
-  --color-text-inverse: var(--color-gray-900);
+  --color-text-inverse: var(--color-gray-0);
 
   --color-border: var(--color-gray-800);
   --color-border-hover: var(--color-gray-700);
@@ -1313,6 +1491,11 @@ export const useUiStore = create<UiState>()(
   --color-input-border: var(--color-gray-600);
   --color-input-text: var(--color-gray-100);
   --color-input-placeholder: var(--color-gray-500);
+
+  /* Modal & Overlay in dark mode */
+  --color-backdrop: rgb(0 0 0 / 0.85);
+  --color-modal-bg: var(--color-gray-800);
+  --color-modal-border: var(--color-gray-700);
 }
 
 /* ============================================
@@ -1362,6 +1545,89 @@ export const useUiStore = create<UiState>()(
 
   ::selection {
     @apply bg-primary/20 text-primary;
+  }
+
+  /* Text Size Utilities - Token-based */
+  .text-size-xs { font-size: var(--font-size-xs); }
+  .text-size-sm { font-size: var(--font-size-sm); }
+  .text-size-base { font-size: var(--font-size-base); }
+  .text-size-lg { font-size: var(--font-size-lg); }
+  .text-size-xl { font-size: var(--font-size-xl); }
+
+  /* Tag/Chip Utilities */
+  .tag-sm {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    padding-left: var(--spacing-2);
+    padding-right: var(--spacing-2);
+    padding-top: var(--spacing-0_5);
+    padding-bottom: var(--spacing-0_5);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-tight);
+    white-space: nowrap;
+    gap: var(--spacing-1);
+  }
+
+  /* Button Size Utilities - Icon Only */
+  .btn-icon-xs {
+    padding: 0;
+    margin: 0;
+    margin-left: var(--spacing-1);
+    border: none;
+    background: none;
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    min-width: 1rem;
+    min-height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 0;
+    transition: color 150ms, background-color 150ms;
+  }
+  .btn-icon-sm { padding: var(--button-icon-sm); }
+  .btn-icon-md { padding: var(--button-icon-md); }
+  .btn-icon-lg { padding: var(--button-icon-lg); }
+
+  /* Button Size Utilities - With Text */
+  .btn-xs {
+    padding-left: var(--button-xs-px);
+    padding-right: var(--button-xs-px);
+    padding-top: var(--button-xs-py);
+    padding-bottom: var(--button-xs-py);
+    gap: var(--button-xs-gap);
+    font-size: var(--button-xs-text);
+  }
+
+  .btn-sm {
+    padding-left: var(--button-sm-px);
+    padding-right: var(--button-sm-px);
+    padding-top: var(--button-sm-py);
+    padding-bottom: var(--button-sm-py);
+    gap: var(--button-sm-gap);
+    font-size: var(--button-sm-text);
+  }
+
+  .btn-md {
+    padding-left: var(--button-md-px);
+    padding-right: var(--button-md-px);
+    padding-top: var(--button-md-py);
+    padding-bottom: var(--button-md-py);
+    gap: var(--button-md-gap);
+    font-size: var(--button-md-text);
+  }
+
+  .btn-lg {
+    padding-left: var(--button-lg-px);
+    padding-right: var(--button-lg-px);
+    padding-top: var(--button-lg-py);
+    padding-bottom: var(--button-lg-py);
+    gap: var(--button-lg-gap);
+    font-size: var(--button-lg-text);
   }
 }
 
@@ -1523,15 +1789,82 @@ export interface Notification {
     border-radius: var(--input-radius);
     background-color: var(--color-surface);
     color: var(--color-text-primary);
+    font-size: var(--input-font-size);
   }
 
   input:focus, textarea:focus, select:focus {
     border-color: var(--color-border-focus);
-    box-shadow: 0 0 0 1px var(--color-border-focus) / 50%;
+    outline: none;
+    box-shadow: 0 0 0 1px var(--color-border-focus);
+  }
+
+  input[type="checkbox"], input[type="radio"] {
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    padding: 0;
+    flex-shrink: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    cursor: pointer;
   }
 
   input[type="checkbox"] {
-    width: auto;
+    border-radius: var(--checkbox-radius);
+  }
+
+  input[type="radio"] {
+    border-radius: 50%;
+  }
+
+  /* Checked state - custom styling */
+  input[type="checkbox"]:checked,
+  input[type="radio"]:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  /* Checkmark for checkbox */
+  input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 0.25rem;
+    height: 0.5rem;
+    border: solid var(--color-text-inverse);
+    border-width: 0 2px 2px 0;
+  }
+
+  /* Dot for radio */
+  input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--color-text-inverse);
+  }
+
+  /* Focus states */
+  input[type="checkbox"]:focus-visible,
+  input[type="radio"]:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Disabled state */
+  input[type="checkbox"]:disabled,
+  input[type="radio"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
@@ -1700,11 +2033,70 @@ export const api = { get, post, patch, delete: del };
 ## `tailwind.config.js`
 ```
 module.exports = {
+  darkMode: 'class',
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
   ],
-  theme: {},
+  theme: {
+    extend: {
+      colors: {
+        // Semantic token mappings
+        background: 'var(--color-background)',
+        surface: 'var(--color-surface)',
+        'surface-hover': 'var(--color-surface-hover)',
+        'surface-active': 'var(--color-surface-active)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-muted': 'var(--color-text-muted)',
+        'text-inverse': 'var(--color-text-inverse)',
+        primary: 'var(--color-primary)',
+        'primary-hover': 'var(--color-primary-hover)',
+        'primary-active': 'var(--color-primary-active)',
+        'primary-light': 'var(--color-primary-light)',
+        success: 'var(--color-success)',
+        'success-light': 'var(--color-success-light)',
+        danger: 'var(--color-danger)',
+        'danger-light': 'var(--color-danger-light)',
+        'danger-hover': 'var(--color-red-700)',
+        warning: 'var(--color-warning)',
+        'warning-light': 'var(--color-warning-light)',
+        border: 'var(--color-border)',
+        'border-hover': 'var(--color-border-hover)',
+        'border-focus': 'var(--color-border-focus)',
+        backdrop: 'var(--color-backdrop)',
+        'modal-bg': 'var(--color-modal-bg)',
+        'modal-border': 'var(--color-modal-border)',
+      },
+      spacing: {
+        'input-x': 'var(--input-padding-x)',
+        'input-y': 'var(--input-padding-y)',
+        'card': 'var(--card-padding)',
+        'nav': 'var(--nav-padding)',
+      },
+      width: {
+        'checkbox': 'var(--checkbox-size)',
+        'radio': 'var(--radio-size)',
+      },
+      height: {
+        'checkbox': 'var(--checkbox-size)',
+        'radio': 'var(--radio-size)',
+      },
+      borderRadius: {
+        'button': 'var(--button-radius)',
+        'card': 'var(--card-radius)',
+        'input': 'var(--input-radius)',
+        'checkbox': 'var(--checkbox-radius)',
+      },
+      fontWeight: {
+        button: 'var(--button-font-weight)',
+      },
+      gap: {
+        'component': 'var(--gap-component-internal)',
+        'grid': 'var(--gap-grid-items)',
+      },
+    },
+  },
   plugins: [],
 };
 

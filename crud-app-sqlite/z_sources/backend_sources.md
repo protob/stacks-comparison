@@ -1,6 +1,6 @@
 # Backend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 11:41:13 CET
+**Generated on:** nie, 16 lis 2025, 16:53:31 CET
 **Backend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite/backend
 **Tech Stack:** Go, SQLite, Huma, Chi, sqlc, Air
 
@@ -204,7 +204,18 @@ func main() {
 		log.Fatalf("FATAL: Could not load config: %v", err)
 	}
 
-	// Initialize database
+	// Ensure DB exists and schema applied if new
+	created, err := database.EnsureDBExists(cfg.DatabaseURL, "db/schema.sql")
+	if err != nil {
+		log.Fatalf("FATAL: Database preparation failed: %v", err)
+	}
+	if created {
+		fmt.Println("✅ Database created and schema applied")
+	} else {
+		fmt.Println("ℹ️ Database exists, skipping schema apply")
+	}
+
+	// Initialize database connection
 	db, err := database.NewDatabase(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("FATAL: Could not initialize database: %v", err)
@@ -212,11 +223,6 @@ func main() {
 	defer db.Close()
 
 	fmt.Println("✅ Database connected successfully")
-
-	// Apply schema to ensure all tables exist
-	if err := database.ApplySchema(db.DB, "db/schema.sql"); err != nil {
-		log.Fatalf("FATAL: Could not apply database schema: %v", err)
-	}
 
 	// Initialize services
 	itemService := services.NewItemService(db.Queries)
@@ -240,7 +246,6 @@ func main() {
 	}))
 
 	// Setup Huma API for OpenAPI documentation
-	// This auto-generates /docs and /openapi.json endpoints
 	apiConfig := huma.DefaultConfig("Items CRUD API", "1.0.0")
 	apiConfig.Info.Description = "Items CRUD API with SQLite, Huma, Chi, and sqlc"
 	apiConfig.Servers = []*huma.Server{
@@ -1801,60 +1806,101 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"items-api/internal/db"
 	"os"
+	"path/filepath"
+	"items-api/internal/db"
 
 	_ "modernc.org/sqlite"
 )
 
+// EnsureDBExists creates DB directory and schema if DB does not exist
+func EnsureDBExists(dbPath string, schemaPath string) (bool, error) {
+	dbDir := filepath.Dir(dbPath)
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		return false, fmt.Errorf("failed to create DB directory: %w", err)
+	}
+
+	if _, err := os.Stat(dbPath); err == nil {
+		// DB exists, no action needed
+		return false, nil
+	} else if !os.IsNotExist(err) {
+		return false, fmt.Errorf("failed to stat DB file: %w", err)
+	}
+
+	// DB does not exist, create empty DB by opening and applying schema
+	dbConn, err := sql.Open("sqlite", fmt.Sprintf("file:%s", dbPath))
+	if err != nil {
+		return false, fmt.Errorf("failed to open database to create schema: %w", err)
+	}
+	defer dbConn.Close()
+
+	// Apply PRAGMA for faster schema apply
+	pragmas := []string{
+		"PRAGMA foreign_keys = ON",
+		"PRAGMA journal_mode = WAL",
+		"PRAGMA synchronous = OFF",
+		"PRAGMA cache_size = -64000",
+		"PRAGMA temp_store = MEMORY",
+	}
+
+	for _, pragma := range pragmas {
+		if _, err := dbConn.Exec(pragma); err != nil {
+			return false, fmt.Errorf("failed to exec pragma %s: %w", pragma, err)
+		}
+	}
+
+	schema, err := os.ReadFile(schemaPath)
+	if err != nil {
+		return false, fmt.Errorf("failed to read schema file: %w", err)
+	}
+	if _, err := dbConn.Exec(string(schema)); err != nil {
+		return false, fmt.Errorf("failed to apply schema: %w", err)
+	}
+
+	return true, nil
+}
+
+// Database wraps sql.DB and queries
 type Database struct {
 	DB      *sql.DB
 	Queries *db.Queries
 }
 
+// NewDatabase opens DB and configures it for app usage
 func NewDatabase(dbPath string) (*Database, error) {
 	fmt.Printf("🗄️ Initializing database at: %s\n", dbPath)
 
-	// Open database with modernc.org/sqlite driver
 	dbConn, err := sql.Open("sqlite", fmt.Sprintf("file:%s", dbPath))
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
-	// Test connection
 	if err := dbConn.Ping(); err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	// Configure database settings via PRAGMA statements
-	// This is more reliable than connection string parameters
 	pragmas := []string{
 		"PRAGMA foreign_keys = ON",
-		"PRAGMA journal_mode = WAL",          // Enable Write-Ahead Logging for concurrent writes
-		"PRAGMA busy_timeout = 5000",         // Wait up to 5 seconds on lock
-		"PRAGMA synchronous = NORMAL",        // Balance between safety and speed
-		"PRAGMA cache_size = -64000",         // 64MB cache
-		"PRAGMA temp_store = MEMORY",         // Keep temp tables in memory
+		"PRAGMA journal_mode = WAL",
+		"PRAGMA busy_timeout = 5000",
+		"PRAGMA synchronous = NORMAL",
+		"PRAGMA cache_size = -64000",
+		"PRAGMA temp_store = MEMORY",
 	}
 
 	for _, pragma := range pragmas {
 		if _, err := dbConn.Exec(pragma); err != nil {
-			return nil, fmt.Errorf("failed to execute %s: %w", pragma, err)
+			return nil, fmt.Errorf("failed to exec pragma %s: %w", pragma, err)
 		}
 	}
 
-	// Set connection pool limits for concurrent operations
-	// SQLite is single-writer, so limit to 1 connection for writes
-	// This completely eliminates SQLITE_BUSY errors
 	dbConn.SetMaxOpenConns(1)
 	dbConn.SetMaxIdleConns(1)
 
-	// Verify WAL mode is enabled
 	var journalMode string
 	if err := dbConn.QueryRow("PRAGMA journal_mode").Scan(&journalMode); err != nil {
 		return nil, fmt.Errorf("failed to verify journal mode: %w", err)
 	}
-
 	fmt.Printf("✅ Database configured: journal_mode=%s\n", journalMode)
 
 	queries := db.New(dbConn)
@@ -1867,20 +1913,6 @@ func NewDatabase(dbPath string) (*Database, error) {
 
 func (d *Database) Close() error {
 	return d.DB.Close()
-}
-
-// ApplySchema reads and applies the schema file to the database
-func ApplySchema(db *sql.DB, schemaPath string) error {
-	schema, err := os.ReadFile(schemaPath)
-	if err != nil {
-		return fmt.Errorf("failed to read schema file: %w", err)
-	}
-	_, err = db.Exec(string(schema))
-	if err != nil {
-		return fmt.Errorf("failed to apply schema: %w", err)
-	}
-	fmt.Println("✅ Database schema applied successfully")
-	return nil
 }
 
 ```
@@ -2506,25 +2538,17 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  # The command to build the application.
   cmd = "go build -o ./tmp/main ./cmd/server"
-  # The binary to run.
   bin = "./tmp/main"
-  # Watch these file extensions.
-  include_ext = ["go", "tpl", "tmpl", "html", "sql"]
-  # Ignore these directories.
+  include_ext = ["go", "sql"]
   exclude_dir = ["assets", "tmp", "vendor", "frontend", "data"]
-  # Log file for build errors.
   log = "air-build-errors.log"
-  # Delay between build and run.
-  delay = 1000 # ms
+  delay = 500
 
 [log]
-  # Show log time
   time = true
 
 [misc]
-  # Delete tmp directory on exit
   clean_on_exit = true
 
 ```

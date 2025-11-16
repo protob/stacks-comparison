@@ -246,15 +246,15 @@ func (q *Queries) GetItemsByCategory(ctx context.Context, categories string) ([]
 
 const updateItem = `-- name: UpdateItem :one
 UPDATE items
-SET 
-    name = COALESCE(?2, name),
-    slug = COALESCE(?3, slug),
-    text = COALESCE(?4, text),
-    is_completed = COALESCE(?5, is_completed),
-    priority = COALESCE(?6, priority),
-    tags = COALESCE(?7, tags),
-    categories = COALESCE(?8, categories)
-WHERE id = ?
+SET
+    name = COALESCE(?1, name),
+    slug = COALESCE(?2, slug),
+    text = COALESCE(?3, text),
+    is_completed = COALESCE(?4, is_completed),
+    priority = COALESCE(?5, priority),
+    tags = COALESCE(?6, tags),
+    categories = COALESCE(?7, categories)
+WHERE id = ?8
 RETURNING id, slug, name, text, is_completed, priority, tags, categories, created_at, updated_at
 `
 
