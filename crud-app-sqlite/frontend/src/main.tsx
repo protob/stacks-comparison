@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
-import './styles/main.css';
+import './index.css';
 import { useUiStore } from './stores/useUiStore';
 
 const Root = () => {
@@ -10,13 +10,26 @@ const Root = () => {
 
   React.useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('light', 'dark');
 
+    const applyTheme = () => {
+      root.classList.remove('light', 'dark');
+
+      if (theme === 'system') {
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.classList.add(systemDark ? 'dark' : 'light');
+      } else {
+        root.classList.add(theme);
+      }
+    };
+
+    applyTheme();
+
+    // Listen for system theme changes when in system mode
     if (theme === 'system') {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.add(systemDark ? 'dark' : 'light');
-    } else {
-      root.classList.add(theme);
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => applyTheme();
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
   }, [theme]);
 
