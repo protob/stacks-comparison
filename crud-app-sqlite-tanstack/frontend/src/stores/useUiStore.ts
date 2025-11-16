@@ -18,9 +18,11 @@ interface UiState {
 }
 
 const getInitialTheme = (): Theme => {
-  const saved = localStorage.getItem('theme');
-  if (saved && ['light', 'dark', 'system'].includes(saved)) {
-    return saved as Theme;
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const saved = localStorage.getItem('theme');
+    if (saved && ['light', 'dark', 'system'].includes(saved)) {
+      return saved as Theme;
+    }
   }
   return 'system';
 };

@@ -1,115 +1,57 @@
-import { useCallback } from 'react';
 import { Link } from '@tanstack/react-router';
-import clsx from 'clsx';
+import type { Item } from '@/types';
+import { formatDate } from '@/utils/helpers';
 import Button from '../common/Button';
-import { Checkbox } from '../common/Checkbox';
-import type { Item, Priority } from '@/types';
 
 interface ItemItemProps {
   item: Item;
   onToggleComplete: (item: Item) => void;
-  onEdit: (item: Item) => void;
   onDelete: (item: Item) => void;
+  onEdit: (item: Item) => void;
 }
 
-const ItemItem = ({ item, onToggleComplete, onEdit, onDelete }: ItemItemProps) => {
-  const getPriorityClass = useCallback((priority: Priority) => {
-    switch (priority) {
-      case 'high': return 'bg-danger-light text-danger border border-danger';
-      case 'mid': return 'bg-warning-light text-warning border border-warning';
-      case 'low': return 'bg-success-light text-success border border-success';
-      default: return 'bg-surface-hover text-text-muted';
-    }
-  }, []);
+const priorityClasses: { [key in Item['priority']]: string } = {
+  high: 'bg-danger text-text-inverse',
+  mid: 'bg-primary text-text-inverse',
+  low: 'bg-surface-hover text-text-secondary',
+};
 
-  const handleToggleComplete = useCallback(() => {
-    onToggleComplete(item);
-  }, [item, onToggleComplete]);
-
-  const handleEdit = useCallback(() => {
-    onEdit(item);
-  }, [item, onEdit]);
-
-  const handleDelete = useCallback(() => {
-    onDelete(item);
-  }, [item, onDelete]);
-
+export default function ItemItem({ item, onToggleComplete, onDelete, onEdit }: ItemItemProps) {
   return (
-    <div className="p-card bg-modal-bg border border-modal-border rounded-card">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start flex-1 min-w-0 gap-component">
-          <Checkbox
-            checked={item.isCompleted}
-            onChange={handleToggleComplete}
-            className="mt-1"
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-component mb-2">
-              <Link
-                to={`/items/${item.categories[0]}/${item.slug}`}
-                className={clsx(
-                  'font-medium text-size-lg hover:text-primary transition-colors',
-                  item.isCompleted ? 'line-through text-text-muted' : 'text-text-primary'
-                )}
-              >
-                {item.name}
-              </Link>
-              <span
-                className={clsx(
-                  'tag-sm rounded-button',
-                  getPriorityClass(item.priority)
-                )}
-              >
-                {item.priority.charAt(0).toUpperCase() + item.priority.slice(1)}
-              </span>
-            </div>
-
-            <p
-              className={clsx(
-                'text-size-sm mb-3',
-                item.isCompleted ? 'line-through text-text-muted' : 'text-text-secondary'
-              )}
-            >
-              {item.text || 'No description provided.'}
-            </p>
-
-            {item.tags?.length > 0 && (
-              <div className="max-h-16 overflow-y-auto scrollbar-thin">
-                <div className="flex flex-wrap gap-1">
-                  {item.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="tag-sm bg-primary-light text-primary rounded-button"
-                    >
+    <div className={`p-card bg-surface rounded-card shadow-sm transition-opacity ${item.isCompleted ? 'opacity-50' : ''}`}>
+      <div className="flex items-start gap-4">
+        <input
+          type="checkbox"
+          checked={item.isCompleted}
+          onChange={() => onToggleComplete(item)}
+          className="mt-1"
+        />
+        <div className="flex-1">
+          <div className="flex justify-between items-center">
+            <Link to="/items/$categorySlug/$itemSlug" params={{ categorySlug: item.categories[0], itemSlug: item.slug }}>
+                    <h3 className="text-size-base font-bold hover:underline">{item.name}</h3>
+                </Link>
+                <div className="flex items-center gap-2">
+                  <span className={`tag-sm rounded-button ${priorityClasses[item.priority]}`}>
+                    {item.priority}
+                  </span>
+                  <Button size="sm" variant="ghost" icon="Edit" onClick={() => onEdit(item)} />
+                  <Button size="sm" variant="ghost" icon="Trash2" onClick={() => onDelete(item)} className="text-danger" />
+                </div>
+              </div>
+              <p className="text-text-secondary text-size-sm mt-1">{item.text}</p>
+              <div className="flex items-center justify-between mt-3">
+                <div className="flex gap-2">
+                  {item.tags?.map(tag => (
+                    <span key={tag} className="tag-sm bg-surface-hover text-text-secondary rounded-button">
                       {tag}
                     </span>
                   ))}
                 </div>
+                <p className="text-text-muted text-size-xs">{formatDate(item.updatedAt)}</p>
               </div>
-            )}
+            </div>
           </div>
         </div>
-
-        <div className="flex gap-1">
-          <Button
-            variant="text"
-            size="sm"
-            onClick={handleEdit}
-            icon="Edit3"
-            aria-label="Edit item"
-          />
-          <Button
-            variant="text"
-            size="sm"
-            onClick={handleDelete}
-            icon="Trash2"
-            className="text-danger hover:text-danger-hover"
-            aria-label="Delete item"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ItemItem;
+      );
+    }

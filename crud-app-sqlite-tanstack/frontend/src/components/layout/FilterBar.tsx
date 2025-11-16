@@ -1,83 +1,47 @@
-import { Radio } from '@/components/common/Radio';
-import { Checkbox } from '@/components/common/Checkbox';
-
-interface FilterOption {
-  value: string;
-  label: string;
-}
+import type { Priority } from "@/types";
 
 interface FilterBarProps {
-  showPriorityFilter?: boolean;
-  priorityLabel?: string;
-  priorityOptions?: FilterOption[];
-  selectedPriority?: string;
-  onPriorityChange: (priority: string) => void;
-  
-  showStatusFilter?: boolean;
-  statusLabel?: string;
-  completedLabel?: string;
-  showCompleted?: boolean;
-  onShowCompletedChange: (show: boolean) => void;
+    selectedPriority: 'all' | Priority;
+    onPriorityChange: (priority: 'all' | Priority) => void;
+    showCompleted: boolean;
+    onShowCompletedChange: (show: boolean) => void;
 }
 
-const FilterBar = ({
-  showPriorityFilter = true,
-  priorityLabel = 'Priority',
-  priorityOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'high', label: 'High' },
-    { value: 'mid', label: 'Medium' },
-    { value: 'low', label: 'Low' },
-  ],
-  selectedPriority = 'all',
-  onPriorityChange,
-  
-  showStatusFilter = true,
-  statusLabel = 'Status',
-  completedLabel = 'Show completed',
-  showCompleted = false,
-  onShowCompletedChange
-}: FilterBarProps) => {
-  return (
-    <div className="flex items-center gap-8 mb-6 p-card bg-surface border border-border rounded">
-      {/* Priority Filter */}
-      {showPriorityFilter && (
-        <div>
-          <h4 className="text-size-sm font-medium text-text-secondary mb-2">{priorityLabel}</h4>
-          <div className="flex gap-4">
-            {priorityOptions.map((option) => (
-              <label
-                key={option.value}
-                className="flex items-center gap-2 text-size-sm text-text-muted"
-              >
-                <Radio
-                  value={option.value}
-                  checked={selectedPriority === option.value}
-                  onChange={(e) => onPriorityChange(e.target.value)}
-                  name="priority-filter"
-                />
-                {option.label}
-              </label>
-            ))}
-          </div>
+export default function FilterBar({
+    selectedPriority, onPriorityChange,
+    showCompleted, onShowCompletedChange
+}: FilterBarProps) {
+    return (
+        <div className="p-4 bg-surface rounded-card">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 className="font-semibold mb-2">Priority</h4>
+                        <div className="flex items-center gap-4">
+                            {(['all', 'high', 'mid', 'low'] as const).map(p => (
+                                <label key={p} className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="priority"
+                                        checked={selectedPriority === p}
+                                        onChange={() => onPriorityChange(p)}
+                                    />
+                                    <span className="capitalize">{p}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-2">Status</h4>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={showCompleted}
+                                onChange={(e) => onShowCompletedChange(e.target.checked)}
+                            />
+                            Show completed
+                        </label>
+                    </div>
+                </div>
         </div>
-      )}
-
-      {/* Status Filter */}
-      {showStatusFilter && (
-        <div>
-          <h4 className="text-size-sm font-medium text-text-secondary mb-2">{statusLabel}</h4>
-          <label className="flex items-center gap-2 text-size-sm text-text-muted">
-            <Checkbox
-              checked={showCompleted}
-              onChange={(e) => onShowCompletedChange(e.target.checked)}
-            />
-            {completedLabel}
-          </label>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default FilterBar;
+    );
+}
