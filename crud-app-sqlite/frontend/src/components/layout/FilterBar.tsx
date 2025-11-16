@@ -36,23 +36,23 @@ const FilterBar = ({
   onShowCompletedChange
 }: FilterBarProps) => {
   return (
-    <div className="flex items-center gap-8 mb-6 p-3 bg-neutral-800 border border-neutral-700 rounded">
+    <div className="flex items-center gap-8 mb-6 p-card bg-surface border border-border rounded">
       {/* Priority Filter */}
       {showPriorityFilter && (
         <div>
-          <h4 className="text-sm font-medium text-neutral-300 mb-2">{priorityLabel}</h4>
+          <h4 className="text-size-sm font-medium text-text-secondary mb-2">{priorityLabel}</h4>
           <div className="flex gap-4">
             {priorityOptions.map((option) => (
               <label
                 key={option.value}
-                className="flex items-center gap-2 text-sm text-neutral-400"
+                className="flex items-center gap-2 text-size-sm text-text-muted"
               >
                 <input
                   value={option.value}
                   checked={selectedPriority === option.value}
                   onChange={(e) => onPriorityChange(e.target.value)}
                   type="radio"
-                  className="w-4 h-4 border-neutral-600 bg-neutral-700 text-blue-600"
+                  className="w-4 h-4 border-border bg-surface text-blue-600"
                 />
                 {option.label}
               </label>
@@ -64,13 +64,13 @@ const FilterBar = ({
       {/* Status Filter */}
       {showStatusFilter && (
         <div>
-          <h4 className="text-sm font-medium text-neutral-300 mb-2">{statusLabel}</h4>
-          <label className="flex items-center gap-2 text-sm text-neutral-400">
+          <h4 className="text-size-sm font-medium text-text-secondary mb-2">{statusLabel}</h4>
+          <label className="flex items-center gap-2 text-size-sm text-text-muted">
             <input
               checked={showCompleted}
               onChange={(e) => onShowCompletedChange(e.target.checked)}
               type="checkbox"
-              className="w-4 h-4 rounded border-neutral-600 bg-neutral-700 text-blue-600"
+              className="w-4 h-4 rounded border-border bg-surface text-blue-600"
             />
             {completedLabel}
           </label>

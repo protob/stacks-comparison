@@ -35,7 +35,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     const baseClasses = useMemo(() => {
-      let classes = 'inline-flex items-center justify-center font-[--button-font-weight] transition-[--button-transition] rounded-[--button-radius] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2';
+      let classes = 'inline-flex items-center justify-center font-button transition-[--button-transition] rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2';
 
       if (loading) {
         classes += ' cursor-default';
@@ -51,9 +51,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       'default': 'bg-primary text-text-inverse hover:bg-primary-hover active:bg-primary-active',
       'primary': 'bg-primary text-text-inverse hover:bg-primary-hover active:bg-primary-active',
       'secondary': 'bg-surface-active text-text-primary hover:bg-surface-hover border border-border',
-      'danger': 'bg-danger text-text-inverse hover:bg-red-700 focus:ring-danger',
+      'danger': 'bg-danger text-text-inverse hover:bg-danger-hover focus:ring-danger',
       'text': 'bg-transparent text-text-primary hover:bg-surface-hover focus:ring-primary',
-      'stealth': 'bg-transparent text-text-muted hover:text-text-primary hover:bg-surface-hover focus:ring-primary p-1.5',
+      'stealth': 'bg-transparent text-text-muted hover:text-text-primary hover:bg-surface-hover focus:ring-primary btn-icon-sm',
       'ghost': 'bg-transparent hover:bg-surface-hover text-text-primary',
     }[variant]), [variant]);
 
@@ -65,19 +65,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sizeClasses = useMemo(() => {
       if (effectiveIconOnly || size === 'icon') {
         return ({
-          'xs': 'p-1',
-          'sm': 'p-1.5',
-          'md': 'p-2',
-          'lg': 'p-2.5',
-          'icon': 'p-2',
-        }[size === 'icon' ? 'icon' : size]) || 'p-2';
+          'xs': 'btn-icon-xs',
+          'sm': 'btn-icon-sm',
+          'md': 'btn-icon-md',
+          'lg': 'btn-icon-lg',
+          'icon': 'btn-icon-md',
+        }[size === 'icon' ? 'icon' : size]) || 'btn-icon-md';
       }
       return ({
-        'xs': 'text-xs px-2.5 py-1 gap-1',
-        'sm': 'text-sm px-3 py-1.5 gap-1.5',
-        'md': 'text-base px-4 py-2 gap-2',
-        'lg': 'text-lg px-5 py-2.5 gap-2.5',
-      }[size]) || 'text-base px-4 py-2 gap-2';
+        'xs': 'btn-xs',
+        'sm': 'btn-sm',
+        'md': 'btn-md',
+        'lg': 'btn-lg',
+      }[size]) || 'btn-md';
     }, [effectiveIconOnly, size]);
 
     const iconSizeMap: Record<Exclude<ButtonSize, 'icon'>, number> = { xs: 14, sm: 16, md: 18, lg: 20 };

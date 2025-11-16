@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+import clsx from 'clsx';
 import { useUiStore } from '@/stores/useUiStore';
 import Icon from './Icon';
 import type { NotificationType } from '@/types';
@@ -53,13 +55,13 @@ const Notifications = () => {
               className={clsx('h-5 w-5 mt-0.5 mr-2 shrink-0', getTextClassForType(notification.type))}
             />
             <div className="flex-1 mr-2">
-              <p className={clsx('text-sm', getTextClassForType(notification.type))}>
+              <p className={clsx('text-size-sm', getTextClassForType(notification.type))}>
                 {notification.message}
               </p>
             </div>
             <button
               onClick={() => removeNotification(notification.id)}
-              className={clsx('text-neutral-300 hover:text-white', getTextClassForType(notification.type))}
+              className={clsx('text-text-secondary hover:text-white', getTextClassForType(notification.type))}
             >
               <Icon name="X" className="w-4 h-4" />
             </button>

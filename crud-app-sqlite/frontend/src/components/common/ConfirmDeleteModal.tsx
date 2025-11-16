@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import Modal from './Modal';
 import Button from './Button';
 
@@ -32,8 +33,8 @@ const ConfirmDeleteModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm" persistent>
-      <p className="text-neutral-300 text-sm mb-6" dangerouslySetInnerHTML={{ __html: message }} />
-      <div className="flex justify-end gap-3">
+      <p className="text-text-secondary text-size-sm mb-6" dangerouslySetInnerHTML={{ __html: message }} />
+      <div className="flex justify-end gap-component">
         <Button variant="secondary" onClick={onClose} ref={cancelButtonRef}>
           Cancel
         </Button>

@@ -91,13 +91,13 @@ const TagInput = ({
   return (
     <div>
       <div
-        className={`flex flex-wrap items-center gap-x-1.5 gap-y-1 w-full px-3 py-2 border bg-neutral-800 text-neutral-200 rounded border-neutral-600 focus-within:ring-1 focus-within:ring-blue-500/70 focus-within:border-blue-500/50 transition-colors duration-150 ${error ? 'border-red-500' : 'border-neutral-600'}`}
+        className={`flex flex-wrap items-center gap-x-1.5 gap-y-1 w-full px-input-x py-input-y border bg-surface text-text-primary rounded-input ${error ? 'border-danger' : 'border-border'} focus-within:ring-1 focus-within:ring-primary/70 focus-within:border-primary/50 transition-colors duration-150`}
         onClick={focusInput}
       >
         {value.map((tag, index) => (
           <div
             key={`${tag}-${index}`}
-            className="flex items-center h-[28px] px-2 bg-neutral-700 text-neutral-200 rounded-sm text-xs whitespace-nowrap"
+            className="flex items-center h-[28px] tag-sm bg-surface-hover text-text-primary rounded-button whitespace-nowrap"
           >
             <span>{tag}</span>
             <button
@@ -106,7 +106,7 @@ const TagInput = ({
                 e.stopPropagation();
                 removeTag(index);
               }}
-              className="ml-1 p-0.5 rounded-full text-neutral-400 hover:bg-red-800/50 hover:text-red-300 focus:outline-none transition-colors"
+              className="ml-1 p-0.5 rounded-full text-text-muted hover:bg-danger/50 hover:text-danger focus:outline-none transition-colors"
               aria-label="Remove tag"
             >
               <Icon name="X" className="w-3 h-3" />
@@ -120,13 +120,13 @@ const TagInput = ({
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="flex-grow min-w-[120px] bg-transparent border-none outline-none rounded-none text-sm h-[28px] py-1 px-2 text-neutral-200 placeholder:text-neutral-500"
+          className="flex-grow min-w-[120px] bg-transparent border-none outline-none rounded-none text-size-sm h-[28px] py-1 px-2 text-text-primary placeholder:text-text-muted"
           placeholder={value.length === 0 ? placeholder : ''}
         />
       </div>
 
       {error && (
-        <div className="mt-1 text-xs text-red-400">
+        <div className="mt-1 text-size-xs text-danger">
           {error}
         </div>
       )}

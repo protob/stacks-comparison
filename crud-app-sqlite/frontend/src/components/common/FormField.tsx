@@ -28,8 +28,8 @@ const FormField = ({
     [fullWidth, className]
   );
 
-  const computedLabelClass = useMemo(() => 
-    `block text-sm font-medium mb-1 ${labelClass || 'text-neutral-300'} ${error ? 'text-red-400' : ''}`.trim(),
+  const computedLabelClass = useMemo(() =>
+    `block text-size-sm font-medium mb-1 ${labelClass || 'text-text-secondary'} ${error ? 'text-danger' : ''}`.trim(),
     [labelClass, error]
   );
 
@@ -38,17 +38,17 @@ const FormField = ({
       {label && (
         <label htmlFor={labelFor} className={computedLabelClass}>
           {label}
-          {required && <span className="ml-1 text-red-500">*</span>}
+          {required && <span className="ml-1 text-danger">*</span>}
         </label>
       )}
       {children}
       {help && !error && (
-        <div className="mt-1 text-xs text-neutral-500">
+        <div className="mt-1 text-size-xs text-text-muted">
           {help}
         </div>
       )}
       {error && (
-        <div className="mt-1 text-xs text-red-400">
+        <div className="mt-1 text-size-xs text-danger">
           {error}
         </div>
       )}

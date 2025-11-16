@@ -140,6 +140,126 @@ Pre-defined tokens for consistent component styling:
 - **Inputs:** `--input-radius`, `--input-padding-x/y`, `--input-border-width`
 - **Layout:** `--nav-height`, `--sidebar-width`, `--container-max`
 
+### Token Usage Guide
+
+**IMPORTANT:** Always use semantic design tokens instead of raw Tailwind utilities. This ensures consistent theming and makes the design system maintainable.
+
+#### Color Classes (Tailwind mapped to tokens)
+
+Use these semantic classes everywhere:
+
+```jsx
+// ✅ CORRECT - Using semantic tokens
+<div className="bg-surface text-text-primary border-border">
+<div className="bg-modal-bg border-modal-border">
+<button className="bg-primary text-text-inverse hover:bg-primary-hover">
+<span className="text-text-secondary">Secondary text</span>
+<span className="text-text-muted">Muted text</span>
+<div className="bg-danger text-danger">Error state</div>
+
+// ❌ WRONG - Using raw color values
+<div className="bg-gray-800 text-gray-100 border-gray-700">
+<div className="bg-neutral-800 border-neutral-600">
+<button className="bg-blue-600 text-white hover:bg-blue-700">
+```
+
+**Available semantic color tokens:**
+- **Backgrounds:** `bg-background`, `bg-surface`, `bg-surface-hover`, `bg-surface-active`, `bg-modal-bg`
+- **Text:** `text-text-primary`, `text-text-secondary`, `text-text-muted`, `text-text-inverse`
+- **Borders:** `border-border`, `border-border-hover`, `border-border-focus`, `border-modal-border`
+- **Brand:** `bg-primary`, `bg-primary-hover`, `bg-primary-active`, `text-primary`
+- **States:** `bg-success`, `bg-danger`, `bg-warning`, `text-success`, `text-danger`, `text-warning`
+- **State backgrounds:** `bg-success-light`, `bg-danger-light`, `bg-warning-light`
+
+#### Typography Classes
+
+Use token-based text size utilities:
+
+```jsx
+// ✅ CORRECT - Token-based sizes
+<h1 className="text-size-xl">Large heading</h1>
+<p className="text-size-base">Body text</p>
+<span className="text-size-sm">Small text</span>
+<span className="text-size-xs">Extra small text</span>
+
+// ❌ WRONG - Raw Tailwind sizes
+<h1 className="text-xl">Large heading</h1>
+<p className="text-base">Body text</p>
+```
+
+#### Spacing & Layout
+
+Use token-based spacing utilities:
+
+```jsx
+// ✅ CORRECT - Token-based spacing
+<div className="p-card">Card with padding</div>
+<div className="px-input-x py-input-y">Input padding</div>
+<div className="p-nav">Navigation padding</div>
+<div className="gap-component">Component gap</div>
+<div className="gap-grid">Grid gap</div>
+
+// ❌ WRONG - Raw spacing values
+<div className="p-4">Card with padding</div>
+<div className="px-3 py-2">Input padding</div>
+<div className="gap-2">Component gap</div>
+```
+
+#### Border Radius
+
+Use semantic radius classes:
+
+```jsx
+// ✅ CORRECT - Token-based radius
+<button className="rounded-button">Button</button>
+<div className="rounded-card">Card</div>
+<input className="rounded-input" />
+
+// ❌ WRONG - Raw radius values
+<button className="rounded-md">Button</button>
+<div className="rounded-lg">Card</div>
+```
+
+#### Button Sizing
+
+Buttons use custom utility classes for consistent sizing:
+
+```jsx
+// Icon-only buttons automatically use token-based sizing
+<Button size="sm" icon="Edit" />  // Uses .btn-icon-sm internally
+<Button size="md" icon="Plus" />  // Uses .btn-icon-md internally
+
+// Buttons with text also use token-based sizing
+<Button size="sm">Submit</Button>  // Uses .btn-sm internally
+<Button size="md">Submit</Button>  // Uses .btn-md internally
+```
+
+**Available button utilities:** `.btn-xs`, `.btn-sm`, `.btn-md`, `.btn-lg`, `.btn-icon-xs`, `.btn-icon-sm`, `.btn-icon-md`, `.btn-icon-lg`
+
+#### Tags & Badges
+
+Use the `.tag-sm` utility for consistent tag/badge styling:
+
+```jsx
+// ✅ CORRECT - Using tag utility
+<span className="tag-sm bg-surface-hover text-text-secondary rounded-button">
+  Tag
+</span>
+
+// ❌ WRONG - Raw padding and text size
+<span className="px-2 py-1 text-xs bg-gray-700">Tag</span>
+```
+
+#### Custom Token Utilities
+
+The design system provides these custom utilities (defined in `src/styles/main.css`):
+
+- **Text sizes:** `.text-size-xs`, `.text-size-sm`, `.text-size-base`, `.text-size-lg`, `.text-size-xl`
+- **Tags:** `.tag-sm` (includes padding and font-size)
+- **Buttons:** `.btn-xs`, `.btn-sm`, `.btn-md`, `.btn-lg` (with text), `.btn-icon-*` (icon-only)
+- **Container queries:** `.container-aware`, `.grid-auto-items`
+- **Performance:** `.contain-strict`, `.item-list`, `.hardware-accelerate`
+
 ### Responsive Design
 
 **Container Queries** (not breakpoints!):
