@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
@@ -44,14 +45,15 @@ const ItemItem = ({ item, onToggleComplete, onEdit, onDelete }: ItemItemProps) =
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-component mb-2">
-              <h3
+              <Link
+                to={`/items/${item.categories[0]}/${item.slug}`}
                 className={clsx(
-                  'font-medium text-size-lg',
+                  'font-medium text-size-lg hover:text-primary transition-colors',
                   item.isCompleted ? 'line-through text-text-muted' : 'text-text-primary'
                 )}
               >
                 {item.name}
-              </h3>
+              </Link>
               <span
                 className={clsx(
                   'tag-sm rounded-button',
