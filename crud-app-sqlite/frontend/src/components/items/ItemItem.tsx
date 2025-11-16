@@ -77,7 +77,7 @@ const ItemItem = ({ item, onToggleComplete, onEdit, onDelete }: ItemItemProps) =
                   {item.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="tag-sm bg-surface-hover rounded-button text-text-secondary"
+                      className="tag-sm bg-primary-light text-primary rounded-button"
                     >
                       {tag}
                     </span>
