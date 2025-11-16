@@ -1,3 +1,4 @@
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { z } from 'zod';
 import Button from '../common/Button';
 import SchemaForm from '../common/SchemaForm';
@@ -122,7 +123,7 @@ const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, o
       onCancel={onCancel}
       showErrors={true}
       footer={({ submit }) => (
-        <div className="flex justify-end pt-4 space-x-3">
+        <div className="flex justify-end pt-4 gap-component">
           <Button type="button" variant="secondary" onClick={onCancel}>
             Cancel
           </Button>

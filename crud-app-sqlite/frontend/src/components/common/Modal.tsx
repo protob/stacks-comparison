@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import clsx from 'clsx';
 import Button from './Button';
 import Icon from './Icon';
 
@@ -28,7 +29,7 @@ const Modal = ({
   closeOnEsc = true,
   hideCloseButton = false,
   headerClass = '',
-  bodyClass = 'py-4 px-6',
+  bodyClass = 'p-card',
   footerClass = '',
   modalClass = '',
   children,
@@ -85,21 +86,21 @@ const Modal = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] bg-backdrop flex items-center justify-center p-4 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
       <div
         ref={modalRef}
         className={clsx(
-          'bg-neutral-800 text-neutral-100 flex flex-col overflow-hidden w-full',
+          'bg-modal-bg text-text-primary flex flex-col overflow-hidden w-full rounded-card shadow-lg',
           baseSizeClasses,
           modalClass
         )}
       >
         {(title || !hideCloseButton) && (
-          <header className={clsx('p-4 border-b border-neutral-700 flex items-center justify-between shrink-0', headerClass)}>
+          <header className={clsx('p-card border-b border-modal-border flex items-center justify-between shrink-0', headerClass)}>
             {title ? (
-              <h2 className="text-lg font-semibold">{title}</h2>
+              <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
             ) : (
               <div></div>
             )}
@@ -108,7 +109,7 @@ const Modal = ({
                 variant="stealth"
                 size="icon"
                 onClick={closeModal}
-                className="ml-auto -mr-2 -my-2"
+                className="ml-auto"
               >
                 <Icon name="X" size={20} />
               </Button>
@@ -121,7 +122,7 @@ const Modal = ({
         </div>
 
         {footer && (
-          <footer className={clsx('p-4 border-t border-neutral-700 shrink-0', footerClass)}>
+          <footer className={clsx('p-card border-t border-modal-border shrink-0', footerClass)}>
             {footer}
           </footer>
         )}

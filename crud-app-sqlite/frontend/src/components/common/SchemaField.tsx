@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { useMemo, useCallback } from 'react';
 import FormField from './FormField';
 import TagInput from './TagInput';
 import { unwrapZodType } from '@/utils/schema-helpers';
@@ -145,7 +146,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
             id={fieldId}
             value={normalizedValue}
             onChange={(e) => handleChange(e.target.value)}
-            className="w-full border rounded-none bg-neutral-800 border-neutral-600 text-neutral-200"
+            className="w-full border rounded-none bg-surface border-border text-text-primary"
             rows={layoutHint?.rows || 3}
             placeholder={layoutHint?.placeholder}
             required={isRequired}
@@ -173,7 +174,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
             id={fieldId}
             value={normalizedValue}
             onChange={(e) => handleChange(e.target.value)}
-            className="w-full border rounded-none bg-neutral-800 border-neutral-600 text-neutral-200"
+            className="w-full border rounded-none bg-surface border-border text-text-primary"
             required={isRequired}
             aria-invalid={!!error}
           >
@@ -193,7 +194,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
             value={normalizedValue}
             onChange={(e) => handleChange(e.target.value)}
             type="date"
-            className="w-full border rounded-none bg-neutral-800 border-neutral-600 text-neutral-200"
+            className="w-full border rounded-none bg-surface border-border text-text-primary"
             required={isRequired}
             aria-invalid={!!error}
           />
@@ -207,7 +208,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
             onChange={(e) => handleChange(e.target.value)}
             type="number"
             step={layoutHint?.step || 'any'}
-            className="w-full border rounded-none bg-neutral-800 border-neutral-600 text-neutral-200"
+            className="w-full border rounded-none bg-surface border-border text-text-primary"
             placeholder={layoutHint?.placeholder}
             required={isRequired}
             aria-invalid={!!error}
@@ -222,7 +223,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
               checked={normalizedValue}
               onChange={(e) => handleChange(e.target.checked)}
               type="checkbox"
-              className="w-4 h-4 rounded-sm accent-blue-500 focus:ring-blue-500 border-neutral-600 bg-neutral-700"
+              className="w-4 h-4 rounded-sm accent-blue-500 focus:ring-blue-500 border-border bg-surface"
               required={isRequired}
               aria-invalid={!!error}
             />
@@ -236,7 +237,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
             value={normalizedValue}
             onChange={(e) => handleChange(e.target.value)}
             type="text"
-            className="w-full border rounded-none bg-neutral-800 border-neutral-600 text-neutral-200"
+            className="w-full border rounded-none bg-surface border-border text-text-primary"
             placeholder={layoutHint?.placeholder}
             required={isRequired}
             aria-invalid={!!error}
@@ -245,7 +246,7 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
 
       default:
         return (
-          <div className="p-2 text-xs italic text-red-400 border rounded-none bg-neutral-800 border-red-700/50">
+          <div className="p-card text-size-xs italic text-danger border rounded-none bg-surface border-danger">
             Unsupported field type: {effectiveFieldType} ({name})
           </div>
         );

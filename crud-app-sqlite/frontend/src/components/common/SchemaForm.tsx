@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import clsx from 'clsx';
 import SchemaField from './SchemaField';
 import Button from './Button';
 import { getBaseSchema } from '@/utils/schema-helpers';
@@ -202,9 +204,9 @@ const SchemaForm = ({
 
       {/* Error summary block */}
       {showErrors && Object.keys(errors).length > 0 && (
-        <div className="p-3 mt-4 text-red-300 border rounded bg-red-900/10 border-red-700/50">
+        <div className="p-card mt-4 text-danger border rounded bg-danger-light border-danger">
           <h4 className="mb-1 font-medium">Please fix the following errors:</h4>
-          <ul className="space-y-1 text-sm list-disc list-inside">
+          <ul className="space-y-1 text-size-sm list-disc list-inside">
             {Object.entries(errors).map(([field, error]) => (
               <li key={field}>
                 {field === '_form' ? (
@@ -221,7 +223,7 @@ const SchemaForm = ({
       )}
 
       {/* Footer with default or custom buttons */}
-      <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-neutral-700">
+      <div className="flex justify-end gap-component pt-4 mt-6 border-t border-border">
         {footer ? (
           footer({ submit: internalSubmit })
         ) : (
