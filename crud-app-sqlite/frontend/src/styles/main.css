@@ -243,8 +243,9 @@
   --input-font-size: var(--font-size-base);
 
   /* Checkbox/Radio sizing */
-  --checkbox-size: 1.125rem; /* 18px - reasonable size */
-  --checkbox-radius: var(--radius-sm);
+  --checkbox-size: 1.125rem; /* 18px - reasonable, accessible size */
+  --radio-size: 1.125rem;    /* 18px - same as checkbox for consistency */
+  --checkbox-radius: var(--radius-sm);  /* Subtle rounded corners for checkboxes */
 
   /* Navigation/Sidebar */
   --nav-height: clamp(3rem, 2.5rem + 2.5vw, 4rem);

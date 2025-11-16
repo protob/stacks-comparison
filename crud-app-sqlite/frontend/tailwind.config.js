@@ -40,10 +40,19 @@ module.exports = {
         'card': 'var(--card-padding)',
         'nav': 'var(--nav-padding)',
       },
+      width: {
+        'checkbox': 'var(--checkbox-size)',
+        'radio': 'var(--radio-size)',
+      },
+      height: {
+        'checkbox': 'var(--checkbox-size)',
+        'radio': 'var(--radio-size)',
+      },
       borderRadius: {
         'button': 'var(--button-radius)',
         'card': 'var(--card-radius)',
         'input': 'var(--input-radius)',
+        'checkbox': 'var(--checkbox-radius)',
       },
       fontWeight: {
         button: 'var(--button-font-weight)',

@@ -1,3 +1,6 @@
+import { Radio } from '@/components/common/Radio';
+import { Checkbox } from '@/components/common/Checkbox';
+
 interface FilterOption {
   value: string;
   label: string;
@@ -47,12 +50,11 @@ const FilterBar = ({
                 key={option.value}
                 className="flex items-center gap-2 text-size-sm text-text-muted"
               >
-                <input
+                <Radio
                   value={option.value}
                   checked={selectedPriority === option.value}
                   onChange={(e) => onPriorityChange(e.target.value)}
-                  type="radio"
-                  className="w-4 h-4 border-border bg-surface text-blue-600"
+                  name="priority-filter"
                 />
                 {option.label}
               </label>
@@ -66,11 +68,9 @@ const FilterBar = ({
         <div>
           <h4 className="text-size-sm font-medium text-text-secondary mb-2">{statusLabel}</h4>
           <label className="flex items-center gap-2 text-size-sm text-text-muted">
-            <input
+            <Checkbox
               checked={showCompleted}
               onChange={(e) => onShowCompletedChange(e.target.checked)}
-              type="checkbox"
-              className="w-4 h-4 rounded border-border bg-surface text-blue-600"
             />
             {completedLabel}
           </label>

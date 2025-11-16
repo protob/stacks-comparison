@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { useMemo, useCallback } from 'react';
 import FormField from './FormField';
 import TagInput from './TagInput';
+import { Checkbox } from './Checkbox';
 import { unwrapZodType } from '@/utils/schema-helpers';
 
 interface SchemaFieldProps {
@@ -218,12 +219,10 @@ const SchemaField = ({ schema, name, value, error, layoutHint = {}, onChange }: 
       case 'boolean':
         return (
           <div className="flex items-center h-10">
-            <input
+            <Checkbox
               id={fieldId}
               checked={normalizedValue}
               onChange={(e) => handleChange(e.target.checked)}
-              type="checkbox"
-              className="w-4 h-4 rounded-sm accent-blue-500 focus:ring-blue-500 border-border bg-surface"
               required={isRequired}
               aria-invalid={!!error}
             />
