@@ -26,7 +26,18 @@ func main() {
 		log.Fatalf("FATAL: Could not load config: %v", err)
 	}
 
-	// Initialize database
+	// Ensure DB exists and schema applied if new
+	created, err := database.EnsureDBExists(cfg.DatabaseURL, "db/schema.sql")
+	if err != nil {
+		log.Fatalf("FATAL: Database preparation failed: %v", err)
+	}
+	if created {
+		fmt.Println("✅ Database created and schema applied")
+	} else {
+		fmt.Println("ℹ️ Database exists, skipping schema apply")
+	}
+
+	// Initialize database connection
 	db, err := database.NewDatabase(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("FATAL: Could not initialize database: %v", err)
@@ -34,11 +45,6 @@ func main() {
 	defer db.Close()
 
 	fmt.Println("✅ Database connected successfully")
-
-	// Apply schema to ensure all tables exist
-	if err := database.ApplySchema(db.DB, "db/schema.sql"); err != nil {
-		log.Fatalf("FATAL: Could not apply database schema: %v", err)
-	}
 
 	// Initialize services
 	itemService := services.NewItemService(db.Queries)
@@ -62,7 +68,6 @@ func main() {
 	}))
 
 	// Setup Huma API for OpenAPI documentation
-	// This auto-generates /docs and /openapi.json endpoints
 	apiConfig := huma.DefaultConfig("Items CRUD API", "1.0.0")
 	apiConfig.Info.Description = "Items CRUD API with SQLite, Huma, Chi, and sqlc"
 	apiConfig.Servers = []*huma.Server{
