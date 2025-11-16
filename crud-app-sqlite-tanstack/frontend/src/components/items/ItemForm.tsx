@@ -150,7 +150,7 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
         })}
       </div>
 
-      <div className="flex gap-2 justify-end">
+      <div className="flex justify-end gap-2">
         <Button
           type="button"
           variant="secondary"
@@ -163,7 +163,7 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
           disabled={!form.state.canSubmit || form.state.isSubmitting}
           onClick={async () => {
             console.log('🔘 BUTTON CLICKED - DIRECT SUBMIT');
-            // Call onSubmit directly, bypassing TanStack Form
+            // Call onSubmit directly, baypassing TanStack Form
             await onSubmit({
               name: form.state.values.name,
               text: form.state.values.text,
