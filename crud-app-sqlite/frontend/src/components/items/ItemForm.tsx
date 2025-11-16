@@ -100,19 +100,26 @@ const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, o
   }, [item, prefilledCategory]);
 
   const handleSubmit = useCallback((validatedData: ItemFormDataType) => {
+    // Ensure category is always a valid single-element array
+    const categoryValue = validatedData.category?.trim();
+    if (!categoryValue) {
+      console.error('Category is required but was empty');
+      return;
+    }
+
     const submissionPayload: any = {
       name: validatedData.name,
       text: validatedData.text,
       priority: validatedData.priority || 'mid',
       tags: validatedData.tags || [],
-      categories: validatedData.category ? [validatedData.category.trim()] : [],
+      categories: [categoryValue], // Always send as single-element array
     };
-    
+
     // Only include isCompleted for existing items
     if (item) {
       submissionPayload.isCompleted = validatedData.isCompleted;
     }
-    
+
     onSubmit(submissionPayload);
   }, [item, onSubmit]);
 
