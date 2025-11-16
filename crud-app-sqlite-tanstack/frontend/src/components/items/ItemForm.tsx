@@ -1,162 +1,122 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
+import { useAddItem, useUpdateItem } from '@/hooks/useItemsApi';
+import type { Item, SingleCategory } from '@/types';
 import Button from '../common/Button';
-import SchemaForm from '../common/SchemaForm';
-import { slugify } from '@/utils/slugify';
-import type { Item } from '@/types';
 
-interface ItemFormProps {
-  item?: Item | null;
-  isLoading?: boolean;
-  prefilledCategory?: string;
-  onSubmit: (data: any) => void;
-  onCancel: () => void;
-}
-
-const priorityEnum = z.enum(['low', 'mid', 'high']).optional().default('mid');
-
-const itemZodSchema = z.object({
-  name: z.string().min(1, "Name is required."),
-  text: z.string().min(1, "Description is required."),
-  category: z.string().min(1, "Category is required."),
-  priority: priorityEnum,
-  tags: z.array(z.string()).optional().default([]),
-  isCompleted: z.boolean().optional().default(false),
+// Define Zod schema for form validation
+const itemSchema = z.object({
+    name: z.string().min(3, 'Name must be at least 3 characters'),
+    text: z.string().min(1, 'Text is required'),
+    priority: z.enum(['low', 'mid', 'high']),
+    tags: z.array(z.string()),
+    categories: z.tuple([z.string().min(1, "Category is required")]) as z.ZodType<SingleCategory<string>>,
 });
 
-type ItemFormDataType = z.infer<typeof itemZodSchema>;
+interface ItemFormProps {
+    item?: Item;
+    onDone: () => void;
+}
 
-const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, onCancel }: ItemFormProps) => {
-  const [formData, setFormData] = useState<Partial<ItemFormDataType>>({});
+export default function ItemForm({ item, onDone }: ItemFormProps) {
+    const addItem = useAddItem();
+    const updateItem = useUpdateItem();
 
-  // Layout hints for SchemaForm
-  const layoutHints = useMemo(() => ({
-    name: {
-      order: 10,
-      placeholder: "e.g., Buy groceries",
-      label: "Item Name",
-      colSpan: 2
-    },
-    text: {
-      order: 20,
-      widget: "textarea",
-      rows: 4,
-      placeholder: "Add more details about this item...",
-      label: "Description",
-      colSpan: 2
-    },
-    category: {
-      order: 30,
-      label: "Category",
-      placeholder: "e.g., Work, Personal, Shopping"
-    },
-    priority: {
-      order: 40,
-      widget: "select",
-      label: "Priority (optional)",
-      options: [
-        { value: 'low', label: 'Low' },
-        { value: 'mid', label: 'Medium' },
-        { value: 'high', label: 'High' },
-      ],
-    },
-    tags: {
-      order: 50,
-      widget: "tag-input",
-      placeholder: "Add tags...",
-      label: "Tags (optional)",
-      colSpan: 2
-    },
-    isCompleted: {
-      order: 60,
-      label: "Mark as completed",
-      hidden: !item,
-      colSpan: 2
-    },
-  }), [item]);
+    const form = useForm({
+        defaultValues: {
+            name: item?.name || '',
+            text: item?.text || '',
+            priority: item?.priority || 'mid',
+            tags: item?.tags || [],
+            categories: item?.categories || [''],
+        },
+        validators: {
+            onChange: itemSchema,
+        },
+        onSubmit: async ({ value }) => {
+            if (item) {
+                // Update logic
+                updateItem.mutate({ categorySlug: item.categories[0], itemSlug: item.slug, payload: value });
+            } else {
+                // Create logic
+                addItem.mutate(value);
+            }
+            onDone();
+        },
+    });
 
-  // Initialize form data when props change
-  useEffect(() => {
-    if (item) {
-      // Editing existing item
-      setFormData({
-        name: item.name,
-        text: item.text,
-        category: item.categories[0] || '',
-        priority: item.priority,
-        tags: [...(item.tags || [])],
-        isCompleted: item.isCompleted,
-      });
-    } else {
-      // Creating new item
-      setFormData({
-        name: '',
-        text: '',
-        category: prefilledCategory || '',
-        priority: 'mid',
-        tags: [],
-        isCompleted: false,
-      });
-    }
-  }, [item, prefilledCategory]);
+    return (
+        <form
+            onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+            }}
+            className="space-y-4"
+        >
+            <form.Field
+                name="name"
+                children={(field) => (
+                    <div>
+                        <label htmlFor={field.name}>Name</label>
+                        <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        {field.state.meta.errors && <p className="text-sm text-danger mt-1">{field.state.meta.errors.join(', ')}</p>}
+                    </div>
+                )}
+            />
+            
+            <form.Field
+                name="text"
+                children={(field) => (
+                    <div>
+                        <label htmlFor={field.name}>Text</label>
+                        <textarea
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            rows={3}
+                        />
+                        {field.state.meta.errors && <p className="text-sm text-danger mt-1">{field.state.meta.errors.join(', ')}</p>}
+                    </div>
+                )}
+            />
 
-  const handleSubmit = useCallback((validatedData: ItemFormDataType) => {
-    // Ensure category is always a valid single-element array
-    const categoryValue = validatedData.category?.trim();
-    if (!categoryValue) {
-      console.error('Category is required but was empty');
-      return;
-    }
+            <form.Field
+                name="categories"
+                children={(field) => (
+                    <div>
+                        <label htmlFor={field.name}>Category</label>
+                        <input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value[0]}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange([e.target.value])}
+                        />
+                        {field.state.meta.errors && <p className="text-sm text-danger mt-1">{field.state.meta.errors.join(', ')}</p>}
+                    </div>
+                )}
+            />
 
-    // Convert category name to slug for backend
-    const categorySlug = slugify(categoryValue);
-
-    const submissionPayload: any = {
-      name: validatedData.name,
-      text: validatedData.text,
-      priority: validatedData.priority || 'mid',
-      tags: validatedData.tags || [],
-      categories: [categorySlug], // Always send as single-element array with slugified value
-    };
-
-    // Only include isCompleted for existing items
-    if (item) {
-      submissionPayload.isCompleted = validatedData.isCompleted;
-    }
-
-    onSubmit(submissionPayload);
-  }, [item, onSubmit]);
-
-  return (
-    <div className="max-w-2xl mx-auto">
-      <SchemaForm
-        schema={itemZodSchema}
-        value={formData}
-        onChange={setFormData}
-        layoutHints={layoutHints}
-        columns={2}
-        onSubmit={handleSubmit}
-        onCancel={onCancel}
-        showErrors={true}
-        footer={({ submit }) => (
-          <div className="flex justify-end pt-4 gap-component">
-            <Button type="button" variant="secondary" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              loading={isLoading}
-              onClick={submit}
-              icon={item?.id ? 'Save' : 'Plus'}
-            >
-              {item?.id ? 'Update Item' : 'Create Item'}
-            </Button>
-          </div>
-        )}
-      />
-    </div>
-  );
-};
-
-export default ItemForm;
+            <div className="flex justify-end gap-2">
+                <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  children={([canSubmit, isSubmitting]) => (
+                    <Button type="submit" disabled={!canSubmit}>
+                      {isSubmitting ? 'Saving...' : 'Save Item'}
+                    </Button>
+                  )}
+                />
+            </div>
+        </form>
+    );
+}

@@ -15,7 +15,9 @@ export default defineConfig({
       imports: [
         'react',
         {
-          'react-router-dom': ['useNavigate', 'useParams', 'useLocation', 'useSearchParams'],
+          '@tanstack/react-query': ['useQuery', 'useMutation', 'useQueryClient'],
+          '@tanstack/react-router': ['useRoute', 'Link'],
+          '@tanstack/react-form': ['useForm'],
           'zustand': [['default', 'create']],
           'zustand/middleware': ['devtools', 'persist'],
           'clsx': [['default', 'clsx']],

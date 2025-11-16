@@ -1,52 +1,34 @@
-import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
-import ItemPage from './pages/ItemPage';
-import AboutPage from './pages/AboutPage';
-import ItemDetailPage from './pages/ItemDetailPage';
+import { Outlet } from '@tanstack/react-router';
+import AppSidebar from './components/layout/AppSidebar';
 import Notifications from './components/common/Notifications';
+import { useUiStore } from './stores/useUiStore';
+import { useEffect } from 'react';
 
 function App() {
-  const location = useLocation();
+  const { theme } = useUiStore();
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+  }, [theme]);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background text-text-primary">
-      <header className="border-b border-border bg-surface shrink-0">
-        <div className="container px-4 py-4 mx-auto">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-xl font-semibold text-text-primary hover:text-primary transition-colors">
-              Items
-            </Link>
-            <nav className="flex items-center gap-6">
-              <Link
-                to="/"
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === '/'
-                    ? 'text-primary'
-                    : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                Home
-              </Link>
-              <Link
-                to="/about"
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === '/about'
-                    ? 'text-primary'
-                    : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                About
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-      <main className="flex-1 w-full overflow-hidden">
-        <Routes>
-          <Route path="/" element={<ItemPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/items/:categorySlug/:itemSlug" element={<ItemDetailPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+    <div className="flex h-screen bg-background text-text-primary">
+      <AppSidebar
+        searchQuery=""
+        onSearchQueryChange={() => {}}
+        availableTags={[]}
+        selectedTags={[]}
+        onToggleTag={() => {}}
+      />
+      <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <Outlet />
       </main>
       <Notifications />
     </div>

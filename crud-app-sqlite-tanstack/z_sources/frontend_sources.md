@@ -1,7 +1,7 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 18:30:51 CET
-**Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite/frontend
+**Generated on:** nie, 16 lis 2025, 19:01:30 CET
+**Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
 
 ---
 
@@ -156,34 +156,41 @@ echo "3. Start development: npm run dev"
 ## `package.json`
 ```
 {
-  "name": "react-todo-app",
+  "name": "react-todo-app-tanstack",
   "private": true,
-  "version": "0.2.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "bun run route-gen && tsc && vite build",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "route-gen": "vite-node src/router.ts"
   },
   "dependencies": {
+    "@tanstack/react-form": "^1.25.0",
+    "@tanstack/react-query": "^5.90.9",
+    "@tanstack/react-router": "^1.136.6",
+    "@tanstack/zod-form-adapter": "^0.42.1",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.379.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0",
-    "zustand": "^4.5.0",
     "zod": "^3.23.8",
-    "lucide-react": "^0.379.0",
-    "clsx": "^2.1.0"
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0-alpha.13",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.19",
     "tailwindcss": "^4.0.0-alpha.13",
     "typescript": "^5.7.2",
     "unplugin-auto-import": "^0.17.6",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "vite-node": "^2.0.3"
   }
 }
 
@@ -801,7 +808,9 @@ export default defineConfig({
       imports: [
         'react',
         {
-          'react-router-dom': ['useNavigate', 'useParams', 'useLocation', 'useSearchParams'],
+          '@tanstack/react-query': ['useQuery', 'useMutation', 'useQueryClient'],
+          '@tanstack/react-router': ['useRoute', 'Link'],
+          '@tanstack/react-form': ['useForm'],
           'zustand': [['default', 'create']],
           'zustand/middleware': ['devtools', 'persist'],
           'clsx': [['default', 'clsx']],
@@ -905,131 +914,20 @@ export function getBaseSchema(schema: z.ZodTypeAny): z.ZodObject<any, any, any> 
 ```
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { Item } from '@/types';
-import * as itemApi from '@/api/itemApi';
-import { useUiStore } from './useUiStore';
-import { slugify } from '@/utils/slugify';
 
 interface ItemState {
-  itemTree: itemApi.ItemTree;
-  isLoading: boolean;
-  error: string | null;
-  
-  fetchItemTree: () => Promise<void>;
-  addItem: (newItemData: Omit<Item, 'id' | 'slug' | 'createdAt' | 'updatedAt' | 'isCompleted'>) => Promise<Item | undefined>;
-  updateItem: (originalCategorySlug: string, itemSlug: string, updateData: Partial<Omit<Item, 'id' | 'slug' | 'createdAt'>>) => Promise<Item | undefined>;
-  toggleItemCompletion: (item: Item) => Promise<Item | undefined>;
-  deleteItem: (categorySlug: string, itemSlug: string) => Promise<boolean>;
+  // This store is now a placeholder.
+  // You can add client-side state here if needed in the future,
+  // such as complex filter states that don't belong in the URL.
+  clientOnlyState: string;
+  setClientOnlyState: (value: string) => void;
 }
 
 export const useItemStore = create<ItemState>()(
   devtools(
-    (set, get) => ({
-      itemTree: {},
-      isLoading: false,
-      error: null,
-
-      fetchItemTree: async () => {
-        set({ isLoading: true, error: null });
-        try {
-          const itemTree = await itemApi.getItemTree();
-          set({ itemTree });
-        } catch (e: any) {
-          const errorMessage = e.message || 'Failed to fetch items';
-          set({ error: errorMessage, itemTree: {} });
-          useUiStore.getState().showNotification('error', errorMessage);
-        } finally {
-          set({ isLoading: false });
-        }
-      },
-
-      addItem: async (newItemData) => {
-        useUiStore.getState().setIsLoading(true, 'Adding item...');
-        try {
-          const createdItem = await itemApi.createItem({
-            name: newItemData.name,
-            text: newItemData.text,
-            priority: newItemData.priority,
-            tags: newItemData.tags,
-            categories: newItemData.categories,
-          });
-          
-          const categorySlug = slugify(newItemData.categories[0]);
-          set(state => {
-            const newTree = { ...state.itemTree };
-            if (!newTree[categorySlug]) {
-              newTree[categorySlug] = [];
-            }
-            newTree[categorySlug].unshift(createdItem);
-            return { itemTree: newTree };
-          });
-          
-          useUiStore.getState().showNotification('success', `Item "${createdItem.name}" added.`);
-          return createdItem;
-        } catch (e: any) {
-          const errorMessage = e.message || 'Failed to add item';
-          set({ error: errorMessage });
-          useUiStore.getState().showNotification('error', errorMessage);
-          return undefined;
-        } finally {
-          useUiStore.getState().setIsLoading(false);
-        }
-      },
-
-      updateItem: async (originalCategorySlug, itemSlug, updateData) => {
-        useUiStore.getState().setIsLoading(true, 'Updating item...');
-        try {
-          const updatedItem = await itemApi.updateItem(originalCategorySlug, itemSlug, updateData);
-          
-          // Refresh to handle potential category changes
-          await get().fetchItemTree();
-          
-          useUiStore.getState().showNotification('success', `Item "${updatedItem.name}" updated.`);
-          return updatedItem;
-        } catch (e: any) {
-          const errorMessage = e.message || 'Failed to update item';
-          set({ error: errorMessage });
-          useUiStore.getState().showNotification('error', errorMessage);
-          return undefined;
-        } finally {
-          useUiStore.getState().setIsLoading(false);
-        }
-      },
-
-      toggleItemCompletion: async (item) => {
-        const categorySlug = slugify(item.categories[0]);
-        return get().updateItem(categorySlug, item.slug, {
-          isCompleted: !item.isCompleted
-        });
-      },
-
-      deleteItem: async (categorySlug, itemSlug) => {
-        useUiStore.getState().setIsLoading(true, 'Deleting item...');
-        try {
-          await itemApi.deleteItem(categorySlug, itemSlug);
-          
-          set(state => {
-            const newTree = { ...state.itemTree };
-            if (newTree[categorySlug]) {
-              newTree[categorySlug] = newTree[categorySlug].filter(t => t.slug !== itemSlug);
-              if (newTree[categorySlug].length === 0) {
-                delete newTree[categorySlug];
-              }
-            }
-            return { itemTree: newTree };
-          });
-          
-          useUiStore.getState().showNotification('success', 'Item deleted.');
-          return true;
-        } catch (e: any) {
-          const errorMessage = e.message || 'Failed to delete item';
-          set({ error: errorMessage });
-          useUiStore.getState().showNotification('error', errorMessage);
-          return false;
-        } finally {
-          useUiStore.getState().setIsLoading(false);
-        }
-      },
+    (set) => ({
+      clientOnlyState: 'Ready',
+      setClientOnlyState: (value: string) => set({ clientOnlyState: value }),
     }),
     { name: 'item-store' }
   )
@@ -1751,6 +1649,182 @@ export function useItemFilters(itemTree: ItemTree, filters: FilterOptions) {
     totalItems,
     totalFilteredItems,
   };
+}
+```
+
+## `src/hooks/useItemsApi.ts`
+```
+import * as itemApi from '@/api/itemApi';
+import { useUiStore } from '@/stores/useUiStore';
+import { slugify } from '@/utils/slugify';
+import type { Item } from '@/types';
+
+// Define query keys for caching
+export const itemKeys = {
+  all: ['items'] as const,
+  tree: () => [...itemKeys.all, 'tree'] as const,
+  detail: (category: string, slug: string) => [...itemKeys.all, 'detail', category, slug] as const,
+};
+
+/**
+ * Fetches the entire item tree.
+ */
+export const useGetItemTree = () => {
+  return useQuery({
+    queryKey: itemKeys.tree(),
+    queryFn: itemApi.getItemTree,
+  });
+};
+
+/**
+ * Provides a mutation function for creating a new item.
+ */
+export const useAddItem = () => {
+  const queryClient = useQueryClient();
+  const { showNotification } = useUiStore.getState();
+
+  return useMutation({
+    mutationFn: itemApi.createItem,
+    onSuccess: (newItem) => {
+      showNotification('success', `Item "${newItem.name}" added.`);
+      // Invalidate the cache for the item tree to trigger a refetch
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+    },
+    onError: (error) => {
+      showNotification('error', error.message || 'Failed to add item.');
+    },
+  });
+};
+
+/**
+ * Provides a mutation function for updating an existing item.
+ */
+export const useUpdateItem = () => {
+  const queryClient = useQueryClient();
+  const { showNotification } = useUiStore.getState();
+
+  return useMutation({
+    mutationFn: (variables: { categorySlug: string; itemSlug: string; payload: itemApi.UpdateItemPayload }) =>
+      itemApi.updateItem(variables.categorySlug, variables.itemSlug, variables.payload),
+    onSuccess: (updatedItem) => {
+      showNotification('success', `Item "${updatedItem.name}" updated.`);
+      // Invalidate both the tree and the specific item detail query
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      const categorySlug = slugify(updatedItem.categories[0]);
+      queryClient.invalidateQueries({ queryKey: itemKeys.detail(categorySlug, updatedItem.slug) });
+    },
+    onError: (error) => {
+      showNotification('error', error.message || 'Failed to update item.');
+    },
+  });
+};
+
+/**
+ * Provides a mutation for toggling an item's completion status.
+ */
+export const useToggleItemCompletion = () => {
+    const updateItemMutation = useUpdateItem();
+    return (item: Item) => {
+        const categorySlug = slugify(item.categories[0]);
+        updateItemMutation.mutate({
+            categorySlug,
+            itemSlug: item.slug,
+            payload: { isCompleted: !item.isCompleted },
+        });
+    };
+};
+
+/**
+ * Provides a mutation function for deleting an item.
+ */
+export const useDeleteItem = () => {
+  const queryClient = useQueryClient();
+  const { showNotification } = useUiStore.getState();
+
+  return useMutation({
+    mutationFn: (variables: { categorySlug: string; itemSlug: string }) =>
+      itemApi.deleteItem(variables.categorySlug, variables.itemSlug),
+    onSuccess: () => {
+      showNotification('success', 'Item deleted.');
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+    },
+    onError: (error) => {
+      showNotification('error', error.message || 'Failed to delete item.');
+    },
+  });
+};
+```
+
+## `src/router.ts`
+```
+import {
+  createRouter,
+  createRootRoute,
+  createRoute,
+} from '@tanstack/react-router';
+import { QueryClient } from '@tanstack/react-query';
+import { itemKeys } from './hooks/useItemsApi';
+import * as itemApi from './api/itemApi';
+
+// Import page/layout components (we will create/update these next)
+import App from './App';
+import ItemPage from './pages/ItemPage';
+import AboutPage from './pages/AboutPage';
+import ItemDetailPage from './pages/ItemDetailPage';
+
+export const queryClient = new QueryClient();
+
+// Create a root route that will serve as the main layout
+const rootRoute = createRootRoute({
+  component: App,
+});
+
+// Create the index route for the main item page
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: ItemPage,
+  // Loader to pre-fetch data for this route
+  loader: () => {
+    return queryClient.ensureQueryData({
+      queryKey: itemKeys.tree(),
+      queryFn: itemApi.getItemTree,
+    });
+  },
+});
+
+// Create the about route
+const aboutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/about',
+  component: AboutPage,
+});
+
+// Create the item detail route with type-safe params
+const itemDetailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/items/$categorySlug/$itemSlug',
+    loader: ({ params }: { params: { categorySlug: string; itemSlug: string } }) => {
+        const { categorySlug, itemSlug } = params;
+        return queryClient.ensureQueryData({
+            queryKey: itemKeys.detail(categorySlug, itemSlug),
+            queryFn: () => itemApi.getItem(categorySlug, itemSlug),
+        });
+    },
+    component: ItemDetailPage,
+});
+
+// Create the route tree
+const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, itemDetailRoute]);
+
+// Create the router instance
+export const router = createRouter({ routeTree, context: { queryClient } });
+
+// Register the router for typesafety
+declare module '@tanstack/router' {
+  interface Register {
+    router: typeof router;
+  }
 }
 ```
 

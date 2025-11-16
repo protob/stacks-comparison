@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { Link } from '@tanstack/react-router';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 interface AppSidebarProps {
@@ -24,6 +25,25 @@ const AppSidebar = ({
 }: AppSidebarProps) => {
   return (
     <aside className="w-[--sidebar-width] h-full bg-surface border-r border-border p-nav overflow-y-auto flex flex-col gap-component">
+      {/* Navigation */}
+      <div>
+        <h3 className="text-size-sm font-medium text-text-secondary mb-3">Navigation</h3>
+        <nav className="space-y-2">
+          <Link
+            to="/"
+            className="block px-3 py-2 text-sm rounded-md hover:bg-surface-hover text-text-primary hover:text-primary transition-colors"
+          >
+            Items
+          </Link>
+          <Link
+            to="/about"
+            className="block px-3 py-2 text-sm rounded-md hover:bg-surface-hover text-text-primary hover:text-primary transition-colors"
+          >
+            About
+          </Link>
+        </nav>
+      </div>
+
       {/* Search Section */}
       <div>
         <h3 className="text-size-sm font-medium text-text-secondary mb-3">Search</h3>
