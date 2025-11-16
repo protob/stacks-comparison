@@ -50,7 +50,7 @@ const AppSidebar = ({
                     'tag-sm rounded-button transition-colors',
                     selectedTags.includes(tag)
                       ? 'bg-primary text-text-inverse'
-                      : 'bg-surface-hover text-text-secondary hover:bg-surface-active'
+                      : 'bg-primary-light text-primary hover:bg-primary-hover hover:text-text-inverse'
                   )}
                 >
                   {tagPrefix}{tag}

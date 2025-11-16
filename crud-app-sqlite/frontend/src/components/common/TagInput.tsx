@@ -97,7 +97,7 @@ const TagInput = ({
         {value.map((tag, index) => (
           <div
             key={`${tag}-${index}`}
-            className="flex items-center h-[28px] tag-sm bg-surface-hover text-text-primary rounded-button whitespace-nowrap"
+            className="flex items-center h-[28px] tag-sm bg-primary-light text-primary rounded-button whitespace-nowrap"
           >
             <span>{tag}</span>
             <button
