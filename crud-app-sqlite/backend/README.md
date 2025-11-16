@@ -106,18 +106,45 @@ All responses follow this format:
 
 ### Quick Start
 
+**Option 1: Using Makefile (Recommended)**
+```bash
+cd backend
+
+# First time setup (install deps + generate code)
+make setup
+
+# Run with hot reload (auto-generates code if needed)
+make dev
+
+# OR run without hot reload
+make run
+
+# See all available commands
+make help
+```
+
+**Option 2: Manual Commands**
 ```bash
 cd backend
 
 # Install dependencies
 go mod download
 
-# Run with hot reload (recommended for development)
+# Generate sqlc code (required on first run or after SQL changes)
+sqlc generate
+
+# Run with hot reload
 air
 
 # OR run directly
 go run ./cmd/server/main.go
 ```
+
+**⚠️ IMPORTANT:**
+- **Makefile commands** (`make dev`, `make run`) automatically run `sqlc generate` if needed ✅
+- When using `air` directly, it auto-runs `scripts/ensure-sqlc.sh` before each build ✅
+- If running `go run` directly, you MUST run `sqlc generate` manually first ⚠️
+- After changing `.sql` files, regenerate with `sqlc generate` or `make generate`
 
 The server will:
 1. Initialize SQLite database at `./data/items.db`

@@ -3,6 +3,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
+  pre_cmd = ["./scripts/ensure-sqlc.sh"]
   cmd = "go build -o ./tmp/main ./cmd/server"
   bin = "./tmp/main"
   include_ext = ["go", "sql"]
