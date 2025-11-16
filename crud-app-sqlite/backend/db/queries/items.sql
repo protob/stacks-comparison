@@ -23,7 +23,7 @@ ORDER BY created_at DESC;
 
 -- name: UpdateItem :one
 UPDATE items
-SET 
+SET
     name = COALESCE(sqlc.narg('name'), name),
     slug = COALESCE(sqlc.narg('slug'), slug),
     text = COALESCE(sqlc.narg('text'), text),
@@ -31,7 +31,7 @@ SET
     priority = COALESCE(sqlc.narg('priority'), priority),
     tags = COALESCE(sqlc.narg('tags'), tags),
     categories = COALESCE(sqlc.narg('categories'), categories)
-WHERE id = ?
+WHERE id = sqlc.arg('id')
 RETURNING *;
 
 -- name: DeleteItem :exec
