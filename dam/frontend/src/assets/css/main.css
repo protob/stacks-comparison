@@ -1,0 +1,161 @@
+/*
+ * TON KOSMOS DESIGN SYSTEM - Tailwind v4 CSS-First
+ * Based on a clean, minimal, functional architecture.
+ */
+
+@config "../../../tailwind.config.js";
+
+@import "tailwindcss";
+
+/* Define layer order for cascade control */
+@layer base, components, utilities;
+
+/* ============================================
+   GRID SYSTEM PHILOSOPHY
+   ============================================
+
+   All collection grids use a SINGLE unified system:
+   - NO variants (compact/default/wide removed)
+   - NO fixed breakpoints (sm:, md:, lg:)
+   - ONE rule: minmax(200px, 260px) for everything
+   - Gap uses clamp() for proportional spacing
+   - justify-content: start keeps sparse items left-aligned
+
+   Result:
+   - Desktop (1200px+): Always 4 columns
+   - Tablet (768-1199px): 3 columns
+   - Mobile (<768px): 1-2 columns
+   - Cards NEVER exceed 260px width
+
+   Edge cases:
+   - 0 items: Empty state shows
+   - 1-3 items: Cards stay at 260px, don't stretch
+   - 4+ items: Normal wrapping behavior
+
+   This eliminates ALL breakpoint sculpting forever.
+   ============================================ */
+
+/* ============================================
+   DESIGN TOKENS - Three-tier architecture
+   ============================================ */
+
+@theme {
+  /* =========================
+     1. PRIMITIVE TOKENS - Raw values (OKLCH Color Space)
+     ========================= */
+
+  /* Grayscale Palette (Unchanged) */
+  --color-gray-0:   oklch(1.000 0.000 0);
+  --color-gray-50:  oklch(0.985 0.002 247);
+  --color-gray-100: oklch(0.973 0.003 247);
+  --color-gray-200: oklch(0.935 0.006 247);
+  --color-gray-300: oklch(0.869 0.010 247);
+  --color-gray-400: oklch(0.707 0.015 247);
+  --color-gray-500: oklch(0.539 0.018 247);
+  --color-gray-600: oklch(0.428 0.020 247);
+  --color-gray-700: oklch(0.321 0.020 247);
+  --color-gray-800: oklch(0.215 0.019 247);
+  --color-gray-900: oklch(0.141 0.015 247);
+  --color-gray-950: oklch(0.075 0.010 247);
+
+  /* Primary Palette - Blue (Unchanged) */
+  --color-blue-500: oklch(0.58 0.215 240);
+  --color-blue-600: oklch(0.50 0.220 240);
+  --color-blue-700: oklch(0.42 0.200 240);
+
+  /* Accent Colors (Unchanged) */
+  --color-green-600: oklch(0.519 0.195 142);
+  --color-red-600:  oklch(0.577 0.237 27);
+  --color-amber-600: oklch(0.659 0.181 75);
+
+  /* --- NEW: FLUID TYPOGRAPHY SCALE --- */
+  --font-size-sm:   clamp(0.8rem, 0.75rem + 0.25vw, 0.95rem);
+  --font-size-base: clamp(1rem, 0.9rem + 0.5vw, 1.2rem);
+  --font-size-lg:   clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --font-size-xl:   clamp(1.563rem, 1.35rem + 1.06vw, 1.875rem);
+  --font-size-2xl:  clamp(1.953rem, 1.65rem + 1.51vw, 2.344rem);
+  --font-size-3xl:  clamp(2.441rem, 2.05rem + 1.95vw, 2.93rem);
+
+  /* --- NEW: FLUID SPACING SCALE --- */
+  --spacing-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.375rem);
+  --spacing-2: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+  --spacing-4: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+  --spacing-6: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+  --spacing-8: clamp(2rem, 1.6rem + 2vw, 3rem);
+  --spacing-12: clamp(3rem, 2.4rem + 3vw, 4.5rem);
+  --spacing-16: clamp(4rem, 3.2rem + 4vw, 6rem);
+
+  /* Aspect Ratios for Cards */
+  --aspect-square: 1 / 1;
+  --aspect-album: 1 / 1;
+  --aspect-video: 16 / 9;
+
+  /* Border Radius (Unchanged) */
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-full: 9999px;
+
+  /* =========================
+     2. SEMANTIC TOKENS - Context-aware aliases (Unchanged)
+     ========================= */
+
+  /* Backgrounds */
+  --color-background: var(--color-gray-0);
+  --color-surface: var(--color-gray-50);
+  --color-surface-hover: var(--color-gray-100);
+
+  /* Text */
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-muted: var(--color-gray-500);
+  --color-text-inverse: var(--color-gray-0);
+
+  /* Brand */
+  --color-primary: var(--color-blue-600);
+  --color-primary-hover: var(--color-blue-700);
+
+  /* States */
+  --color-success: var(--color-green-600);
+  --color-danger: var(--color-red-600);
+  --color-warning: var(--color-amber-600);
+
+  /* Borders */
+  --color-border: var(--color-gray-200);
+  --color-border-hover: var(--color-gray-300);
+
+  /* =========================
+     3. COMPONENT TOKENS - Scoped to components (Unchanged)
+     ========================= */
+
+  --button-radius: var(--radius-md);
+  --card-radius: var(--radius-lg);
+  --input-radius: var(--radius-md);
+}
+
+/* Dark Mode Theme */
+[data-theme="dark"] {
+  --color-background: var(--color-gray-950);
+  --color-surface: var(--color-gray-900);
+  --color-surface-hover: var(--color-gray-800);
+  --color-text-primary: var(--color-gray-50);
+  --color-text-secondary: var(--color-gray-400);
+  --color-text-muted: var(--color-gray-500);
+  --color-border: var(--color-gray-800);
+  --color-border-hover: var(--color-gray-700);
+}
+
+/* ============================================
+   BASE LAYER - Global defaults
+   ============================================ */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-text-primary antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}

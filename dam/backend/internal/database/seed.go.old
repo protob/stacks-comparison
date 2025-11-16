@@ -1,0 +1,209 @@
+package database
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"dam-backend/internal/constants"
+	"dam-backend/internal/db"
+	"dam-backend/pkg/models"
+
+	"github.com/google/uuid"
+)
+
+// Seed wipes the database and inserts a fresh set of sample data.
+func Seed(ctx context.Context, sqlDB *sql.DB) error {
+	tx, err := sqlDB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback() // Rollback on error
+
+	qtx := db.New(tx)
+
+	// 1. Clear existing data (in reverse order of foreign key dependencies)
+	fmt.Println("   - Clearing existing data...")
+	if _, err := tx.ExecContext(ctx, "DELETE FROM playlist_tracks;"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "DELETE FROM playlists;"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "DELETE FROM tracks;"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "DELETE FROM albums;"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "DELETE FROM artists;"); err != nil {
+		return err
+	}
+
+	// 2. Create Artists
+	fmt.Println("   - Creating artists...")
+	artists := createSeedArtists(ctx, qtx)
+
+	// 3. Create Albums
+	fmt.Println("   - Creating albums...")
+	trackIDs := createSeedAlbums(ctx, qtx, artists)
+
+	// 4. Create Playlists
+	fmt.Println("   - Creating playlists...")
+	createSeedPlaylists(ctx, qtx, trackIDs)
+
+	fmt.Println("   - Committing transaction...")
+	return tx.Commit()
+}
+
+func createSeedArtists(ctx context.Context, qtx *db.Queries) map[string]db.Artist {
+	artists := map[string]db.Artist{}
+
+	// Special Artists
+	va, _ := qtx.CreateArtist(ctx, db.CreateArtistParams{ID: constants.VariousArtistsID, Name: "Various Artists", State: "active"})
+	artists["va"] = va
+	unlinked, _ := qtx.CreateArtist(ctx, db.CreateArtistParams{ID: constants.UnlinkedArtistPlaceholderID, Name: "Unlinked Placeholder", State: "active"})
+	artists["unlinked"] = unlinked
+
+	// Regular Artists
+	custom1, _ := qtx.CreateArtist(ctx, db.CreateArtistParams{ID: uuid.NewString(), Name: "Custom Artist 1 (Active)", State: "active", About: sql.NullString{String: "An active artist in the main collection.", Valid: true}})
+	artists["custom1"] = custom1
+	custom2, _ := qtx.CreateArtist(ctx, db.CreateArtistParams{ID: uuid.NewString(), Name: "Custom Artist 2 (Sketch)", State: "sketch", About: sql.NullString{String: "An artist in the workspace.", Valid: true}})
+	artists["custom2"] = custom2
+	custom3, _ := qtx.CreateArtist(ctx, db.CreateArtistParams{ID: uuid.NewString(), Name: "Custom Artist 3 (Concept)", State: "concept"})
+	artists["custom3"] = custom3
+
+	return artists
+}
+
+func createSeedAlbums(ctx context.Context, qtx *db.Queries, artists map[string]db.Artist) map[string]string {
+	trackIDs := make(map[string]string)
+
+	// Album 1: Active, with tracks and lyrics
+	album1ID := uuid.NewString()
+	qtx.CreateAlbum(ctx, db.CreateAlbumParams{ID: album1ID, Slug: "sample-album-1", Title: "Sample Album 1", ArtistID: artists["custom1"].ID, AlbumType: "album", State: "active"})
+	lyricsExtras, _ := json.Marshal(models.TrackExtras{Lyrics: &struct {
+		Original   string  `json:"original"`
+		Translated *string `json:"translated,omitempty"`
+	}{Original: "This is the original text."}})
+	track1ID := uuid.NewString()
+	track2ID := uuid.NewString()
+	qtx.CreateTrack(ctx, db.CreateTrackParams{ID: track1ID, AlbumID: album1ID, TrackNumber: 1, Title: "Track One", AudioStorageKey: sql.NullString{String: constants.SampleMp3Url, Valid: true}, Extras: sql.NullString{String: string(lyricsExtras), Valid: true}})
+	qtx.CreateTrack(ctx, db.CreateTrackParams{ID: track2ID, AlbumID: album1ID, TrackNumber: 2, Title: "Track Two", AudioStorageKey: sql.NullString{String: constants.SampleMp3Url, Valid: true}})
+
+	// Album 2: Active, Various Artists
+	album2ID := uuid.NewString()
+	qtx.CreateAlbum(ctx, db.CreateAlbumParams{ID: album2ID, Slug: "various-artists-compilation", Title: "Various Artists Compilation", ArtistID: artists["va"].ID, AlbumType: "compilation", State: "active"})
+	track3ID := uuid.NewString()
+	track4ID := uuid.NewString()
+	qtx.CreateTrack(ctx, db.CreateTrackParams{ID: track3ID, AlbumID: album2ID, TrackNumber: 1, Title: "VA Track A", AudioStorageKey: sql.NullString{String: constants.SampleMp3Url, Valid: true}})
+	qtx.CreateTrack(ctx, db.CreateTrackParams{ID: track4ID, AlbumID: album2ID, TrackNumber: 2, Title: "VA Track B", AudioStorageKey: sql.NullString{String: constants.SampleMp3Url, Valid: true}})
+
+	// Album 3: Sketch, with one track
+	album3ID := uuid.NewString()
+	qtx.CreateAlbum(ctx, db.CreateAlbumParams{ID: album3ID, Slug: "sketch-album-3", Title: "Sketch Album 3", ArtistID: artists["custom2"].ID, AlbumType: "ep", State: "sketch"})
+	track5ID := uuid.NewString()
+	qtx.CreateTrack(ctx, db.CreateTrackParams{ID: track5ID, AlbumID: album3ID, TrackNumber: 1, Title: "Work in Progress", AudioStorageKey: sql.NullString{String: constants.SampleMp3Url, Valid: true}})
+
+	// Album 4: Concept, no tracks
+	qtx.CreateAlbum(ctx, db.CreateAlbumParams{ID: uuid.NewString(), Slug: "concept-album-4", Title: "Concept Album 4", ArtistID: artists["custom3"].ID, AlbumType: "album", State: "concept"})
+
+	// Album 5: Concept, Unlinked Artist
+	qtx.CreateAlbum(ctx, db.CreateAlbumParams{ID: uuid.NewString(), Slug: "unlinked-project-5", Title: "Unlinked Project 5", ArtistID: artists["unlinked"].ID, AlbumType: "single", State: "concept", ArtistNameDisplay: sql.NullString{String: "A Temporary Project Name", Valid: true}})
+
+	// Store track IDs for playlist creation
+	trackIDs["track1"] = track1ID
+	trackIDs["track2"] = track2ID
+	trackIDs["track3"] = track3ID
+	trackIDs["track4"] = track4ID
+	trackIDs["track5"] = track5ID
+
+	return trackIDs
+}
+
+func createSeedPlaylists(ctx context.Context, qtx *db.Queries, trackIDs map[string]string) {
+	// Playlist 1: Favorite Tracks
+	favoritesID := uuid.NewString()
+	qtx.CreatePlaylist(ctx, db.CreatePlaylistParams{
+		ID:          favoritesID,
+		Name:        "Favorite Tracks",
+		Description: sql.NullString{String: "My all-time favorite tracks", Valid: true},
+		State:       "active",
+	})
+
+	// Add some tracks to favorites
+	if trackID, exists := trackIDs["track1"]; exists {
+		qtx.CreatePlaylistTrack(ctx, db.CreatePlaylistTrackParams{
+			ID:         uuid.NewString(),
+			PlaylistID: favoritesID,
+			TrackID:    trackID,
+			Position:   1,
+		})
+	}
+	if trackID, exists := trackIDs["track3"]; exists {
+		qtx.CreatePlaylistTrack(ctx, db.CreatePlaylistTrackParams{
+			ID:         uuid.NewString(),
+			PlaylistID: favoritesID,
+			TrackID:    trackID,
+			Position:   2,
+		})
+	}
+
+	// Playlist 2: Workout Mix
+	workoutID := uuid.NewString()
+	qtx.CreatePlaylist(ctx, db.CreatePlaylistParams{
+		ID:          workoutID,
+		Name:        "Workout Mix",
+		Description: sql.NullString{String: "High energy tracks for workouts", Valid: true},
+		State:       "active",
+	})
+
+	// Add tracks to workout playlist
+	if trackID, exists := trackIDs["track2"]; exists {
+		qtx.CreatePlaylistTrack(ctx, db.CreatePlaylistTrackParams{
+			ID:         uuid.NewString(),
+			PlaylistID: workoutID,
+			TrackID:    trackID,
+			Position:   1,
+		})
+	}
+	if trackID, exists := trackIDs["track4"]; exists {
+		qtx.CreatePlaylistTrack(ctx, db.CreatePlaylistTrackParams{
+			ID:         uuid.NewString(),
+			PlaylistID: workoutID,
+			TrackID:    trackID,
+			Position:   2,
+		})
+	}
+
+	// Playlist 3: Chill Vibes
+	chillID := uuid.NewString()
+	qtx.CreatePlaylist(ctx, db.CreatePlaylistParams{
+		ID:          chillID,
+		Name:        "Chill Vibes",
+		Description: sql.NullString{String: "Relaxing tracks for unwinding", Valid: true},
+		State:       "active",
+	})
+
+	// Playlist 4: Recently Added (System Generated)
+	recentID := uuid.NewString()
+	qtx.CreatePlaylist(ctx, db.CreatePlaylistParams{
+		ID:          recentID,
+		Name:        "Recently Added",
+		Description: sql.NullString{String: "Tracks recently added to the library", Valid: true},
+		State:       "active",
+	})
+
+	// Add most recent tracks to recently added playlist
+	trackKeys := []string{"track5", "track4", "track3"}
+	for i, key := range trackKeys {
+		if trackID, exists := trackIDs[key]; exists {
+			qtx.CreatePlaylistTrack(ctx, db.CreatePlaylistTrackParams{
+				ID:         uuid.NewString(),
+				PlaylistID: recentID,
+				TrackID:    trackID,
+				Position:   int64(i + 1),
+			})
+		}
+	}
+}

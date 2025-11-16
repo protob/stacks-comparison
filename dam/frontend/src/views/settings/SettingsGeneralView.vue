@@ -1,0 +1,2 @@
+<template><Section><h1 class="text-4xl font-bold p-8">Settings: General</h1><p class="p-8">General application settings.</p></Section></template>
+<script setup lang="ts">import Section from '@/components/layout/Section.vue'</script>

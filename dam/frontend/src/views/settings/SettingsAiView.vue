@@ -1,0 +1,2 @@
+<template><Section><h1 class="text-4xl font-bold p-8">Settings: AI Agents</h1><p class="p-8">Configuration for AI agent APIs and permissions.</p></Section></template>
+<script setup lang="ts">import Section from '@/components/layout/Section.vue'</script>

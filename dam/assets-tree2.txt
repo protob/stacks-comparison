@@ -1,0 +1,216 @@
+.
+├── ./suno
+│   ├── ./suno/json
+│   │   ├── ./suno/json/1.json
+│   │   ├── ./suno/json/2.json
+
+│   └── ./suno/output
+│       ├── ./suno/output/1
+│       │   ├── ./suno/output/1/image
+│       │   │   ├── ./suno/output/1/image/14b40934-65e3-4196-9a6a-651df8eb0777.jpg
+│       │   │   ├── ./suno/output/1/image/1c0136f8-96d0-49fa-a42d-90f1603cfa6b.jpg
+│       │   └── ./suno/output/1/mp3
+│       │       ├── ./suno/output/1/mp3/14b40934-65e3-4196-9a6a-651df8eb0777.mp3
+│       │       ├── ./suno/output/1/mp3/1c0136f8-96d0-49fa-a42d-90f1603cfa6b.mp3
+
+
+└── ./udio
+    └── ./udio/sorted
+        ├── ./udio/sorted/2024
+        │   ├── ./udio/sorted/2024/chiptune
+        │   │   ├── ./udio/sorted/2024/chiptune/62nNim7THHYT4mQpfx4FJm-neon-reverie.mp3
+        │   │   ├── ./udio/sorted/2024/chiptune/aXiWTz6HgbTsP1WjrvzdwG-echoes-of-tomorrow.mp3
+    
+        │   ├── ./udio/sorted/2024/lotr
+        │   │   ├── ./udio/sorted/2024/lotr/6ndsShKszKFdkCvzdbCKiK-bombadil's-dance-ext-v2.2.2.1.1--okayish.mp3
+        │   │   ├── ./udio/sorted/2024/lotr/c4tUjBc8WFha32iEXt4zac-lotr.mp3
+        │   │   ├── ./udio/sorted/2024/lotr/kSCZc3yGsRPuTQ5oJH2Uuz-bombadil's-dance-ext-v2.2.2.1.1---okayish.mp3
+        │   │   ├── ./udio/sorted/2024/lotr/vFK3Wa3CsFXezH7buXqqke-bombadil's-dance-ext-v2.2.2.1.1--okayish.mp3
+        │   │   └── ./udio/sorted/2024/lotr/we2trGmwKagCPdnB8C6Tzz-bombadil's-dance-ext-v2.2.2.1.2--okayish.mp3
+        │   ├── ./udio/sorted/2024/postpunk-darkwave
+        │   │   ├── ./udio/sorted/2024/postpunk-darkwave/guvR9ZAgf7yPscLTiwkk7r-echoes-of-tomorrow.mp3
+        │   │   ├── ./udio/sorted/2024/postpunk-darkwave/nQ2xrpeLQ7BDQc37LZjYK3-echoes-of-tomorrow.mp3
+        │   │   └── ./udio/sorted/2024/postpunk-darkwave/ufbve5rrf9ggcyYVtaRiTj-lambda-serenade.mp3
+        │   ├── ./udio/sorted/2024/synthpop
+        │   │   ├── ./udio/sorted/2024/synthpop/1wmRfkL9xKidi6qHqxptdE-neon-dreamscape.mp3
+        │   │   ├── ./udio/sorted/2024/synthpop/248DVFaLVTJKJPvBNwm6Cn-neon-reverie.mp3
+        │   │   ├── ./udio/sorted/2024/synthpop/2Zse8Gn4j6rJrgpcmP5CHb-neon-reverie.mp3
+        │   │   ├── ./udio/sorted/2024/synthpop/32R3zs978sD6yUwfxF6SAm-neon-dreams.mp3
+        │   │   ├── ./udio/sorted/2024/synthpop/3a5qG53ozzhPRhHyWfYDi8-echoes-of-tomorrow.mp3
+        
+        │   ├── ./udio/sorted/2024/tropical-carabean
+        │   │   ├── ./udio/sorted/2024/tropical-carabean/7GoLGgYUiqV1qs7xdjLMPL-async-serenade-ext-v2.mp3
+        │   │   ├── ./udio/sorted/2024/tropical-carabean/9R8jL1frd11U7dZKRFDTs9-recursive-whispers-ext-v2.mp3
+        │   │   ├── ./udio/sorted/2024/tropical-carabean/c4JaEVDuV9n9ddUjJSS3zJ-lambda-paradise.mp3
+      
+        │   ├── ./udio/sorted/2024/uk-grime
+        │   │   ├── ./udio/sorted/2024/uk-grime/aSJuZcUPSgz7MyLh8PiCSv-bottle-of-water.mp3
+        │   │   ├── ./udio/sorted/2024/uk-grime/puPwUuG7wmDHnDncrKjNzh-bottle-of-command.mp3
+        │   │   └── ./udio/sorted/2024/uk-grime/pWinJZis7wdzWcdDTTiuTw-concrete-jungle-swagger.mp3
+        │   └── ./udio/sorted/2024/unsorted
+        │       ├── ./udio/sorted/2024/unsorted/1tA371d9BzLcmbtxAmh7Pg-cybernetic-laments.mp3
+        │       ├── ./udio/sorted/2024/unsorted/79PAwdJGPNmLZ6C62g9EGJ-woda-z-głębin.mp3
+        │    
+        ├── ./udio/sorted/2025
+        │   ├── ./udio/sorted/2025/acid
+        │   │   ├── ./udio/sorted/2025/acid/58Ww8NSVVSJiZeAtdbPBKT-echoes-in-the-warehouse.mp3
+  mp3
+        │   │   └── ./udio/sorted/2025/acid/iHqu5oGFwnrcVHAw6Zibva-raw-resonance.mp3
+        │   ├── ./udio/sorted/2025/dark-folk-ethereal
+        │   │   ├── ./udio/sorted/2025/dark-folk-ethereal/3Xx8H3NAF2Z1Zax79FDsWY-echoes-of-the-forgotten.mp3
+      
+        │   ├── ./udio/sorted/2025/ebm
+        │   │   ├── ./udio/sorted/2025/ebm/19pLZF1qVt1p2Rz92CLaz1-shadows-of-rhythm.mp3
+     
+        │   ├── ./udio/sorted/2025/electroclash
+        │   │   └── ./udio/sorted/2025/electroclash/p6M2BCRfQfEe1ZULEyi2oK-neon-uprising.mp3
+        │   ├── ./udio/sorted/2025/euro-nrg
+        │   │   ├── ./udio/sorted/2025/euro-nrg/4fpq732W3q7PZK5Uga6r3s-euphoria-in-motion.mp3
+  
+        │   ├── ./udio/sorted/2025/funk
+        │   │   ├── ./udio/sorted/2025/funk/6E3aZUcRQgbUH8DuyhN3xo-groove-momentum.mp3
+        │   │   ├── ./udio/sorted/2025/funk/8Zxj4oD8bgko9MqcBX5kBW-soulful-swing.mp3
+        │   │   └── ./udio/sorted/2025/funk/xii8RLUw1PXPaxJxfcL8uE-soulful-movement.mp3
+        │   ├── ./udio/sorted/2025/hip-hop-abstract-chillwave
+        │   │   ├── ./udio/sorted/2025/hip-hop-abstract-chillwave/6ZddkAvHEcQa5geCFDVVPp-shadows-in-the-silence.mp3
+
+        │   ├── ./udio/sorted/2025/hip-hop-boom-bap-2024
+        │   │   ├── ./udio/sorted/2025/hip-hop-boom-bap-2024/pS58rRsqbRoGjZpZ4LgqGU-async-rhymes-in-es6-ext-v1.2---no-outro.mp3
+        │   │   ├── ./udio/sorted/2025/hip-hop-boom-bap-2024/sNJfcjm17LKAWq69t5Xzzn-async-rhymes-in-es6-ext-v1.mp3
+        │   │   └── ./udio/sorted/2025/hip-hop-boom-bap-2024/w39chGAvEhrWA3hsTTfw2X-promises-delivered.mp3
+        │   ├── ./udio/sorted/2025/jaz-traditional
+        │   │   ├── ./udio/sorted/2025/jaz-traditional/42Drh7qCdJmkX1NiG4TZck-riffing-on-rhythms.mp3
+        │   │   ├── ./udio/sorted/2025/jaz-traditional/6NBu2UgeU8mZavyLjEsuEj-coding-in-a-new-rhythm.mp3
+        
+        │   ├── ./udio/sorted/2025/jazz-quite-storm-2024
+        │   │   ├── ./udio/sorted/2025/jazz-quite-storm-2024/2uGhyHCew9QMi36VyJeTgA-refactor-serenade.mp3
+
+        │   ├── ./udio/sorted/2025/mongolian-folk-metal
+        │   │   ├── ./udio/sorted/2025/mongolian-folk-metal/3V2xcoRt6xRjJoX6g7hexH-echoes-of-the-steppe.mp3
+        │ 
+        │   ├── ./udio/sorted/2025/postpunk-darkwave
+        │   │   ├── ./udio/sorted/2025/postpunk-darkwave/2bU6aDhi3nydDujn4Kbgcg-echoes-of-tomorrow.mp3
+        │   │   ├── ./udio/sorted/2025/postpunk-darkwave/5QaZmtasy1JnH8eBgAuSog-shadows-in-silence.mp3
+      
+        │   ├── ./udio/sorted/2025/space-age-pop
+        │   │   ├── ./udio/sorted/2025/space-age-pop/22oUd3TdjRzmcpzjvjoH4z-echoes-of-a-dreamscape.mp3
+
+        │   ├── ./udio/sorted/2025/synthpop-latin
+        │   │   ├── ./udio/sorted/2025/synthpop-latin/2BSXaGw1rXdNiuqhfV77ZJ-neon-vibes.mp3
+      
+        │   └── ./udio/sorted/2025/tropical-cabaret
+        │       ├── ./udio/sorted/2025/tropical-cabaret/3iZvwaYDD2sLirP8DV2DK3-siren's-masquerade.mp3
+        │       ├── ./udio/sorted/2025/tropical-cabaret/6HtVahCvLN9a1nTvszbtL5-hypnotic-desires.mp3
+    
+        ├── ./udio/sorted/2rerender
+        │   ├── ./udio/sorted/2rerender/90s-pop-dance
+        │   │   ├── ./udio/sorted/2rerender/90s-pop-dance/7GjP8262wA8ohjbXAD43Ze-code-revolution.mp3
+
+        │   ├── ./udio/sorted/2rerender/grime
+        │   │   ├── ./udio/sorted/2rerender/grime/eAdqAMErVh3vV57aucBvx3-urban-hydration-ext-v1.mp3
+        │   │   ├── ./udio/sorted/2rerender/grime/eAWkh6R1Fnb9jLJiQZWFsr-quench-the-streets.mp3
+        │   │   └── ./udio/sorted/2rerender/grime/ubjBob5u7UJWLuBdhmhiJQ-urban-hydration.mp3
+        │   ├── ./udio/sorted/2rerender/hip-hop-ff
+        │   │   ├── ./udio/sorted/2rerender/hip-hop-ff/55QhZPdpnxCPdZqwqvmd16-funkcyjny-kod--chaotic.mp3
+ 
+        │   └── ./udio/sorted/2rerender/synthwave
+        │       ├── ./udio/sorted/2rerender/synthwave/4Y6yJebw5NGjKY3wsktBFa-asynchronous-euphoria.mp3
+        │       └── ./udio/sorted/2rerender/synthwave/sQx9MfybwejAzEEMAksNpQ-immutable-euphoria.mp3
+        ├── ./udio/sorted/acid-industail-techno-ebm
+        │   ├── ./udio/sorted/acid-industail-techno-ebm/3bDp1fAfC3C1o9Mdtzy7RW-mechanical-descent.mp3
+        │   ├── ./udio/sorted/acid-industail-techno-ebm/3Jnt7tij7ZCPMbHdXMizTp-relentless-machine.mp3
+        │  
+        ├── ./udio/sorted/eurodance
+        │   ├── ./udio/sorted/eurodance/16kE6pKjqcszkaAMRhoFFZ-euphoria-in-motion.mp3
+        │   ├── ./udio/sorted/eurodance/1kRC82RbhWQk7WfMCG3nNj-euphoric-pulse.mp3
+        │ 
+        ├── ./udio/sorted/full-songs
+        │   ├── ./udio/sorted/full-songs/1Ku3vGoocadkfdyNv3WxeC-async-reverie-ext-v2.2--ok-ext-v2--ok-ext-v2--ok.mp3
+        │   ├── ./udio/sorted/full-songs/1Wb2iaRWybchf2vCEVB3n8-callback-blues.mp3
+     
+        ├── ./udio/sorted/full-songs-electrscher-forschrit-veriosn
+        │   ├── ./udio/sorted/full-songs-electrscher-forschrit-veriosn/1yJZt4RYvcW6tDWCBUtx2b-elektrischer-fortschritt-ext-v2.2.2.1.2.1-ok-4-ok-ext-v2.mp3
+    
+        ├── ./udio/sorted/hip-hop
+        │   ├── ./udio/sorted/hip-hop/4s5rNfU9YBbJxQYWjHsrTg-systematic-inquiry.mp3
+        │   ├── ./udio/sorted/hip-hop/7Q665Xh6LW2EbSvmZkjsJg-systematic-patterns.mp3
+        │   ├── ./udio/sorted/hip-hop/8NQdERhwQe2tir57KjurFx-shadows-of-dissonance.mp3
+        │   ├── ./udio/sorted/hip-hop/d5LTUQUneJEAZuBCYjVEr6-mechanical-oom-pah.mp3
+        │   ├── ./udio/sorted/hip-hop/dP32QVTRN5r8RMz24HKkqS-fragments-of-dystopia.mp3
+        │   ├── ./udio/sorted/hip-hop/m7Ejpa5PZ6PFPTrdXxHTRm-echoes-of-the-night.mp3
+        │   ├── ./udio/sorted/hip-hop/pWCoMGyeqtoRyuhFVGRxbu-systematic-reflections.mp3
+        │   ├── ./udio/sorted/hip-hop/v8ChDHGcF614vWi9npy5D9-fragments-of-dystopia.mp3
+        │   └── ./udio/sorted/hip-hop/wU9798GNdSinupMeWfsBWq-the-untitled.mp3
+        ├── ./udio/sorted/industrial-tribal-techno
+        │   ├── ./udio/sorted/industrial-tribal-techno/1nRUGwMjmEjatxnPmqkYQU-primal-pulse.mp3
+        │   ├── ./udio/sorted/industrial-tribal-techno/2ACBonr8jUzSF7rndzau4G-echoes-of-the-ancients.mp3
+        │   ├── ./udio/sorted/industrial-tribal-techno/3sWsQgYSeBhFtRt5Wxkj8y-evolving-rhythmic-tension.mp3
+        │   ├── ./udio/sorted/industrial-tribal-techno/3XjAMo4XoQcFHgLuhJPEGo-evolving-structures.mp3
+        
+        ├── ./udio/sorted/podcast-intro-elcro-acid-idm
+        │   ├── ./udio/sorted/podcast-intro-elcro-acid-idm/15RYzwuHWsryqWH5Dkdm5Y-rhythmic-precision.mp3
+        │   ├── ./udio/sorted/podcast-intro-elcro-acid-idm/1k1rViWQA5xWmdX3Y2xYGF-mechanized-precision.mp3
+   
+        ├── ./udio/sorted/podcast-itro-idm
+        │   ├── ./udio/sorted/podcast-itro-idm/1vR32zcSE1st6oCM8q4X5Z-evolving-logic.mp3
+        │   ├── ./udio/sorted/podcast-itro-idm/2DYXn8TJuwuN3N3mKpszrZ-evolving-horizons.mp3
+        │   ├── ./udio/sorted/podcast-itro-idm/2eni24Bw4v8pd6dFZXBr22-evolving-horizons.mp3
+     
+        ├── ./udio/sorted/podcast-may-2025
+        │   ├── ./udio/sorted/podcast-may-2025/1hb2PBdXNjiYbKQmn39pE7-new-title.mp3
+        │   ├── ./udio/sorted/podcast-may-2025/24bKz6ydXHcKhP2CsErxCY-silent-echoes.mp3
+        │   ├── ./udio/sorted/podcast-may-2025/2k81DnP3upA9hv6vEvbppK-new-title.mp3
+        │   ├── ./udio/sorted/podcast-may-2025/2UFNwCiY1Gpce2TCCV4APQ-technological-reverie.mp3
+      
+        ├── ./udio/sorted/soundtracks-2025
+        │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/1cPhBGuMr2P6tUnVcS2URu-mechanical-shadows---ok-to-extend-or-remix.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/1gXFP2D9qxtKYwgsCSBtG2-echoes-of-an-industrial-city--ok-to-remix.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/2kWrwASSUcn13NAqYFw71A-echoes-of-the-technopolis--okayish.mp3
+   
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/main-them-versions
+        │   │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/main-them-versions/19VGzNtUpshYvLgR9dpK4U-metropolis-noir--ok-remix-v1--okayish.mp3
+        │   │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/main-them-versions/1naGYGXp8yUJRRqVCX98jN-metropolis-noir--ok-remix-v1.mp3
+        │   │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/main-them-versions/1SXLngyiNwWy85a5MYrg4E-metropolis-noir--ok-remix-v2--ok-to-edit-second-part.mp3
+
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/mCJhM4DjvgdX2Y3WT5Sh68-echoes-of-a-forgotten-city--ok.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/n7ZcqoYCA8b66mFCaVBcya-mechanical-shadows--ok-to-extend.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -neu tech/ncCBJVRYJJ6n79emZDrfsQ-echoes-of-a-distant-future--ok-to-remix.mp3
+    
+        │   ├── ./udio/sorted/soundtracks-2025/1920s -nider
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nider/17kU7o8FGDjNx7JMaqxiFT-nautical-echoes--okayish-beginging.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nider/1syybvxHM4GmDL43eJoy3q-nautical-reverie--ok.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nider/1vVJpWoLqEYPSR2imRHS57-echoes-of-the-port---ok.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nider/1WyNL12RK4ieakNTg2FaUx-echoes-of-the-port-city--ok.mp3
+        │
+        │   ├── ./udio/sorted/soundtracks-2025/1920s -nordik
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nordik/1HMCtgMSu3yuT4r9V3HaDw-echoes-of-the-machine--ok.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nordik/1vmGXd7A8bFYdxfVf3kMeq-echoes-of-the-ancients.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nordik/25RKpQHaAjdG9c6ucKgNN8-echoes-of-frost--okayish.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/1920s -nordik/2Tqgmanj5wfNup1VWpAwkq-echoes-of-the-mechanized-forest---ok.mp3
+        │   │   
+        │   ├── ./udio/sorted/soundtracks-2025/2050 neutech
+        │   │   ├── ./udio/sorted/soundtracks-2025/2050 neutech/3ZMxMJay1dZ1SRe9hpcQvj-urban-shadows.mp3
+      
+        │   │   └── ./udio/sorted/soundtracks-2025/2050 neutech/uWTB5Jd3qCMGUaKnpU5eYL-echoes-of-decay.mp3
+        │   ├── ./udio/sorted/soundtracks-2025/2080 neutech
+        │   │   ├── ./udio/sorted/soundtracks-2025/2080 neutech/1fspoUftXGzuSugGceJyed-veil-of-shadows.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/2080 neutech/1KWHvg2BH8GSBUBerxsj4Y-lost-in-the-neon-city.mp3
+        │   │   ├── ./udio/sorted/soundtracks-2025/2080 neutech/1QaAtuH4i2MadNoEwhPuvJ-neon-shadows.mp3
+      
+        │   └── ./udio/sorted/soundtracks-2025/2080 norse
+        │       ├── ./udio/sorted/soundtracks-2025/2080 norse/1Hxvt4AMN9sgu6sXjcYBBX-echoes-of-the-frost.mp3
+        │       ├── ./udio/sorted/soundtracks-2025/2080 norse/2FrTjtP5QEgbYsM6oeziZq-whispers-of-the-frost.mp3
+
+        ├── ./udio/sorted/sountrtack-may-2025
+        │   ├── ./udio/sorted/sountrtack-may-2025/16m4TpSKQGNgeKeFaNehbs-lost-in-the-echo.mp3
+        │   ├── ./udio/sorted/sountrtack-may-2025/1eH5AeAjR79QZXWAwthnEn-ok---fast---new-horizons.mp3
+        │   ├── ./udio/sorted/sountrtack-may-2025/1eozcAbn2ANSKTLB2UMuBT-mechanical-masquerade--okayish.mp3
+     
+        └── ./udio/sorted/synth-remix-neutech
+            ├── ./udio/sorted/synth-remix-neutech/1uK6rTp465nEtFttw1JCPy-ok--the-untitled-remix-v2.mp3
+            ├── ./udio/sorted/synth-remix-neutech/3WTh2EW3Vapfq7Mg53x5H8-ok--the-untitled-remix-v1.mp3
+            ├── ./udio/sorted/synth-remix-neutech/41J2niHQdwVmjf1sWsYuDs-ok--the-untitled-remix-v2.mp3
+     
+
+336 directories, 5170 files

@@ -1,0 +1,14 @@
+/* TON KOSMOS - Main CSS Entry Point */
+
+/* 1. Base Tailwind setup and design tokens */
+@import './main.css';
+
+/* 2. Layout Component Styles (will be added in Phase 4) */
+/* @import '@/components/layout/Container.css'; */
+/* @import '@/components/layout/Section.css'; */
+
+/* 3. UI Component Styles (to be added as you build them) */
+/* @import '@/components/ui/BaseButton.css'; */
+
+/* 4. View (Page) Styles (to be added as you build them) */
+/* @import '@/views/LibraryView.css'; */
