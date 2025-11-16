@@ -54,7 +54,7 @@ const request = async <T>(
     }
 
     const data = await response.json();
-    return success(data.data ?? data);
+    return success(data.data ?? data) as Result<T, ApiErrorData>;
   } catch (error: any) {
     return failure(createApiError(
       error.message || 'Network request failed',

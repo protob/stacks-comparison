@@ -1,22 +1,20 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwind from '@tailwindcss/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
   plugins: [
     react(),
-    tailwind(),
     AutoImport({
       include: [
-        /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
+        /\.[tj]sx?$/,
       ],
       imports: [
         'react',
-        'react-router-dom',
         {
-          'zustand': ['create'],
+          'react-router': ['useNavigate', 'useParams', 'useLocation', 'useSearchParams'],
+          'zustand': [['create', 'create']],
           'zustand/middleware': ['devtools', 'persist'],
           'clsx': [['default', 'clsx']],
         },
