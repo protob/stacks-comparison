@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 19:39:46 CET
+**Generated on:** nie, 16 lis 2025, 20:09:00 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
 
 ---
@@ -1554,6 +1554,26 @@ export const useUiStore = create<UiState>()(
   }
 }
 
+```
+
+## `src/schemas/itemSchema.ts`
+```
+import { z } from 'zod';
+
+export const itemFormSchema = z.object({
+  name: z.string()
+    .min(1, 'Name is required')
+    .min(3, 'Name must be at least 3 characters'),
+  text: z.string()
+    .min(1, 'Description is required'),
+  priority: z.enum(['low', 'mid', 'high'], {
+    errorMap: () => ({ message: 'Please select a priority' })
+  }),
+  tags: z.array(z.string()).optional(),
+  categories: z.tuple([z.string().min(1, 'Category is required')]),
+});
+
+export type ItemFormData = z.infer<typeof itemFormSchema>;
 ```
 
 ## `src/hooks/useItemFilters.ts`
