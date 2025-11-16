@@ -27,16 +27,23 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
       onChange: zodValidator({ schema: itemFormSchema }),
     },
     onSubmit: async ({ value }) => {
-      console.log('FORM SUBMITTED!', value);
+      console.log('🔥 FORM.onSubmit FIRED!', value);
       await onSubmit(value);
     },
   });
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
+        console.log('🎯 HTML FORM SUBMIT EVENT FIRED');
         e.preventDefault();
-        form.handleSubmit();
+        e.stopPropagation();
+        console.log('⚡ Calling form.handleSubmit()');
+        
+        // TRY THIS - await the submission
+        await form.handleSubmit();
+        
+        console.log('✅ handleSubmit completed');
       }}
       className="space-y-4"
     >
@@ -152,8 +159,19 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
           Cancel
         </Button>
         <Button
-          type="submit"
+          type="button" // Change to button temporarily
           disabled={!form.state.canSubmit || form.state.isSubmitting}
+          onClick={async () => {
+            console.log('🔘 BUTTON CLICKED - DIRECT SUBMIT');
+            // Call onSubmit directly, bypassing TanStack Form
+            await onSubmit({
+              name: form.state.values.name,
+              text: form.state.values.text,
+              priority: form.state.values.priority,
+              tags: form.state.values.tags,
+              categories: form.state.values.categories,
+            });
+          }}
         >
           {form.state.isSubmitting ? 'Adding...' : 'Add Item'}
         </Button>
