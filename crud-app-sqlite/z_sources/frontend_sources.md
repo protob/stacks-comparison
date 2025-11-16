@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 11:32:20 CET
+**Generated on:** nie, 16 lis 2025, 12:05:30 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite/frontend
 
 ---
@@ -176,8 +176,9 @@ echo "3. Start development: npm run dev"
     "clsx": "2.1.1"
   },
   "devDependencies": {
-    "@types/react": "19.2.5",
-    "@types/react-dom": "19.2.3",
+    "@tailwindcss/vite": "4.1.17",
+    "@types/react": "19.0.4",
+    "@types/react-dom": "19.0.2",
     "@vitejs/plugin-react": "5.1.1",
     "typescript": "5.9.3",
     "vite": "7.2.2",
@@ -207,12 +208,14 @@ echo "3. Start development: npm run dev"
 ```
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
     AutoImport({
       include: [
         /\.[tj]sx?$/,
