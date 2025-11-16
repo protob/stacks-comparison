@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: theme(colors.neutral.900);
+    color: theme(colors.neutral.100);
+    font-family: theme(fontFamily.sans);
+    min-height: 100vh;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid theme(colors.neutral.700);
+    border-radius: 0.375rem;
+    background-color: theme(colors.neutral.800);
+    color: theme(colors.neutral.100);
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: theme(colors.blue.500);
+    box-shadow: 0 0 0 1px theme(colors.blue.500 / 50%);
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+}
+
+/* Scrollbar styling */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background-color: theme(colors.neutral.800);
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: theme(colors.neutral.600);
+  border-radius: 0.25rem;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: theme(colors.neutral.500);
+}

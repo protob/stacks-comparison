@@ -142,3 +142,8 @@ dist-ssr
 
 # Tailwind CSS
 *.tailwind.*.cache
+
+dam
+dam/*
+
+
