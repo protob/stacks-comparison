@@ -1,73 +1,42 @@
-import { Clock } from '@/components/common/Clock';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
+import { useState } from 'react'
+import { Input } from 'react' // Assume basic, or use native
+import ThemeToggle from '../common/ThemeToggle'
 
-interface AppSidebarProps {
-  searchQuery: string;
-  onSearchQueryChange: (query: string) => void;
-  searchPlaceholder?: string;
-  availableTags: string[];
-  selectedTags: string[];
-  onToggleTag: (tag: string) => void;
-  tagsLabel?: string;
-  tagPrefix?: string;
+interface Props {
+  allTags: string[]
+  selectedTags: string[]
+  onTagSelect: (tags: string[]) => void
+  onSearch: (query: string) => void
 }
 
-const AppSidebar = ({
-  searchQuery,
-  onSearchQueryChange,
-  searchPlaceholder = 'Search items...',
-  availableTags,
-  selectedTags,
-  onToggleTag,
-  tagsLabel = 'TAGS',
-  tagPrefix = '#'
-}: AppSidebarProps) => {
+export default function AppSidebar({ allTags, selectedTags, onTagSelect, onSearch }: Props) {
+  const [search, setSearch] = useState('')
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value)
+    onSearch(e.target.value)
+  }
+
+  const toggleTag = (tag: string) => {
+    const updated = selectedTags.includes(tag) ? selectedTags.filter(t => t !== tag) : [...selectedTags, tag]
+    onTagSelect(updated)
+  }
+
   return (
-    <aside className="w-[--sidebar-width] bg-surface border-r border-border p-[--nav-padding] flex flex-col gap-[--gap-component-internal]">
-      {/* Search Section */}
-      <div>
-        <h3 className="text-sm font-medium text-text-secondary mb-3">Search</h3>
-        <input
-          value={searchQuery}
-          onChange={(e) => onSearchQueryChange(e.target.value)}
-          type="text"
-          placeholder={searchPlaceholder}
-          className="w-full px-3 py-2 text-sm bg-surface-hover border border-border rounded text-text-primary placeholder:text-text-muted"
-        />
+    <aside className="w-sidebar-width bg-surface p-nav-padding fixed h-screen overflow-y-auto scrollbar-thin">
+      <h3 className="text-primary font-medium mb-spacing-2">Search Items...</h3>
+      <input className="mb-spacing-4" value={search} onChange={handleSearch} placeholder="Search..." />
+      <h3 className="text-primary font-medium mb-spacing-2">Tags</h3>
+      <div className="flex flex-wrap gap-spacing-2">
+        {allTags.map(tag => (
+          <button key={tag} onClick={() => toggleTag(tag)} className={clsx('px-3 py-1 rounded-radius-md', selectedTags.includes(tag) ? 'bg-primary text-inverse' : 'bg-surface-hover text-secondary')}>
+            {tag}
+          </button>
+        ))}
       </div>
-
-      {/* Tags Section */}
-      {availableTags.length > 0 && (
-        <div>
-          <h3 className="text-sm font-medium text-text-secondary mb-3">{tagsLabel}</h3>
-          <div className="max-h-64 overflow-y-auto scrollbar-thin">
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => onToggleTag(tag)}
-                  className={clsx(
-                    'px-2 py-1 text-xs rounded transition-colors',
-                    selectedTags.includes(tag)
-                      ? 'bg-primary text-text-inverse'
-                      : 'bg-surface-hover text-text-secondary hover:bg-surface-active'
-                  )}
-                >
-                  {tagPrefix}{tag}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Theme Toggle and Clock */}
-      <div className="mt-auto flex items-center justify-between">
-        <Clock />
+      <div className="mt-auto pt-spacing-4">
         <ThemeToggle />
       </div>
     </aside>
-  );
-};
-
-export default AppSidebar;
+  )
+}

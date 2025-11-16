@@ -1,10 +1,2 @@
-export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric', 
-    hour: '2-digit', 
-    minute: '2-digit'
-  });
-};
+// Add any general helpers here if needed in the future
+export const noop = () => {}

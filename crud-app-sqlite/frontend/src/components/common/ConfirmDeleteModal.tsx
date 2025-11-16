@@ -1,48 +1,19 @@
-import Modal from './Modal';
-import Button from './Button';
-
-interface ConfirmDeleteModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title?: string;
-  message?: string;
-  confirmText?: string;
-  isLoading?: boolean;
+interface Props {
+  onConfirm: () => void
+  onCancel: () => void
+  message: string
 }
 
-const ConfirmDeleteModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  title = 'Confirm Deletion',
-  message = 'Are you sure you want to delete this item? This action cannot be undone.',
-  confirmText = 'Delete',
-  isLoading = false
-}: ConfirmDeleteModalProps) => {
-  const cancelButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        cancelButtonRef.current?.focus();
-      }, 100);
-    }
-  }, [isOpen]);
-
+export default function ConfirmDeleteModal({ onConfirm, onCancel, message }: Props) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm" persistent>
-      <p className="text-neutral-300 text-sm mb-6" dangerouslySetInnerHTML={{ __html: message }} />
-      <div className="flex justify-end gap-3">
-        <Button variant="secondary" onClick={onClose} ref={cancelButtonRef}>
-          Cancel
-        </Button>
-        <Button variant="danger" onClick={onConfirm} loading={isLoading}>
-          {confirmText}
-        </Button>
+    <div className="fixed inset-0 bg-background/80 flex items-center justify-center">
+      <div className="bg-surface p-card-padding rounded-card-radius shadow-lg max-w-sm w-full">
+        <p className="text-primary mb-spacing-4">{message}</p>
+        <div className="flex justify-end gap-spacing-2">
+          <button onClick={onCancel} className="bg-surface-hover text-secondary px-4 py-2 rounded-button-radius">Cancel</button>
+          <button onClick={onConfirm} className="bg-danger text-inverse px-4 py-2 rounded-button-radius">Delete</button>
+        </div>
       </div>
-    </Modal>
-  );
-};
-
-export default ConfirmDeleteModal;
+    </div>
+  )
+}

@@ -1,169 +1,74 @@
-/*
- * MODERNIST DESIGN SYSTEM - Tailwind v4 CSS-First for Todo App
- * Clean, minimal, functional - inspired by Bauhaus & Swiss typography
- * Optimized for React with fluid responsiveness, vertical rhythm, proportions
- */
-
-@config "../../tailwind.config.js";
-
-@import "tailwindcss";
-
-/* Define layer order for cascade control */
-@layer base, components, utilities;
-
-/* ============================================
-   BASE CONSTRAINTS - Minimum viewport
-   ============================================ */
-@layer base {
-  html {
-    min-width: 320px;
-  }
-
-  body {
-    min-width: 320px;
-  }
-}
-
-/* ============================================
-   DESIGN TOKENS - Three-tier architecture
-   ============================================ */
-
 @theme {
   /* =========================
-     1. PRIMITIVE TOKENS - Raw values
+     1. PRIMITIVE TOKENS - Foundations
      ========================= */
 
-  /* Grayscale Palette - OKLCH for better perceptual uniformity */
-  --color-gray-0:   oklch(1.000 0.000 0);      /* Pure white */
-  --color-gray-50:  oklch(0.985 0.002 247);
-  --color-gray-100: oklch(0.973 0.003 247);
-  --color-gray-200: oklch(0.935 0.006 247);
-  --color-gray-300: oklch(0.869 0.010 247);
-  --color-gray-400: oklch(0.707 0.015 247);
-  --color-gray-500: oklch(0.539 0.018 247);
-  --color-gray-600: oklch(0.428 0.020 247);
-  --color-gray-700: oklch(0.321 0.020 247);
-  --color-gray-800: oklch(0.215 0.019 247);
-  --color-gray-900: oklch(0.141 0.015 247);
-  --color-gray-950: oklch(0.075 0.010 247);    /* Near black */
+  /* Breakpoints - Fluid scaling between breakpoints */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 
-  /* Primary Palette - Blue for trust & professionalism */
-  --color-blue-50:  oklch(0.96 0.025 240);  /* Very light blue */
-  --color-blue-100: oklch(0.92 0.045 240);
-  --color-blue-200: oklch(0.86 0.075 240);
-  --color-blue-300: oklch(0.78 0.115 240);
-  --color-blue-400: oklch(0.68 0.165 240);
-  --color-blue-500: oklch(0.58 0.215 240);
-  --color-blue-600: oklch(0.50 0.220 240);
-  --color-blue-700: oklch(0.42 0.200 240);
-  --color-blue-800: oklch(0.35 0.175 240);
-  --color-blue-900: oklch(0.30 0.150 240);
-
-  /* Accent Colors - Semantic use for Todo app */
-  --color-green-50:  oklch(0.971 0.018 142);
-  --color-green-500: oklch(0.647 0.190 142);
-  --color-green-600: oklch(0.519 0.195 142);
-
-  --color-red-50:   oklch(0.971 0.018 27);
-  --color-red-500:  oklch(0.637 0.237 27);
-  --color-red-600:  oklch(0.577 0.237 27);
-
-  --color-amber-50:  oklch(0.987 0.021 91);
-  --color-amber-500: oklch(0.769 0.183 84);
-  --color-amber-600: oklch(0.659 0.181 75);
-
-  /* Typography Scale - Modular (1.2 ratio) - Fluid with clamp for auto scaling */
-  --font-size-xs:   clamp(0.625rem, 0.6rem + 0.125vw, 0.694rem);     /* 10-11px */
-  --font-size-sm:   clamp(0.75rem, 0.72rem + 0.14vw, 0.833rem);      /* 12-13px */
-  --font-size-base: clamp(0.875rem, 0.825rem + 0.25vw, 1rem);        /* 14-16px */
-  --font-size-lg:   clamp(1.05rem, 0.99rem + 0.3vw, 1.2rem);         /* 17-19px */
-  --font-size-xl:   clamp(1.26rem, 1.188rem + 0.36vw, 1.44rem);      /* 20-23px */
-  --font-size-2xl:  clamp(1.512rem, 1.425rem + 0.435vw, 1.728rem);   /* 24-28px */
-  --font-size-3xl:  clamp(1.814rem, 1.71rem + 0.52vw, 2.074rem);     /* 29-33px */
-  --font-size-4xl:  clamp(2.177rem, 2.052rem + 0.625vw, 2.488rem);   /* 35-40px */
-  --font-size-5xl:  clamp(2.612rem, 2.462rem + 0.75vw, 2.986rem);    /* 42-48px */
-
-  /* Spacing - 4px base grid for precision, fluid with clamp */
-  --spacing-0: 0;
-  --spacing-px: 1px;
-  --spacing-0_5: clamp(0.125rem, 0.1rem + 0.125vw, 0.25rem);  /* 2-4px */
-  --spacing-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);     /* 4-8px */
-  --spacing-2: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);      /* 8-16px */
-  --spacing-3: clamp(0.75rem, 0.6rem + 0.75vw, 1.5rem);     /* 12-24px */
-  --spacing-4: clamp(1rem, 0.8rem + 1vw, 2rem);        /* 16-32px */
-  --spacing-5: clamp(1.25rem, 1rem + 1.25vw, 2.5rem);     /* 20-40px */
-  --spacing-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);      /* 24-48px */
-  --spacing-8: clamp(2rem, 1.6rem + 2vw, 4rem);        /* 32-64px */
-  --spacing-10: clamp(2.5rem, 2rem + 2.5vw, 5rem);       /* 40-80px */
-  --spacing-12: clamp(3rem, 2.4rem + 3vw, 6rem);         /* 48-96px */
-  --spacing-16: clamp(4rem, 3.2rem + 4vw, 8rem);         /* 64-128px */
-  --spacing-20: clamp(5rem, 4rem + 5vw, 10rem);          /* 80-160px */
-  --spacing-24: clamp(6rem, 4.8rem + 6vw, 12rem);        /* 96-192px */
-
-  /* Line Heights - Fluid for better rhythm */
-  --line-height-none: 1;
-  --line-height-tight: clamp(1.2, 1.15 + 0.25vw, 1.25);
-  --line-height-snug: clamp(1.325, 1.3 + 0.125vw, 1.375);
-  --line-height-normal: clamp(1.45, 1.4 + 0.25vw, 1.5);
-  --line-height-relaxed: clamp(1.575, 1.55 + 0.125vw, 1.625);
-  --line-height-loose: clamp(1.7, 1.675 + 0.125vw, 1.75);
-
-  /* Vertical Rhythm System - Based on base line-height multiple */
-  --rhythm-base: var(--line-height-normal); /* ~1.5 */
-  --rhythm-half: calc(var(--rhythm-base) / 2);
-  --rhythm-double: calc(var(--rhythm-base) * 2);
-  --rhythm-triple: calc(var(--rhythm-base) * 3);
-
-  /* Fluid Rhythm */
-  --rhythm-fluid: clamp(1.25rem, 1.125rem + 0.625vw, 1.5rem);
-  --rhythm-fluid-half: calc(var(--rhythm-fluid) / 2);
-  --rhythm-fluid-double: calc(var(--rhythm-fluid) * 2);
-  --rhythm-fluid-triple: calc(var(--rhythm-fluid) * 3);
-
-  /* Semantic Rhythm Tokens for Todo app */
-  --margin-after-heading: var(--rhythm-fluid);
-  --margin-after-paragraph: var(--rhythm-half);
-  --margin-between-sections: var(--rhythm-double);
-  --gap-grid-items: var(--rhythm-fluid);
-  --gap-component-internal: var(--spacing-2);
-
-  /* Font Weights */
+  /* Typography */
+  --font-family-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-size-base: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem); /* Scaled down from 14-16px to 12-14px */
+  --font-size-sm: clamp(0.7rem, 0.65rem + 0.25vw, 0.8rem);
+  --font-size-lg: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --font-size-xl: clamp(1.2rem, 1.1rem + 0.5vw, 1.35rem);
   --font-weight-light: 300;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* Border Radius - Subtle for modernist aesthetic */
-  --radius-none: 0;
-  --radius-sm: 0.125rem;   /* 2px */
-  --radius-md: 0.25rem;    /* 4px */
-  --radius-lg: 0.375rem;   /* 6px */
-  --radius-xl: 0.5rem;     /* 8px */
-  --radius-2xl: 0.75rem;   /* 12px */
-  --radius-3xl: 1rem;      /* 16px */
-  --radius-full: 9999px;   /* pills */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
 
-  /* Shadows - Subtle depth */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-none: none;
+  /* Spacing - 4px base grid with fluid scaling, scaled down for smaller UI */
+  --spacing-0: 0px;
+  --spacing-px: 1px;
+  --spacing-1: clamp(0.15rem, 0.13rem + 0.1vw, 0.25rem); /* 2.4-4px */
+  --spacing-2: clamp(0.3rem, 0.26rem + 0.2vw, 0.5rem); /* 4.8-8px */
+  --spacing-3: clamp(0.45rem, 0.39rem + 0.3vw, 0.75rem); /* 7.2-12px */
+  --spacing-4: clamp(0.6rem, 0.52rem + 0.4vw, 1rem); /* 9.6-16px */
+  --spacing-5: clamp(0.75rem, 0.65rem + 0.5vw, 1.25rem); /* 12-20px */
+  --spacing-6: clamp(0.9rem, 0.78rem + 0.6vw, 1.5rem); /* 14.4-24px */
+  --spacing-8: clamp(1.2rem, 1.04rem + 0.8vw, 2rem); /* 19.2-32px */
+  --spacing-10: clamp(1.5rem, 1.3rem + 1vw, 2.5rem); /* 24-40px */
+  --spacing-12: clamp(1.8rem, 1.56rem + 1.2vw, 3rem); /* 28.8-48px */
+
+  /* Radius */
+  --radius-sm: clamp(0.15rem, 0.13rem + 0.1vw, 0.25rem); /* Scaled down */
+  --radius-md: clamp(0.3rem, 0.26rem + 0.2vw, 0.5rem);
+  --radius-lg: clamp(0.45rem, 0.39rem + 0.3vw, 0.75rem);
+  --radius-xl: clamp(0.6rem, 0.52rem + 0.4vw, 1rem);
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow: 0 2px 4px oklch(0% 0 0 / 0.05), 0 1px 2px oklch(0% 0 0 / 0.1);
+  --shadow-md: 0 4px 6px oklch(0% 0 0 / 0.05), 0 2px 4px oklch(0% 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px oklch(0% 0 0 / 0.1), 0 4px 6px oklch(0% 0 0 / 0.05);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* =========================
-     2. SEMANTIC TOKENS - Context-aware
+     2. SEMANTIC TOKENS - Meaningful aliases
      ========================= */
 
-  /* Background & Surface */
+  /* Surfaces */
   --color-background: var(--color-gray-0);
   --color-surface: var(--color-gray-50);
   --color-surface-hover: var(--color-gray-100);
   --color-surface-active: var(--color-gray-200);
 
-  /* Text Hierarchy */
-  --color-text-primary: var(--color-gray-900);
+  /* Text */
+  --color-text-primary: var(--color-gray-950);
   --color-text-secondary: var(--color-gray-600);
   --color-text-muted: var(--color-gray-500);
   --color-text-inverse: var(--color-gray-0);
@@ -198,23 +103,23 @@
 
   /* Card/Item Components */
   --card-radius: var(--radius-lg);
-  --card-padding: var(--spacing-4);
+  --card-padding: var(--spacing-3); /* Reduced from spacing-4 for smaller padding */
   --card-shadow: var(--shadow);
 
   /* Input Components */
   --input-radius: var(--radius-md);
-  --input-padding-x: var(--spacing-3);
-  --input-padding-y: var(--spacing-2);
+  --input-padding-x: var(--spacing-2); /* Reduced for smaller inputs */
+  --input-padding-y: var(--spacing-1);
   --input-border-width: 1px;
 
   /* Navigation/Sidebar */
-  --nav-height: clamp(3rem, 2.5rem + 2.5vw, 4rem);
-  --nav-padding: var(--spacing-4);
+  --nav-height: clamp(2.5rem, 2rem + 2.5vw, 3.5rem); /* Scaled down */
+  --nav-padding: var(--spacing-3); /* Reduced */
 
   /* Layout */
-  --container-max: 1280px;
-  --sidebar-width: clamp(200px, 15vw, 280px);
-  --content-max: 65ch;
+  --container-max: 1024px; /* Reduced from 1280px */
+  --sidebar-width: clamp(180px, 12vw, 240px); /* Scaled down */
+  --content-max: 55ch; /* Reduced */
 }
 
 /* ============================================
@@ -240,9 +145,44 @@
   /* Intrinsic grid for Todo items */
   .grid-auto-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
-    gap: var(--gap-grid-items);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); /* Reduced min width for smaller cards */
+    gap: var(--spacing-3); /* Reduced gap */
   }
+
+  /* Semantic utilities for easy use in components */
+  .bg-background { background-color: var(--color-background); }
+  .bg-surface { background-color: var(--color-surface); }
+  .bg-surface-hover { background-color: var(--color-surface-hover); }
+  .bg-surface-active { background-color: var(--color-surface-active); }
+  .bg-primary { background-color: var(--color-primary); }
+  .bg-primary-hover { background-color: var(--color-primary-hover); }
+  .bg-primary-active { background-color: var(--color-primary-active); }
+  .bg-success { background-color: var(--color-success); }
+  .bg-danger { background-color: var(--color-danger); }
+  .bg-warning { background-color: var(--color-warning); }
+  .bg-success-light { background-color: var(--color-success-light); }
+  .bg-danger-light { background-color: var(--color-danger-light); }
+  .bg-warning-light { background-color: var(--color-warning-light); }
+
+  .text-primary { color: var(--color-text-primary); }
+  .text-secondary { color: var(--color-text-secondary); }
+  .text-muted { color: var(--color-text-muted); }
+  .text-inverse { color: var(--color-text-inverse); }
+
+  .border-border { border-color: var(--color-border); }
+  .border-border-hover { border-color: var(--color-border-hover); }
+  .border-border-focus { border-color: var(--color-border-focus); }
+
+  .rounded-card-radius { border-radius: var(--card-radius); }
+  .p-card-padding { padding: var(--card-padding); }
+  .shadow-card-shadow { box-shadow: var(--card-shadow); }
+  .rounded-button-radius { border-radius: var(--button-radius); }
+  .font-button-font-weight { font-weight: var(--button-font-weight); }
+  .transition-button-transition { transition: var(--button-transition); }
+  .rounded-input-radius { border-radius: var(--input-radius); }
+  .p-nav-padding { padding: var(--nav-padding); }
+  .h-nav-height { height: var(--nav-height); }
+  .w-sidebar-width { width: var(--sidebar-width); }
 }
 
 /* ============================================
@@ -258,7 +198,7 @@
   /* For Todo list items */
   .item-list {
     content-visibility: auto;
-    contain-intrinsic-size: 0 300px;
+    contain-intrinsic-size: 0 250px; /* Reduced for smaller */
   }
 
   /* Hardware acceleration */
@@ -315,7 +255,17 @@
   --color-blue-800: oklch(0.35 0.175 240);
   --color-blue-900: oklch(0.30 0.150 240);
 
-  /* Green, Red, Amber as in example  look here  0_docs/sample-style.css*/
+  /* Green */
+  --color-green-50:  oklch(0.96 0.025 150);
+  --color-green-600: oklch(0.50 0.220 150);
+
+  /* Red */
+  --color-red-50:  oklch(0.96 0.025 0);
+  --color-red-600: oklch(0.50 0.220 0);
+
+  /* Amber */
+  --color-amber-50:  oklch(0.96 0.025 60);
+  --color-amber-600: oklch(0.50 0.220 60);
 }
 
 /* Dark mode overrides (class strategy) */
@@ -349,12 +299,12 @@
   }
 
   body {
-    @apply bg-background text-text-primary antialiased;
+    @apply bg-background text-primary antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-text-primary;
+    @apply font-semibold text-primary;
     line-height: var(--line-height-tight);
   }
 

@@ -1,19 +1,13 @@
-import { Moon, Sun } from 'lucide-react';
-import { useUiStore } from '@/stores/useUiStore';
-import { Button } from './Button';
+import { Sun, Moon } from 'lucide-react'
+import { useUiStore } from '../../stores/useUiStore'
+import { Icon } from './Icon'
 
-export const ThemeToggle = () => {
-  const { theme, toggleTheme } = useUiStore();
+export default function ThemeToggle() {
+  const { theme, toggleTheme } = useUiStore()
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={toggleTheme}
-      className="text-text-muted hover:text-text-primary"
-      aria-label="Toggle theme"
-    >
-      {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-    </Button>
-  );
-};
+    <button onClick={toggleTheme} className="p-2 rounded-radius-md bg-surface-hover">
+      {theme === 'dark' ? <Icon name={Sun} className="text-primary" /> : <Icon name={Moon} className="text-primary" />}
+    </button>
+  )
+}

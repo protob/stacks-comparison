@@ -1,83 +1,38 @@
-interface FilterOption {
-  value: string;
-  label: string;
+import clsx from 'clsx'
+
+interface Props {
+  filters: FilterOptions
+  onChange: (filters: FilterOptions) => void
 }
 
-interface FilterBarProps {
-  showPriorityFilter?: boolean;
-  priorityLabel?: string;
-  priorityOptions?: FilterOption[];
-  selectedPriority?: string;
-  onPriorityChange: (priority: string) => void;
-  
-  showStatusFilter?: boolean;
-  statusLabel?: string;
-  completedLabel?: string;
-  showCompleted?: boolean;
-  onShowCompletedChange: (show: boolean) => void;
-}
+export default function FilterBar({ filters, onChange }: Props) {
+  const priorities = ['all', 'high', 'mid', 'low'] as const
 
-const FilterBar = ({
-  showPriorityFilter = true,
-  priorityLabel = 'Priority',
-  priorityOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'high', label: 'High' },
-    { value: 'mid', label: 'Medium' },
-    { value: 'low', label: 'Low' },
-  ],
-  selectedPriority = 'all',
-  onPriorityChange,
-  
-  showStatusFilter = true,
-  statusLabel = 'Status',
-  completedLabel = 'Show completed',
-  showCompleted = false,
-  onShowCompletedChange
-}: FilterBarProps) => {
   return (
-    <div className="flex items-center gap-8 mb-6 p-3 bg-neutral-800 border border-neutral-700 rounded">
-      {/* Priority Filter */}
-      {showPriorityFilter && (
-        <div>
-          <h4 className="text-sm font-medium text-neutral-300 mb-2">{priorityLabel}</h4>
-          <div className="flex gap-4">
-            {priorityOptions.map((option) => (
-              <label
-                key={option.value}
-                className="flex items-center gap-2 text-sm text-neutral-400"
-              >
-                <input
-                  value={option.value}
-                  checked={selectedPriority === option.value}
-                  onChange={(e) => onPriorityChange(e.target.value)}
-                  type="radio"
-                  className="w-4 h-4 border-neutral-600 bg-neutral-700 text-blue-600"
-                />
-                {option.label}
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Status Filter */}
-      {showStatusFilter && (
-        <div>
-          <h4 className="text-sm font-medium text-neutral-300 mb-2">{statusLabel}</h4>
-          <label className="flex items-center gap-2 text-sm text-neutral-400">
-            <input
-              checked={showCompleted}
-              onChange={(e) => onShowCompletedChange(e.target.checked)}
-              type="checkbox"
-              className="w-4 h-4 rounded border-neutral-600 bg-neutral-700 text-blue-600"
-            />
-            {completedLabel}
-          </label>
-        </div>
-      )}
+    <div className="bg-surface p-spacing-3 flex items-center justify-between rounded-radius-lg mb-spacing-4">
+      <div className="flex items-center gap-spacing-3">
+        <span className="text-secondary font-medium">Priority</span>
+        {priorities.map(p => (
+          <button
+            key={p}
+            onClick={() => onChange({ ...filters, selectedPriority: p })}
+            className={clsx(
+              'w-5 h-5 rounded-full', /* Smaller size */
+              p === 'all' ? 'bg-primary' : p === 'high' ? 'bg-danger' : p === 'mid' ? 'bg-warning' : 'bg-success',
+              filters.selectedPriority === p ? 'ring-2 ring-border-focus' : ''
+            )}
+          />
+        ))}
+      </div>
+      <label className="flex items-center gap-spacing-2 text-secondary">
+        <input
+          type="checkbox"
+          checked={filters.showCompleted}
+          onChange={e => onChange({ ...filters, showCompleted: e.target.checked })}
+          className="w-4 h-4"
+        />
+        Show completed
+      </label>
     </div>
-  );
-};
-
-export default FilterBar;
+  )
+}
