@@ -46,7 +46,7 @@ const Notifications = () => {
           <div
             key={notification.id}
             className={clsx(
-              'flex items-start p-3 rounded-sm shadow-lg border text-white',
+              'flex items-start p-3 rounded-sm shadow-lg border text-white animate-fade-in-up',
               getBgClassForType(notification.type)
             )}
           >

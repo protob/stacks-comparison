@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 19:20:59 CET
+**Generated on:** nie, 16 lis 2025, 19:39:46 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
 
 ---
@@ -2193,6 +2193,15 @@ module.exports = {
       gap: {
         'component': 'var(--gap-component-internal)',
         'grid': 'var(--gap-grid-items)',
+      },
+      keyframes: {
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'fade-in-up': 'fade-in-up 0.3s ease-out',
       },
     },
   },

@@ -1,6 +1,7 @@
 import { Outlet } from '@tanstack/react-router';
 import AppSidebar from './components/layout/AppSidebar';
 import Notifications from './components/common/Notifications';
+import TopBar from './components/layout/TopBar';
 import { useUiStore } from './stores/useUiStore';
 import { useEffect, useState, createContext, useContext } from 'react';
 
@@ -70,15 +71,15 @@ function App() {
       clearTags
     }}>
       <div className="flex h-screen bg-background text-text-primary">
-        <AppSidebar
-          searchQuery={searchQuery}
-          onSearchQueryChange={setSearchQuery}
-          availableTags={availableTags}
-          selectedTags={selectedTags}
-          onToggleTag={toggleTag}
-        />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <Outlet />
+          <AppSidebar 
+            searchQuery={searchQuery} 
+            onSearchQueryChange={setSearchQuery} 
+          />
+        <main className="flex-1 flex flex-col overflow-y-auto p-4 md:p-6 lg:p-8">
+            <TopBar />
+            <div className="flex-1">
+              <Outlet />
+            </div>
         </main>
         <Notifications />
       </div>

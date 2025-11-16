@@ -1,92 +1,51 @@
-import clsx from 'clsx';
-import { Link } from '@tanstack/react-router';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
+import { Sun, Moon, Tags, Search } from 'lucide-react';
+import { useUiStore } from '@/stores/useUiStore';
+import { useItemFilters } from '@/hooks/useItemFilters';
+import { useGetItemTree } from '@/hooks/useItemsApi';
 
 interface AppSidebarProps {
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
-  searchPlaceholder?: string;
-  availableTags: string[];
-  selectedTags: string[];
-  onToggleTag: (tag: string) => void;
-  tagsLabel?: string;
-  tagPrefix?: string;
 }
 
-const AppSidebar = ({
-  searchQuery,
-  onSearchQueryChange,
-  searchPlaceholder = 'Search items...',
-  availableTags,
-  selectedTags,
-  onToggleTag,
-  tagsLabel = 'TAGS',
-  tagPrefix = '#'
-}: AppSidebarProps) => {
-  return (
-    <aside className="w-[--sidebar-width] h-full bg-surface border-r border-border p-nav overflow-y-auto flex flex-col gap-component">
-      {/* Navigation */}
-      <div>
-        <h3 className="text-size-sm font-medium text-text-secondary mb-3">Navigation</h3>
-        <nav className="space-y-2">
-          <Link
-            to="/"
-            className="block px-3 py-2 text-sm rounded-md hover:bg-surface-hover text-text-primary hover:text-primary transition-colors"
-          >
-            Items
-          </Link>
-          <Link
-            to="/about"
-            className="block px-3 py-2 text-sm rounded-md hover:bg-surface-hover text-text-primary hover:text-primary transition-colors"
-          >
-            About
-          </Link>
-        </nav>
-      </div>
+export default function AppSidebar({ searchQuery, onSearchQueryChange }: AppSidebarProps) {
+        const { theme, toggleTheme } = useUiStore();
+        const { data: itemTree = {} } = useGetItemTree();
+        const { allTags } = useItemFilters(itemTree, {
+            searchQuery: '',
+            selectedPriority: 'all',
+            showCompleted: true,
+            selectedTags: [],
+        });
 
-      {/* Search Section */}
-      <div>
-        <h3 className="text-size-sm font-medium text-text-secondary mb-3">Search</h3>
-        <input
-          value={searchQuery}
-          onChange={(e) => onSearchQueryChange(e.target.value)}
-          type="text"
-          placeholder={searchPlaceholder}
-          className="w-full px-input-x py-input-y text-size-sm bg-surface-hover border border-border rounded-input text-text-primary placeholder:text-text-muted"
-        />
-      </div>
-
-      {/* Tags Section */}
-      {availableTags.length > 0 && (
-        <div>
-          <h3 className="text-size-sm font-medium text-text-secondary mb-3">{tagsLabel}</h3>
-          <div className="max-h-64 overflow-y-auto scrollbar-thin">
-            <div className="flex flex-wrap gap-component">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => onToggleTag(tag)}
-                  className={clsx(
-                    'tag-sm rounded-button transition-colors',
-                    selectedTags.includes(tag)
-                      ? 'bg-primary text-text-inverse'
-                      : 'bg-primary-light text-primary hover:bg-primary-hover hover:text-text-inverse'
-                  )}
-                >
-                  {tagPrefix}{tag}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Theme Toggle */}
-      <div className="mt-auto pt-4 flex items-center justify-end">
-        <ThemeToggle />
-      </div>
-    </aside>
-  );
-};
-
-export default AppSidebar;
+        return (
+            <aside className="w-[--sidebar-width] bg-surface flex flex-col p-4 border-r border-border">
+                <div className="flex-1 space-y-6">
+                    <div>
+                        <h2 className="text-size-sm font-semibold text-text-muted mb-2 flex items-center gap-2"><Search size={16} /> Search</h2>
+                        <input
+                            type="text"
+                            placeholder="Search items..."
+                            value={searchQuery}
+                            onChange={(e) => onSearchQueryChange(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <h2 className="text-size-sm font-semibold text-text-muted mb-2 flex items-center gap-2"><Tags size={16} /> Tags</h2>
+                        <div className="flex flex-wrap gap-2">
+                            {allTags.map(tag => (
+                                <button key={tag} className="tag-sm bg-surface-hover text-text-secondary rounded-button hover:bg-surface-active">
+                                    {tag}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <button onClick={toggleTheme} className="w-full flex items-center justify-center p-2 rounded-md bg-surface-hover">
+                        {theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) ? <Sun /> : <Moon />}
+                    </button>
+                </div>
+            </aside>
+        );
+}

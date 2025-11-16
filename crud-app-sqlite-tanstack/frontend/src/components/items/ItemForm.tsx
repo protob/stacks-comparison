@@ -1,176 +1,174 @@
 import { useForm } from '@tanstack/react-form';
-import { z } from 'zod';
-import type { Item, Priority, SingleCategory } from '@/types';
+import { zodValidator } from '@tanstack/zod-form-adapter';
+import { itemFormSchema } from '@/schemas/itemSchema';
+import { FormFieldWrapper } from '@/components/common/FormFieldWrapper';
+import type { Item } from '@/types';
 import type { CreateItemPayload } from '@/api/itemApi';
 import Button from '../common/Button';
 
-// Expanded Zod schema for full validation
-const itemSchema = z.object({
-    name: z.string().min(3, 'Name must be at least 3 characters'),
-    text: z.string().min(1, 'Description is required'),
-    priority: z.enum(['low', 'mid', 'high']),
-    tags: z.string().transform(val => val.split(',').map(tag => tag.trim()).filter(Boolean)), // Handle comma-separated tags
-    categories: z.tuple([z.string().min(1, "Category is required")]) as z.ZodType<SingleCategory<string>>,
-});
-
 interface ItemFormProps {
-    item?: Item | null | undefined;
+    item?: Item | null;
     isLoading?: boolean;
     prefilledCategory?: string;
     onSubmit: (data: CreateItemPayload) => void;
     onCancel: () => void;
 }
 
-export default function ItemForm({ item, isLoading, onSubmit, onCancel }: ItemFormProps) {
-    const form = useForm({
-        defaultValues: {
-            name: item?.name || '',
-            text: item?.text || '',
-            priority: item?.priority || 'mid',
-            tags: item?.tags?.join(', ') || '',
-            categories: item?.categories || [''],
-        },
-        validators: {
-            onChange: ({ value }) => itemSchema.safeParse(value),
-            onSubmit: ({ value }) => itemSchema.safeParse(value),
-        },
-        onSubmit: async ({ value }) => {
-            const preparedPayload = {
-                ...value,
-                tags: value.tags.split(',').map(tag => tag.trim()).filter(Boolean),
-                categories: [value.categories[0].trim()] as SingleCategory<string>,
-            };
-            onSubmit(preparedPayload);
-        },
-    });
+export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
+  const form = useForm({
+    defaultValues: {
+      name: '',
+      text: '',
+      priority: 'mid' as const,
+      tags: [] as string[],
+      categories: [''] as [string],
+    },
+    validators: {
+      onChange: zodValidator({ schema: itemFormSchema }),
+    },
+    onSubmit: async ({ value }) => {
+      // Debug logging
+      console.log('Form state:', {
+        canSubmit: form.state.canSubmit,
+        isSubmitting: form.state.isSubmitting,
+        isValid: form.state.isValid,
+        isDirty: form.state.isDirty,
+        errors: form.state.errors,
+        values: form.state.values,
+      });
+      
+      await onSubmit(value);
+    },
+  });
 
-    return (
-        <form
-            onSubmit={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                form.handleSubmit();
-            }}
-            className="space-y-4"
-        >
-            {/* Name Field */}
-            <form.Field
-                name="name"
-                validators={{ onChange: itemSchema.shape.name }}
-                children={(field) => (
-                    <div>
-                        <label htmlFor={field.name} className="block text-sm font-medium text-text-secondary mb-1">Name</label>
-                        <input
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            className="w-full"
-                            placeholder="e.g., Deploy new feature"
-                        />
-                        {field.state.meta.errors && <p className="text-sm text-danger mt-1">{field.state.meta.errors.join(', ')}</p>}
-                    </div>
-                )}
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-4"
+    >
+      <form.Field
+        name="name"
+        children={(field) => (
+          <FormFieldWrapper field={field} label="Name">
+            <input
+              type="text"
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              placeholder="e.g., Deploy new feature"
+              className="w-full"
             />
+          </FormFieldWrapper>
+        )}
+      />
 
-            {/* Text/Description Field */}
-            <form.Field
-                name="text"
-                validators={{ onChange: itemSchema.shape.text }}
-                children={(field) => (
-                    <div>
-                        <label htmlFor={field.name} className="block text-sm font-medium text-text-secondary mb-1">Description</label>
-                        <textarea
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            className="w-full"
-                            rows={3}
-                            placeholder="Add more details here..."
-                        />
-                        {field.state.meta.errors && <p className="text-sm text-danger mt-1">{field.state.meta.errors.join(', ')}</p>}
-                    </div>
-                )}
+      <form.Field
+        name="text"
+        children={(field) => (
+          <FormFieldWrapper field={field} label="Description">
+            <textarea
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              rows={3}
+              placeholder="Add more details here..."
+              className="w-full"
             />
+          </FormFieldWrapper>
+        )}
+      />
 
-            {/* Category Field */}
-            <form.Field
-                name="categories"
-                validators={{ onChange: itemSchema.shape.categories }}
-                 children={(field) => (
-                    <div>
-                        <label htmlFor="categories-input" className="block text-sm font-medium text-text-secondary mb-1">Category</label>
-                        <input
-                            id="categories-input"
-                            name={field.name}
-                            value={field.state.value[0]}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange([e.target.value])}
-                            className="w-full"
-                            placeholder="e.g., Work or Personal"
-                        />
-                        {field.state.meta.errors && <p className="text-sm text-danger mt-1">{field.state.meta.errors.join(', ')}</p>}
-                    </div>
-                )}
+      <form.Field
+        name="categories"
+        mode="array"
+        children={(field) => (
+          <FormFieldWrapper field={field} label="Category">
+            <input
+              type="text"
+              value={field.state.value[0] || ''}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange([e.target.value])}
+              placeholder="e.g., Work or Personal"
+              className="w-full"
             />
+          </FormFieldWrapper>
+        )}
+      />
 
-            {/* Tags Field */}
-            <form.Field
-                name="tags"
-                 children={(field) => (
-                    <div>
-                        <label htmlFor={field.name} className="block text-sm font-medium text-text-secondary mb-1">Tags (comma-separated)</label>
-                        <input
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            className="w-full"
-                            placeholder="e.g., urgent, frontend, bug"
-                        />
-                    </div>
-                )}
+      <form.Field
+        name="tags"
+        children={(field) => (
+          <FormFieldWrapper field={field} label="Tags (comma-separated)">
+            <input
+              type="text"
+              value={field.state.value?.join(', ') || ''}
+              onBlur={field.handleBlur}
+              onChange={(e) => 
+                field.handleChange(
+                  e.target.value.split(',').map(t => t.trim()).filter(Boolean)
+                )
+              }
+              placeholder="e.g., urgent, frontend"
+              className="w-full"
             />
+          </FormFieldWrapper>
+        )}
+      />
 
-            {/* Priority Field */}
-            <form.Field
-                name="priority"
-                children={(field) => (
-                    <div>
-                        <label className="block text-sm font-medium text-text-secondary mb-2">Priority</label>
-                        <div className="flex items-center gap-4">
-                            {(['high', 'mid', 'low'] as Priority[]).map((p) => (
-                                <label key={p} className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name={field.name}
-                                        checked={field.state.value === p}
-                                        onChange={() => field.handleChange(p)}
-                                        onBlur={field.handleBlur}
-                                    />
-                                <span className="capitalize">{p}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            />
-
-            <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  children={([canSubmit, isSubmitting]) => (
-                    <Button type="submit" disabled={!canSubmit || isSubmitting || isLoading}>
-                      {isSubmitting || isLoading ? 'Saving...' : (item ? 'Update Item' : 'Add Item')}
-                    </Button>
-                  )}
-                />
+      <form.Field
+        name="priority"
+        children={(field) => (
+          <FormFieldWrapper field={field} label="Priority">
+            <div className="flex gap-4">
+              {(['high', 'mid', 'low'] as const).map((p) => (
+                <label key={p} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    checked={field.state.value === p}
+                    onChange={() => field.handleChange(p as any)}
+                    onBlur={field.handleBlur}
+                  />
+                  <span className="text-sm">{p.charAt(0).toUpperCase() + p.slice(1)}</span>
+                </label>
+              ))}
             </div>
-        </form>
-    );
+          </FormFieldWrapper>
+        )}
+      />
+
+      {/* Add this RIGHT BEFORE the submit button */}
+      <div>
+        {console.log('=== FORM STATE ===', {
+          canSubmit: form.state.canSubmit,
+          isSubmitting: form.state.isSubmitting,
+          isValid: form.state.isValid,
+          isDirty: form.state.isDirty,
+          errors: form.state.errors,
+          fieldMeta: form.state.fieldMeta,
+          values: form.state.values,
+        })}
+      </div>
+
+      <div className="flex gap-2 justify-end">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={!form.state.canSubmit || form.state.isSubmitting}
+        >
+          {form.state.isSubmitting ? 'Adding...' : 'Add Item'}
+        </Button>
+      </div>
+    </form>
+  );
 }
+
+export default ItemForm;
