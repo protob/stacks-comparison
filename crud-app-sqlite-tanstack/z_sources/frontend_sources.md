@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 19:01:30 CET
+**Generated on:** nie, 16 lis 2025, 19:20:59 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
 
 ---
@@ -956,9 +956,11 @@ interface UiState {
 }
 
 const getInitialTheme = (): Theme => {
-  const saved = localStorage.getItem('theme');
-  if (saved && ['light', 'dark', 'system'].includes(saved)) {
-    return saved as Theme;
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const saved = localStorage.getItem('theme');
+    if (saved && ['light', 'dark', 'system'].includes(saved)) {
+      return saved as Theme;
+    }
   }
   return 'system';
 };
@@ -1821,7 +1823,7 @@ const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, itemDetailRoute
 export const router = createRouter({ routeTree, context: { queryClient } });
 
 // Register the router for typesafety
-declare module '@tanstack/router' {
+declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }

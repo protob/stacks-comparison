@@ -62,7 +62,7 @@ const routeTree = rootRoute.addChildren([indexRoute, aboutRoute, itemDetailRoute
 export const router = createRouter({ routeTree, context: { queryClient } });
 
 // Register the router for typesafety
-declare module '@tanstack/router' {
+declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
