@@ -70,3 +70,55 @@ Determine whether to:
 1. Keep current architecture but simplify PATCH requirements (make categories optional in updates)
 2. Modernize schema with proper category table and relationships
 3. Hybrid approach: normalize database but maintain single-category business rule
+
+---
+
+## ✅ Resolution (2025-11-16)
+
+### Changes Implemented
+
+Following REST API best practices for partial updates with PATCH requests:
+
+**Frontend Changes:**
+- **useItemStore.ts**: Removed redundant `categories` field from `toggleItemCompletion()`
+  - Now sends only `{isCompleted: true/false}` instead of including categories
+  - Follows REST best practice: PATCH should only include fields being updated
+
+**Backend Changes:**
+- **No changes required**: Backend already supported optional categories!
+  - `ItemUpdateInput` struct uses `omitempty` for all fields including categories
+  - Service layer (lines 220-231) only validates categories if present in request
+  - Backend correctly handles partial updates per REST standards
+
+**Cleanup:**
+- **Removed legacy YAML code**:
+  - Deleted `/backend/internal/handlers/` (old YAML-based handlers)
+  - Deleted `/backend/internal/storage/` (filesystem storage service)
+  - App now uses only SQLite-based `/backend/internal/api/handlers.go` and `/backend/internal/services/item_service.go`
+
+### Current Architecture
+
+**Database:**
+- SQLite with sqlc-generated queries
+- UUIDs for primary keys (already implemented!)
+- Categories stored as single-element JSON array: `["category-slug"]`
+- Simple, maintainable approach for single-category requirement
+
+**API:**
+- REST-compliant PATCH requests support partial updates
+- Categories field optional when not being updated
+- URL routing remains `/items/{categorySlug}/{itemSlug}` for human-readable URLs
+
+### Remaining Considerations
+
+The current architecture is **well-suited** for the single-category use case:
+- ✅ JSON storage avoids unnecessary joins for single category
+- ✅ UUID primary keys provide security and flexibility
+- ✅ Slug-based URLs maintain human-readability
+- ✅ REST-compliant partial updates
+
+**Future enhancement opportunity:**
+If requirements change to support many-to-many categories, consider:
+1. Create `categories` table with junction table for relationships
+2. Migrate URL routing to `/items/{itemSlug}` (category-agnostic)
+3. Maintain backward compatibility via redirects
