@@ -72,7 +72,7 @@ export function TagInput({
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         placeholder={value.length === 0 ? placeholder : ''}
-         className="flex-1 min-w-[120px] bg-transparent border-0 outline-none p-0 text-size-sm"
+    className="flex-1 min-w-[80px] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none text-size-sm py-0 px-0 text-text-primary placeholder:text-text-muted"
       />
     </div>
   );
