@@ -94,8 +94,7 @@ export const useItemStore = create<ItemState>()(
       toggleItemCompletion: async (item) => {
         const categorySlug = slugify(item.categories[0]);
         return get().updateItem(categorySlug, item.slug, {
-          isCompleted: !item.isCompleted,
-          categories: [categorySlug] // Always include current category
+          isCompleted: !item.isCompleted
         });
       },
 
