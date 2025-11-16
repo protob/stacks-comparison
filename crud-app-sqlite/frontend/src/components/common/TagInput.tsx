@@ -91,13 +91,13 @@ const TagInput = ({
   return (
     <div>
       <div
-        className={`flex flex-wrap items-center gap-x-1.5 gap-y-1 w-full px-input-x py-input-y border bg-surface text-text-primary rounded-input ${error ? 'border-danger' : 'border-border'} focus-within:ring-1 focus-within:ring-primary/70 focus-within:border-primary/50 transition-colors duration-150`}
+        className={`flex flex-wrap items-center gap-1 w-full px-input-x py-input-y border bg-surface text-text-primary rounded-input ${error ? 'border-danger' : 'border-border'} focus-within:border-primary transition-colors`}
         onClick={focusInput}
       >
         {value.map((tag, index) => (
-          <div
+          <span
             key={`${tag}-${index}`}
-            className="flex items-center h-[28px] tag-sm bg-primary-light text-primary rounded-button whitespace-nowrap"
+            className="tag-sm bg-primary-light text-primary rounded-button inline-flex items-center gap-1 whitespace-nowrap"
           >
             <span>{tag}</span>
             <button
@@ -106,12 +106,12 @@ const TagInput = ({
                 e.stopPropagation();
                 removeTag(index);
               }}
-              className="ml-1 p-0.5 rounded-full text-text-muted hover:bg-danger/50 hover:text-danger focus:outline-none transition-colors"
+              className="inline-flex items-center justify-center w-3 h-3 rounded-full text-primary hover:text-danger hover:bg-danger/20 focus-visible:outline-none transition-colors"
               aria-label="Remove tag"
             >
-              <Icon name="X" className="w-3 h-3" />
+              <Icon name="X" className="w-2.5 h-2.5" />
             </button>
-          </div>
+          </span>
         ))}
 
         <input
@@ -120,7 +120,7 @@ const TagInput = ({
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="flex-grow min-w-[120px] bg-transparent border-none outline-none rounded-none text-size-sm h-[28px] py-1 px-2 text-text-primary placeholder:text-text-muted"
+          className="flex-1 min-w-[120px] bg-transparent border-0 outline-none focus-visible:outline-none text-size-sm py-0 px-0 text-text-primary placeholder:text-text-muted"
           placeholder={value.length === 0 ? placeholder : ''}
         />
       </div>
