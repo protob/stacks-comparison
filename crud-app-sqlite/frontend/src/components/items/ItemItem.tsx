@@ -54,7 +54,7 @@ const ItemItem = ({ item, onToggleComplete, onEdit, onDelete }: ItemItemProps) =
               </h3>
               <span
                 className={clsx(
-                  'tag-sm rounded-button font-medium',
+                  'tag-sm rounded-button',
                   getPriorityClass(item.priority)
                 )}
               >
