@@ -74,7 +74,9 @@ frontend/
 │   ├── hooks/                    # Custom React hooks
 │   │   └── useItemFilters.ts     # Item filtering logic
 │   ├── pages/                    # Page components
-│   │   └── ItemPage.tsx          # Main items page
+│   │   ├── ItemPage.tsx          # Main items page
+│   │   ├── AboutPage.tsx         # About/info page
+│   │   └── ItemDetailPage.tsx   # Item detail view page
 │   ├── stores/                   # Zustand state stores
 │   │   ├── useItemStore.ts       # Items state & CRUD operations
 │   │   └── useUiStore.ts         # UI state (loading, notifications, theme)
@@ -334,6 +336,28 @@ The frontend communicates with the backend REST API:
 - Automatic error notification via `useUiStore`
 - Type-safe responses with `ApiResponse<T>` wrapper
 - Network error detection and user-friendly messages
+
+## Routing
+
+The application uses React Router v6 for client-side navigation:
+
+**Routes:**
+- `/` - Main items page with list, search, and filtering
+- `/about` - About page with app information and tech stack
+- `/items/:categorySlug/:itemSlug` - Item detail view page
+
+**Navigation:**
+- Header contains Home and About links with active state highlighting
+- Item titles in list are clickable links to detail pages
+- Detail page includes back button navigation
+- Logo/title in header navigates to home
+
+**Features:**
+- URL-based routing with path parameters
+- Active route highlighting in navigation
+- Back button support (browser history)
+- Loading and error states per page
+- Separate components for each route demonstrating proper React Router usage
 
 ## Running the Application
 
