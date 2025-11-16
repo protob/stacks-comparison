@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 20:09:00 CET
+**Generated on:** nie, 16 lis 2025, 20:13:25 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
 
 ---
@@ -1676,6 +1676,7 @@ export function useItemFilters(itemTree: ItemTree, filters: FilterOptions) {
 
 ## `src/hooks/useItemsApi.ts`
 ```
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as itemApi from '@/api/itemApi';
 import { useUiStore } from '@/stores/useUiStore';
 import { slugify } from '@/utils/slugify';

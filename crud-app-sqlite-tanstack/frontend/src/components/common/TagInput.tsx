@@ -38,7 +38,6 @@ const TagInput = ({
         return;
       }
       if (!allowDuplicates && value.includes(finalTag)) {
-        console.log(`TagInput: Duplicate tag "${finalTag}" ignored.`);
         return;
       }
       onChange([...value, finalTag]);

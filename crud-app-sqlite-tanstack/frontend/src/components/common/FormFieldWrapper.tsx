@@ -9,10 +9,6 @@ interface FormFieldWrapperProps {
 export function FormFieldWrapper({ field, label, children }: FormFieldWrapperProps) {
   const { isTouched, isBlurred, errors } = field.state.meta;
   
-  // Debug logging
-  console.log('Field errors:', errors);
-  console.log('Field meta:', field.state.meta);
-  
   // Only show errors if field has been touched/blurred
   const shouldShowError = (isTouched || isBlurred) && errors.length > 0;
   
