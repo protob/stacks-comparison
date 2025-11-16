@@ -1,2 +1,0 @@
-<template><Section><h1 class="text-4xl font-bold p-8">Settings: Collection</h1><p class="p-8">Settings for file paths, naming conventions, etc.</p></Section></template>
-<script setup lang="ts">import Section from '@/components/layout/Section.vue'</script>
