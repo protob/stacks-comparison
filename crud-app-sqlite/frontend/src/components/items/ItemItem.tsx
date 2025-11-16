@@ -1,5 +1,4 @@
 import clsx from 'clsx'
-import { Trash } from 'lucide-react'
 import { useItemStore } from '../../stores/useItemStore'
 import { Icon } from '../common/Icon'
 import type { Item } from '@/types'
@@ -40,7 +39,7 @@ export default function ItemItem({ item, categorySlug }: Props) {
       </div>
       <div className="flex justify-end mt-auto">
         <button onClick={() => deleteItem(categorySlug, item.slug)} className="text-danger">
-          <Icon name={Trash} className="w-4 h-4" />
+          <Icon name="Trash" className="w-4 h-4" />
         </button>
       </div>
     </div>

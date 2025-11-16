@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Input } from 'react' // Assume basic, or use native
+import clsx from 'clsx'
 import ThemeToggle from '../common/ThemeToggle'
 
 interface Props {
