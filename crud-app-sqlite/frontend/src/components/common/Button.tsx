@@ -1,7 +1,7 @@
 import { forwardRef, ButtonHTMLAttributes, useMemo, useCallback } from 'react';
 import Icon from './Icon';
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'text' | 'stealth';
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'text' | 'stealth' | 'ghost' | 'default';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'icon';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -35,12 +35,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     const baseClasses = useMemo(() => {
-      let classes = 'inline-flex items-center justify-center font-medium transition-colors duration-150 rounded-sm focus:outline-none focus:ring-1 focus:ring-offset-0 focus:ring-opacity-30';
+      let classes = 'inline-flex items-center justify-center font-[--button-font-weight] transition-[--button-transition] rounded-[--button-radius] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2';
 
       if (loading) {
         classes += ' cursor-default';
       } else if (disabled) {
-        classes += ' opacity-60 cursor-not-allowed';
+        classes += ' opacity-50 cursor-not-allowed pointer-events-none';
       } else {
         classes += ' cursor-pointer';
       }
@@ -48,11 +48,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }, [loading, disabled]);
 
     const variantClasses = useMemo(() => ({
-      'primary': 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500/30',
-      'secondary': 'bg-neutral-700/80 text-neutral-200 hover:bg-neutral-600 focus:ring-neutral-500/30',
-      'danger': 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500/30',
-      'text': 'bg-transparent text-neutral-300 hover:bg-neutral-700/50 focus:ring-blue-500/30',
-      'stealth': 'bg-transparent text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/60 focus:ring-blue-500/30 p-1.5',
+      'default': 'bg-primary text-text-inverse hover:bg-primary-hover active:bg-primary-active',
+      'primary': 'bg-primary text-text-inverse hover:bg-primary-hover active:bg-primary-active',
+      'secondary': 'bg-surface-active text-text-primary hover:bg-surface-hover border border-border',
+      'danger': 'bg-danger text-text-inverse hover:bg-red-700 focus:ring-danger',
+      'text': 'bg-transparent text-text-primary hover:bg-surface-hover focus:ring-primary',
+      'stealth': 'bg-transparent text-text-muted hover:text-text-primary hover:bg-surface-hover focus:ring-primary p-1.5',
+      'ghost': 'bg-transparent hover:bg-surface-hover text-text-primary',
     }[variant]), [variant]);
 
     const effectiveIconOnly = useMemo(() => 
@@ -132,4 +134,5 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
+export { Button };
 export default Button;
