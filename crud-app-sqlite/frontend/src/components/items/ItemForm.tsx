@@ -30,22 +30,24 @@ const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, o
 
   // Layout hints for SchemaForm
   const layoutHints = useMemo(() => ({
-    name: { 
-      order: 10, 
+    name: {
+      order: 10,
       placeholder: "e.g., Buy groceries",
-      label: "Item Name"
+      label: "Item Name",
+      colSpan: 2
     },
-    text: { 
-      order: 20, 
-      widget: "textarea", 
-      rows: 4, 
+    text: {
+      order: 20,
+      widget: "textarea",
+      rows: 4,
       placeholder: "Add more details about this item...",
-      label: "Description"
+      label: "Description",
+      colSpan: 2
     },
-    category: { 
-      order: 30, 
-      label: "Category", 
-      placeholder: "e.g., Work, Personal, Shopping" 
+    category: {
+      order: 30,
+      label: "Category",
+      placeholder: "e.g., Work, Personal, Shopping"
     },
     priority: {
       order: 40,
@@ -57,16 +59,18 @@ const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, o
         { value: 'high', label: 'High' },
       ],
     },
-    tags: { 
-      order: 50, 
-      widget: "tag-input", 
+    tags: {
+      order: 50,
+      widget: "tag-input",
       placeholder: "Add tags...",
-      label: "Tags (optional)"
+      label: "Tags (optional)",
+      colSpan: 2
     },
-    isCompleted: { 
-      order: 60, 
+    isCompleted: {
+      order: 60,
       label: "Mark as completed",
-      hidden: !item
+      hidden: !item,
+      colSpan: 2
     },
   }), [item]);
 
@@ -119,7 +123,7 @@ const ItemForm = ({ item, isLoading = false, prefilledCategory = '', onSubmit, o
         value={formData}
         onChange={setFormData}
         layoutHints={layoutHints}
-        columns={1}
+        columns={2}
         onSubmit={handleSubmit}
         onCancel={onCancel}
         showErrors={true}
