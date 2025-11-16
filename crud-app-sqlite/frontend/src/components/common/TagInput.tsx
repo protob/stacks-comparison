@@ -23,6 +23,7 @@ const TagInput = ({
   maxTagLength = 50
 }: TagInputProps) => {
   const [inputValue, setInputValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addCurrentTag = useCallback(() => {
@@ -91,13 +92,16 @@ const TagInput = ({
   return (
     <div>
       <div
-        className={`flex flex-wrap items-center gap-1 w-full px-input-x py-input-y border bg-surface text-text-primary rounded-input ${error ? 'border-danger' : 'border-border'} focus-within:border-primary transition-colors`}
+        className={`flex flex-wrap items-center gap-1 w-full px-input-x py-input-y border rounded-input bg-surface text-text-primary transition-shadow ${error ? 'border-danger' : 'border-border'} ${isFocused ? 'ring-2 ring-primary ring-inset' : ''}`}
         onClick={focusInput}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        tabIndex={-1}
       >
         {value.map((tag, index) => (
           <span
             key={`${tag}-${index}`}
-            className="tag-sm bg-primary-light text-primary rounded-button inline-flex items-center gap-1 whitespace-nowrap"
+            className="tag-sm bg-primary-light text-primary rounded-button inline-flex items-center whitespace-nowrap"
           >
             <span>{tag}</span>
             <button
@@ -106,10 +110,11 @@ const TagInput = ({
                 e.stopPropagation();
                 removeTag(index);
               }}
-              className="inline-flex items-center justify-center w-3 h-3 rounded-full text-primary hover:text-danger hover:bg-danger/20 focus-visible:outline-none transition-colors"
-              aria-label="Remove tag"
+              tabIndex={-1}
+              className="btn-icon-xs inline-flex items-center justify-center ml-1 text-primary hover:text-danger hover:bg-danger/20 focus-visible:outline-none transition-colors"
+              aria-label={`Remove ${tag}`}
             >
-              <Icon name="X" className="w-2.5 h-2.5" />
+              <Icon name="X" className="w-3 h-3" />
             </button>
           </span>
         ))}
@@ -120,7 +125,7 @@ const TagInput = ({
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="flex-1 min-w-[120px] bg-transparent border-0 outline-none focus-visible:outline-none text-size-sm py-0 px-0 text-text-primary placeholder:text-text-muted"
+          className="flex-1 min-w-[80px] bg-transparent border-0 outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none text-size-sm py-0 px-0 text-text-primary placeholder:text-text-muted"
           placeholder={value.length === 0 ? placeholder : ''}
         />
       </div>
