@@ -27,16 +27,7 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
       onChange: zodValidator({ schema: itemFormSchema }),
     },
     onSubmit: async ({ value }) => {
-      // Debug logging
-      console.log('Form state:', {
-        canSubmit: form.state.canSubmit,
-        isSubmitting: form.state.isSubmitting,
-        isValid: form.state.isValid,
-        isDirty: form.state.isDirty,
-        errors: form.state.errors,
-        values: form.state.values,
-      });
-      
+      console.log('FORM SUBMITTED!', value);
       await onSubmit(value);
     },
   });
