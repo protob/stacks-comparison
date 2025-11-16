@@ -1,6 +1,5 @@
-Based on the codebase analysis, this is a React 18 + Vite 5 + Tailwind 4 alpha + Zustand 4 + React Router 6 CRUD app built in early 2025 that requires modernization to the latest stable versions as of November 2025.[1][2][3][4][5]
-
-## No-Brainer Modernization Steps
+WORKING DIRECOTRY IS "crud-app-sqlite/frontend"
+do cd crud-app-sqlite/frontend  first
 
 ### Step 1: Update package.json
 
