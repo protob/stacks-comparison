@@ -145,6 +145,7 @@ export function ItemForm({ onSubmit, onCancel }: ItemFormProps) {
           isValid: form.state.isValid,
           isDirty: form.state.isDirty,
           errors: form.state.errors,
+          errorText: JSON.stringify(form.state.errors), // <-- ADD THIS to see the error text
           fieldMeta: form.state.fieldMeta,
           values: form.state.values,
         })}
