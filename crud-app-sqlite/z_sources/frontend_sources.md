@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 11:00:36 CET
+**Generated on:** nie, 16 lis 2025, 11:32:20 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite/frontend
 
 ---
@@ -118,9 +118,9 @@ echo "3. Start development: npm run dev"
 ```
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2024",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
 
@@ -150,6 +150,7 @@ echo "3. Start development: npm run dev"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
+
 ```
 
 ## `package.json`
@@ -157,7 +158,7 @@ echo "3. Start development: npm run dev"
 {
   "name": "react-todo-app",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -166,24 +167,23 @@ echo "3. Start development: npm run dev"
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0",
-    "zustand": "^4.5.0",
-    "zod": "^3.23.8",
-    "lucide-react": "^0.379.0",
-    "clsx": "^2.1.0"
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-router": "7.9.6",
+    "zustand": "5.0.8",
+    "zod": "4.1.12",
+    "lucide-react": "0.553.0",
+    "clsx": "2.1.1"
   },
   "devDependencies": {
-    "@types/react": "^18.2.66",
-    "@types/react-dom": "^18.2.22",
-    "@vitejs/plugin-react": "^4.2.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0",
-    "@tailwindcss/vite": "^4.0.0-alpha.13",
-    "tailwindcss": "^4.0.0-alpha.13",
-    "autoprefixer": "^10.4.19",
-    "unplugin-auto-import": "^0.17.6"
+    "@types/react": "19.2.5",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.1",
+    "typescript": "5.9.3",
+    "vite": "7.2.2",
+    "tailwindcss": "4.1.17",
+    "unplugin-auto-import": "20.2.0",
+    "use-sync-external-store": "1.6.0"
   }
 }
 
@@ -207,23 +207,21 @@ echo "3. Start development: npm run dev"
 ```
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwind from '@tailwindcss/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
   plugins: [
     react(),
-    tailwind(),
     AutoImport({
       include: [
-        /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
+        /\.[tj]sx?$/,
       ],
       imports: [
         'react',
-        'react-router-dom',
         {
-          'zustand': ['create'],
+          'react-router': ['useNavigate', 'useParams', 'useLocation', 'useSearchParams'],
+          'zustand': [['create', 'create']],
           'zustand/middleware': ['devtools', 'persist'],
           'clsx': [['default', 'clsx']],
         },
@@ -262,6 +260,7 @@ export default defineConfig({
     }
   }
 });
+
 ```
 
 ## `src/utils/slugify.ts`
@@ -325,7 +324,7 @@ export function getBaseSchema(schema: z.ZodTypeAny): z.ZodObject<any, any, any> 
 ```
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { Item, Priority, SingleCategory } from '@/types';
+import type { Item } from '@/types';
 import * as itemApi from '@/api/itemApi';
 import { useUiStore } from './useUiStore';
 import { slugify } from '@/utils/slugify';
@@ -679,7 +678,6 @@ export interface Notification {
   }
 }
 
-/* Scrollbar styling */
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -694,6 +692,7 @@ export interface Notification {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: theme(colors.neutral.500);
 }
+
 ```
 
 ## `src/api/itemApi.ts`
@@ -806,7 +805,7 @@ const request = async <T>(
     }
 
     const data = await response.json();
-    return success(data.data ?? data);
+    return success(data.data ?? data) as Result<T, ApiErrorData>;
   } catch (error: any) {
     return failure(createApiError(
       error.message || 'Network request failed',
@@ -839,20 +838,5 @@ export const del = <TResponse = { deleted: boolean }>(endpoint: string) =>
   unwrapResult(request<TResponse>('DELETE', endpoint));
 
 export const api = { get, post, patch, delete: del };
-```
-
-## `tailwind.config.js`
-```
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    './index.html',
-    './src/**/*.{js,jsx,ts,tsx}',
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
 ```
 
