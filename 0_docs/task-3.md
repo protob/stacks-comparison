@@ -1,5 +1,5 @@
 1. Set working directory to crud-app-sqlite/frontend.
-
+`cd crud-app-sqlite/frontend`
 2. Update package.json to support Tailwind v4 alpha features (based on research: use CSS-first config, update to alpha for @theme support, add postcss for better processing). Replace the entire file with this literal code:
 
 ```json
