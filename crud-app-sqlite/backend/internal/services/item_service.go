@@ -213,7 +213,13 @@ func (s *ItemService) UpdateItem(categorySlug, itemSlug string, input items.Item
 	}
 
 	if input.Tags != nil {
-		updateParams.Tags = tagsToString(input.Tags)
+		// Always set Valid=true for tags, even if empty array
+		tagsNullString := tagsToString(input.Tags)
+		if len(input.Tags) == 0 {
+			// For empty tags array, store empty JSON array instead of NULL
+			tagsNullString = sql.NullString{String: "[]", Valid: true}
+		}
+		updateParams.Tags = tagsNullString
 		updated = true
 	}
 
