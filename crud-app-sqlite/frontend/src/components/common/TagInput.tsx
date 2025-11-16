@@ -114,7 +114,7 @@ const TagInput = ({
               className="btn-icon-xs inline-flex items-center justify-center ml-1 text-primary hover:text-danger hover:bg-danger/20 focus-visible:outline-none transition-colors"
               aria-label={`Remove ${tag}`}
             >
-              <Icon name="X" className="w-3 h-3" />
+              <Icon name="X" className="w-2.5 h-2.5 leading-none" />
             </button>
           </span>
         ))}
