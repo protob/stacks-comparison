@@ -1,12 +1,13 @@
 {
-  "name": "shadcn-simple-vue-vite",
+  "name": "vue-crud-app-tanstack-shadcn",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
