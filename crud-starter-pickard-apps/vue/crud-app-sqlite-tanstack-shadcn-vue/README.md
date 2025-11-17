@@ -1,7 +1,3 @@
-Of course. Here is an excellent, comprehensive `README.md` file tailored specifically for your Vue.js codebase. It is modeled after the high-quality React README you provided, updated with the correct technologies, file paths, and architectural patterns used in your Vue project.
-
----
-
 # (Technical Documentation) Items App - Vue Frontend
 
 **This document serves as a detailed technical guide for developers (human or AI) interacting with the `crud-app-sqlite-tanstack-shadcn-vue` frontend codebase. Its purpose is to provide a comprehensive understanding of the architecture, design system, state management, and development practices.**
