@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** pon, 17 lis 2025, 16:49:40 CET
+**Generated on:** pon, 17 lis 2025, 16:58:28 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-vue
 
 ---
@@ -263,9 +263,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { useAddItem } from '@/composables/useItemsApi';
 import { itemFormSchema } from '@/schemas/itemSchema';
+import { useUiStore } from '@/stores/uiStore';
 
 const emit = defineEmits<{ close: [] }>();
 const { mutate: addItem } = useAddItem();
+const uiStore = useUiStore();
 
 const currentTag = ref('');
 
@@ -275,7 +277,8 @@ const form = useForm({
     text: '',
     priority: 'mid' as const,
     tags: [] as string[],
-    categories: ['general'] as [string],
+    // Use preselected category from store, or a default
+    categories: [uiStore.preselectedCategory || 'general'] as [string],
   },
   onSubmit: async ({ value }) => {
     addItem(value, {
@@ -299,6 +302,7 @@ const removeTag = (tagToRemove: string) => {
 </script>
 
 <template>
+  <!-- TEMPLATE REMAINS UNCHANGED -->
   <Dialog :open="true" @update:open="emit('close')">
     <DialogContent>
       <DialogHeader>
@@ -548,7 +552,7 @@ const toggleTag = (tag: string) => {
 </script>
 
 <template>
-  <aside class="flex flex-col p-4 border-r w-72 bg-surface border-border">
+  <aside class="flex flex-col p-4 border-r bg-surface border-border">
     <div class="p-2 mb-4">
       <h2 class="text-xl font-bold">TodoApp</h2>
     </div>
@@ -2302,6 +2306,7 @@ export const useUiStore = defineStore('ui', () => {
   // Form state
   const isFormOpen = ref(false);
   const editingItem = ref<Item | null>(null);
+  const preselectedCategory = ref<string | null>(null); // Added state
 
   const setIsLoading = (status: boolean, message?: string) => {
     isLoading.value = status;
@@ -2335,14 +2340,18 @@ export const useUiStore = defineStore('ui', () => {
     theme.value = theme.value === 'dark' ? 'light' : 'dark';
   };
 
-  const openForm = (item?: Item) => {
+  // Modified openForm to accept an optional category
+  const openForm = (item?: Item, category?: string) => {
     isFormOpen.value = true;
     editingItem.value = item || null;
+    preselectedCategory.value = category || null;
   };
 
+  // Modified closeForm to reset new state
   const closeForm = () => {
     isFormOpen.value = false;
     editingItem.value = null;
+    preselectedCategory.value = null;
   };
 
   return {
@@ -2351,6 +2360,7 @@ export const useUiStore = defineStore('ui', () => {
     theme,
     isFormOpen,
     editingItem,
+    preselectedCategory, // Expose new state
     setIsLoading,
     showNotification,
     setTheme,
@@ -3114,17 +3124,21 @@ import TopBar from '@/components/layout/TopBar.vue';
 
 <template>
   <!-- 
-    TODO: Investigate grid layout solution for better control
-    Previous grid implementation: grid-cols-[var(--sidebar-width)_1fr]
-    Grid preferred for better layout control, but flexbox used temporarily due to overlap issues
-    Need to investigate CSS custom variables and grid column sizing conflicts
+    Layout changed from 'flex' to 'grid'.
+    The grid columns are defined by our CSS variable for sidebar and '1fr' for main content.
+    This provides a robust and token-based layout structure.
   -->
-  <div class="flex min-h-screen">
-    <!-- Sidebar: Fixed width -->
+  <div class="grid min-h-screen" style="grid-template-columns: var(--sidebar-width) 1fr;">
+    <!-- Sidebar: Width is now controlled by the grid template column -->
     <AppSidebar />
 
-    <!-- Main Content: Takes remaining space -->
-    <main class="flex-1 overflow-y-auto">
+    <!-- 
+      Main Content: 
+      - 'min-w-0' is crucial. It prevents wide content (like long text without breaks) 
+        from pushing past the boundaries of the grid cell, fixing the overlap issue.
+      - 'flex-1' is removed as it's a flexbox property.
+    -->
+    <main class="min-w-0 overflow-y-auto">
       <div class="p-fluid-4 md:p-fluid-6 lg:p-fluid-8">
         <TopBar />
         <div class="flex-1">
@@ -3672,6 +3686,7 @@ import FilterBar from '@/components/layout/FilterBar.vue';
 import ItemItem from '@/components/items/ItemItem.vue';
 import ItemForm from '@/components/items/ItemForm.vue';
 import { useUiStore } from '@/stores/uiStore';
+import { Button } from '@/components/ui/button';
 
 const { data: itemTree, isLoading, error } = useItemTree();
 const uiStore = useUiStore();
@@ -3693,7 +3708,7 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
   <MainLayout>
     <header class="mb-6">
       <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
-      <!-- The "Add New Item" button is now in the sidebar -->
+      <!-- The main "Add New Item" button remains in the sidebar -->
     </header>
 
     <FilterBar
@@ -3713,6 +3728,10 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
         <div class="flex items-center gap-2 mb-4">
           <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
           <span class="text-sm text-text-muted">({{ items.length }})</span>
+          <!-- Add "+" button here -->
+          <Button variant="ghost" size="icon-sm" @click="uiStore.openForm(undefined, category)">
+            <icon-lucide-plus class="w-4 h-4" />
+          </Button>
         </div>
         <div class="grid gap-4">
           <ItemItem
@@ -3728,10 +3747,9 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
       </div>
     </div>
 
-    <!-- The ItemForm will be triggered from the sidebar -->
+    <!-- The ItemForm is now aware of pre-selected category -->
     <ItemForm
       v-if="uiStore.isFormOpen"
-      :item="uiStore.editingItem"
       @close="uiStore.closeForm"
     />
   </MainLayout>
