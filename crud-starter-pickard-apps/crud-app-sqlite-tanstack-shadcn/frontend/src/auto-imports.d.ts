@@ -56,6 +56,7 @@ declare global {
   const useRoute: typeof import('@tanstack/react-router')['useRoute']
   const useState: typeof import('react')['useState']
   const useSyncExternalStore: typeof import('react')['useSyncExternalStore']
+  const useThemeUpdater: typeof import('./hooks/useThemeUpdater')['useThemeUpdater']
   const useToggleItemCompletion: typeof import('./hooks/useItemsApi')['useToggleItemCompletion']
   const useTransition: typeof import('react')['useTransition']
   const useUiStore: typeof import('./stores/useUiStore')['useUiStore']
