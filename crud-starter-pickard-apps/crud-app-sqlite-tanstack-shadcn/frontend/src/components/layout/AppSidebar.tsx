@@ -1,11 +1,11 @@
-import { Sun, Moon, Tags, Search } from 'lucide-react';
+import { Tags, Search } from 'lucide-react';
 import { useUiStore } from '@/stores/useUiStore';
 import { useItemFilters } from '@/hooks/useItemFilters';
 import { useGetItemTree } from '@/hooks/useItemsApi';
 import { useSearch } from '@/App';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 export function AppSidebar() {
-    const { theme, toggleTheme } = useUiStore();
     const { searchQuery, setSearchQuery, selectedTags, setSelectedTags, setAvailableTags, toggleTag, clearSearch, clearTags } = useSearch();
     const { data: itemTree = {} } = useGetItemTree();
     const { allTags: availableTags } = useItemFilters(itemTree, {
@@ -47,9 +47,7 @@ export function AppSidebar() {
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <button onClick={toggleTheme} className="w-full flex items-center justify-center p-2 rounded-md bg-surface-hover">
-                        {theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) ? <Sun /> : <Moon />}
-                    </button>
+                    <ThemeToggle />
                 </div>
             </aside>
     );

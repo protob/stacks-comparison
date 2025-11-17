@@ -1,5 +1,5 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import Notifications from '@/components/common/Notifications';
+import { Toaster } from '@/components/ui/sonner';
 import { useThemeUpdater } from '@/hooks/useThemeUpdater';
 import { useState, createContext, useContext } from 'react';
 
@@ -61,8 +61,7 @@ function App() {
     }}>
       <>
         <MainLayout />
-        {/* Notifications are kept outside the main layout to overlay everything. */}
-        <Notifications />
+        <Toaster position="top-right" richColors />
       </>
     </SearchContext.Provider>
   );

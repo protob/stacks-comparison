@@ -1,18 +1,17 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { Notification, NotificationType } from '@/types';
+import { toast } from "sonner";
+import type { NotificationType } from '@/types';
 
 type Theme = 'light' | 'dark' | 'system';
 
 interface UiState {
   isLoading: boolean;
   loadingMessage: string | null;
-  notifications: Notification[];
   theme: Theme;
 
   setIsLoading: (status: boolean, message?: string) => void;
-  showNotification: (type: NotificationType, message: string, duration?: number) => string;
-  removeNotification: (id: string) => void;
+  showNotification: (type: NotificationType, message: string) => void;
   setTheme: (newTheme: Theme) => void;
   toggleTheme: () => void;
 }
@@ -33,37 +32,20 @@ export const useUiStore = create<UiState>()(
       (set, get) => ({
         isLoading: false,
         loadingMessage: null,
-        notifications: [],
         theme: getInitialTheme(),
 
         setIsLoading: (status: boolean, message?: string) =>
           set({ isLoading: status, loadingMessage: message || null }),
 
-        showNotification: (type: NotificationType, message: string, duration = 3000): string => {
-          const id = `notif-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-          const notification: Notification = {
-            id,
-            type,
-            message,
-            duration,
-            timestamp: Date.now()
-          };
-
-          set(state => ({
-            notifications: [...state.notifications, notification]
-          }));
-
-          if (duration > 0) {
-            setTimeout(() => get().removeNotification(id), duration);
+        showNotification: (type: NotificationType, message: string) => {
+          switch (type) {
+            case 'success': toast.success(message); break;
+            case 'error': toast.error(message); break;
+            case 'warning': toast.warning(message); break;
+            case 'info': toast.info(message); break;
+            default: toast(message);
           }
-
-          return id;
         },
-
-        removeNotification: (id: string) =>
-          set(state => ({
-            notifications: state.notifications.filter(n => n.id !== id)
-          })),
 
         setTheme: (newTheme: Theme) => set({ theme: newTheme }),
 
