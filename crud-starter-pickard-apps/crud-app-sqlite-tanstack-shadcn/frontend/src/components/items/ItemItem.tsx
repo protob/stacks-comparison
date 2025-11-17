@@ -3,6 +3,7 @@ import { Edit, Trash2 } from 'lucide-react';
 import type { Item } from '@/types';
 import { formatDate } from '@/utils/helpers';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ItemItemProps {
   item: Item;
@@ -21,10 +22,9 @@ export function ItemItem({ item, onToggleComplete, onDelete, onEdit }: ItemItemP
   return (
     <div className={`p-card bg-surface rounded-card shadow-sm transition-opacity ${item.isCompleted ? 'opacity-50' : ''}`}>
       <div className="flex items-start gap-4">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={item.isCompleted}
-          onChange={() => onToggleComplete(item)}
+          onCheckedChange={() => onToggleComplete(item)}
           className="mt-1"
         />
         <div className="flex-1">

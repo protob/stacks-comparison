@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** pon, 17 lis 2025, 12:41:05 CET
+**Generated on:** pon, 17 lis 2025, 13:09:24 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/crud-app-sqlite-tanstack-shadcn/frontend
 
 ---
@@ -721,24 +721,46 @@ export const useUiStore = create<UiState>()(
   --font-size-4xl:  clamp(2.177rem, 2.052rem + 0.625vw, 2.488rem);   /* 35-40px */
   --font-size-5xl:  clamp(2.612rem, 2.462rem + 0.75vw, 2.986rem);    /* 42-48px */
 
-  /* Spacing - 4px base grid for precision, fluid with clamp */
-  --spacing-0: 0;
+  /* Spacing - Standard Fixed Scale (Tailwind Default) */
+  --spacing-0: 0px;
   --spacing-px: 1px;
-  --spacing-0_5: clamp(0.125rem, 0.1rem + 0.125vw, 0.25rem);  /* 2-4px */
-  --spacing-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);     /* 4-8px */
-  --spacing-1_5: clamp(0.375rem, 0.3rem + 0.375vw, 0.75rem);  /* 6-12px */
-  --spacing-2: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);      /* 8-16px */
-  --spacing-2_5: clamp(0.625rem, 0.5rem + 0.625vw, 1.25rem);  /* 10-20px */
-  --spacing-3: clamp(0.75rem, 0.6rem + 0.75vw, 1.5rem);     /* 12-24px */
-  --spacing-4: clamp(1rem, 0.8rem + 1vw, 2rem);        /* 16-32px */
-  --spacing-5: clamp(1.25rem, 1rem + 1.25vw, 2.5rem);     /* 20-40px */
-  --spacing-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);      /* 24-48px */
-  --spacing-8: clamp(2rem, 1.6rem + 2vw, 4rem);        /* 32-64px */
-  --spacing-10: clamp(2.5rem, 2rem + 2.5vw, 5rem);       /* 40-80px */
-  --spacing-12: clamp(3rem, 2.4rem + 3vw, 6rem);         /* 48-96px */
-  --spacing-16: clamp(4rem, 3.2rem + 4vw, 8rem);         /* 64-128px */
-  --spacing-20: clamp(5rem, 4rem + 5vw, 10rem);          /* 80-160px */
-  --spacing-24: clamp(6rem, 4.8rem + 6vw, 12rem);        /* 96-192px */
+  --spacing-0_5: 0.125rem;  /* 2px */
+  --spacing-1: 0.25rem;     /* 4px */
+  --spacing-1_5: 0.375rem;  /* 6px */
+  --spacing-2: 0.5rem;      /* 8px */
+  --spacing-2_5: 0.625rem;  /* 10px */
+  --spacing-3: 0.75rem;     /* 12px */
+  --spacing-3_5: 0.875rem;  /* 14px */
+  --spacing-4: 1rem;        /* 16px */
+  --spacing-5: 1.25rem;     /* 20px */
+  --spacing-6: 1.5rem;      /* 24px */
+  --spacing-7: 1.75rem;     /* 28px */
+  --spacing-8: 2rem;        /* 32px */
+  --spacing-9: 2.25rem;     /* 36px */
+  --spacing-10: 2.5rem;     /* 40px */
+  --spacing-11: 2.75rem;    /* 44px */
+  --spacing-12: 3rem;       /* 48px */
+  --spacing-14: 3.5rem;     /* 56px */
+  --spacing-16: 4rem;       /* 64px */
+  --spacing-20: 5rem;       /* 80px */
+  --spacing-24: 6rem;       /* 96px */
+
+  /* Spacing - Custom Fluid Scale */
+  --spacing-fluid-0_5: clamp(0.125rem, 0.1rem + 0.125vw, 0.25rem);
+  --spacing-fluid-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+  --spacing-fluid-1_5: clamp(0.375rem, 0.3rem + 0.375vw, 0.75rem);
+  --spacing-fluid-2: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
+  --spacing-fluid-2_5: clamp(0.625rem, 0.5rem + 0.625vw, 1.25rem);
+  --spacing-fluid-3: clamp(0.75rem, 0.6rem + 0.75vw, 1.5rem);
+  --spacing-fluid-4: clamp(1rem, 0.8rem + 1vw, 2rem);
+  --spacing-fluid-5: clamp(1.25rem, 1rem + 1.25vw, 2.5rem);
+  --spacing-fluid-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
+  --spacing-fluid-8: clamp(2rem, 1.6rem + 2vw, 4rem);
+  --spacing-fluid-10: clamp(2.5rem, 2rem + 2.5vw, 5rem);
+  --spacing-fluid-12: clamp(3rem, 2.4rem + 3vw, 6rem);
+  --spacing-fluid-16: clamp(4rem, 3.2rem + 4vw, 8rem);
+  --spacing-fluid-20: clamp(5rem, 4rem + 5vw, 10rem);
+  --spacing-fluid-24: clamp(6rem, 4.8rem + 6vw, 12rem);
 
   /* Line Heights - Fluid for better rhythm */
   --line-height-none: 1;
@@ -868,9 +890,9 @@ export const useUiStore = create<UiState>()(
   --button-lg-gap: var(--spacing-2_5);
   --button-lg-text: var(--font-size-lg);
 
-  /* Card/Item Components */
+  /* Card/Item Components (uses FLUID spacing) */
   --card-radius: var(--radius-lg);
-  --card-padding: var(--spacing-4);
+  --card-padding: var(--spacing-fluid-4);
   --card-shadow: var(--shadow);
 
   /* Input Components */
@@ -885,9 +907,9 @@ export const useUiStore = create<UiState>()(
   --radio-size: 1.125rem;    /* 18px - same as checkbox for consistency */
   --checkbox-radius: var(--radius-sm);  /* Subtle rounded corners for checkboxes */
 
-  /* Navigation/Sidebar */
+  /* Navigation/Sidebar (uses FLUID spacing) */
   --nav-height: clamp(3rem, 2.5rem + 2.5vw, 4rem);
-  --nav-padding: var(--spacing-4);
+  --nav-padding: var(--spacing-fluid-4);
 
   /* Layout */
   --container-max: 1280px;
@@ -921,6 +943,31 @@ export const useUiStore = create<UiState>()(
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
     gap: var(--gap-grid-items);
   }
+
+  /* Custom Fluid Spacing Utilities */
+  .p-fluid-1 { padding: var(--spacing-fluid-1); }
+  .p-fluid-2 { padding: var(--spacing-fluid-2); }
+  .p-fluid-3 { padding: var(--spacing-fluid-3); }
+  .p-fluid-4 { padding: var(--spacing-fluid-4); }
+  .p-fluid-5 { padding: var(--spacing-fluid-5); }
+  .p-fluid-6 { padding: var(--spacing-fluid-6); }
+  .p-fluid-8 { padding: var(--spacing-fluid-8); }
+
+  .px-fluid-4 { padding-left: var(--spacing-fluid-4); padding-right: var(--spacing-fluid-4); }
+  .py-fluid-4 { padding-top: var(--spacing-fluid-4); padding-bottom: var(--spacing-fluid-4); }
+  
+  .m-fluid-4 { margin: var(--spacing-fluid-4); }
+  .mt-fluid-4 { margin-top: var(--spacing-fluid-4); }
+  .mb-fluid-4 { margin-bottom: var(--spacing-fluid-4); }
+
+  .gap-fluid-2 { gap: var(--spacing-fluid-2); }
+  .gap-fluid-4 { gap: var(--spacing-fluid-4); }
+  .gap-fluid-6 { gap: var(--spacing-fluid-6); }
+  .gap-fluid-8 { gap: var(--spacing-fluid-8); }
+
+  .space-y-fluid-2 > :not([hidden]) ~ :not([hidden]) { margin-top: var(--spacing-fluid-2); }
+  .space-y-fluid-3 > :not([hidden]) ~ :not([hidden]) { margin-top: var(--spacing-fluid-3); }
+  .space-y-fluid-6 > :not([hidden]) ~ :not([hidden]) { margin-top: var(--spacing-fluid-6); }
 }
 
 /* ============================================
@@ -1914,12 +1961,10 @@ module.exports = {
         'nav': 'var(--nav-padding)',
       },
       width: {
-        'checkbox': 'var(--checkbox-size)',
-        'radio': 'var(--radio-size)',
+        // 'checkbox' and 'radio' removed
       },
       height: {
-        'checkbox': 'var(--checkbox-size)',
-        'radio': 'var(--radio-size)',
+        // 'checkbox' and 'radio' removed
       },
       borderRadius: {
         lg: "var(--radius)",
