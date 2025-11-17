@@ -4,9 +4,9 @@ set -euo pipefail
 # Consolidates frontend source files only into a single markdown file
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
-FRONTEND_DIR="$ROOT_DIR/crud-app-sqlite-tanstack-shadcn-vue"
+FRONTEND_DIR="$ROOT_DIR/crud-app-sqlite-tanstack-shadcn-nuxt"
 OUTPUT_DIR="$ROOT_DIR/z_sources"
-OUTPUT_FILE="$OUTPUT_DIR/crud-app-sqlite-tanstack-shadcn-vue_sources.md"
+OUTPUT_FILE="$OUTPUT_DIR/crud-app-sqlite-tanstack-shadcn-nuxt_sources.md"
 
 # Directories to exclude (these won't be descended into at all)
 EXCLUDES=("node_modules" ".git" "dist" "build" ".output" ".nuxt" ".cache" "public" ".vite")
