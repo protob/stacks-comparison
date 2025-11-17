@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { toast } from 'sonner';
+import { toast } from 'vue-sonner'; 
 import type { NotificationType } from '@/types';
 
 type Theme = 'light' | 'dark' | 'system';
