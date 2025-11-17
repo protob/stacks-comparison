@@ -20,6 +20,9 @@ We will now install all the necessary dependencies for state management, data fe
 bun add @pinia/nuxt @tanstack/vue-query-nuxt @tanstack/vue-form zod vue-sonner @tanstack/zod-form-adapter ofetch
 ```
 
+
+
+
 Next, add the required development dependency for icons.
 
 ```bash
