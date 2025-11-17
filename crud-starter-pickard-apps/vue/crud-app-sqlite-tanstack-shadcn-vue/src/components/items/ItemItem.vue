@@ -2,7 +2,9 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useUpdateItem, useDeleteItem } from '@/composables/useItemsApi';
+import { formatDate } from '@/utils/helpers';
 import type { Item } from '@/types';
 
 const props = defineProps<{ item: Item }>();
@@ -25,24 +27,39 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <Card>
-    <CardContent class="p-4">
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <h3 class="mb-2 font-semibold text-size-lg">{{ item.name }}</h3>
-          <p class="mb-2 text-text-secondary">{{ item.text }}</p>
-          <div class="flex gap-2">
-            <Badge :class="`tag-priority-${item.priority}`">{{ item.priority }}</Badge>
-            <Badge v-if="item.isCompleted" class="bg-success-light">Completed</Badge>
-          </div>
+  <Card :class="{ 'opacity-60': item.isCompleted }">
+    <CardContent class="flex items-start gap-4 p-4">
+      <Checkbox
+        :checked="item.isCompleted"
+        @update:checked="toggleComplete"
+        class="mt-1"
+      />
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+            <h3 
+              class="font-semibold text-size-lg"
+              :class="{ 'line-through text-text-muted': item.isCompleted }"
+            >
+              {{ item.name }}
+            </h3>
+             <Badge :class="`tag-priority-${item.priority}`" variant="outline">
+               {{ item.priority }}
+            </Badge>
         </div>
-        <div class="flex gap-2">
-          <Button size="sm" variant="outline" @click="toggleComplete">
-            {{ item.isCompleted ? 'Undo' : 'Complete' }}
-          </Button>
-          <Button size="sm" variant="destructive" @click="handleDelete">
-            Delete
-          </Button>
+        <p class="mb-3 text-text-secondary">{{ item.text }}</p>
+
+        <div class="flex items-center justify-between">
+            <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
+            <div class="flex gap-2">
+                <!-- Edit button can be added here -->
+                <Button size="sm" variant="destructive" @click="handleDelete">
+                    Delete
+                </Button>
+            </div>
+        </div>
+
+        <div class="flex gap-2 mt-3">
+          <Badge v-for="tag in item.tags" :key="tag" variant="secondary">{{ tag }}</Badge>
         </div>
       </div>
     </CardContent>
