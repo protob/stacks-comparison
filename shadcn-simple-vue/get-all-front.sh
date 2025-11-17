@@ -4,9 +4,9 @@ set -euo pipefail
 # Consolidates frontend source files only into a single markdown file
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
-FRONTEND_DIR="$ROOT_DIR/shadcn-simple-vue-vite"
+FRONTEND_DIR="$ROOT_DIR/shadcn-simple-nuxt"
 OUTPUT_DIR="$ROOT_DIR/z_sources"
-OUTPUT_FILE="$OUTPUT_DIR/shadcn-simple-vue-vite_sources.md"
+OUTPUT_FILE="$OUTPUT_DIR/shadcn-simple-nuxt.md"
 
 # Directories to exclude (these won't be descended into at all)
 EXCLUDES=("node_modules" ".git" "dist" "build" ".output" ".nuxt" ".cache" "public" ".vite")
