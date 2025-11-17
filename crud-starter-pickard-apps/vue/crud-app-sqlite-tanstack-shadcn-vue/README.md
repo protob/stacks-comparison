@@ -1,8 +1,5 @@
-# (Technical Documentation) Items App - Vue Frontend
+#  Items App - Vue Frontend
 
-**This document serves as a detailed technical guide for developers (human or AI) interacting with the `crud-app-sqlite-tanstack-shadcn-vue` frontend codebase. Its purpose is to provide a comprehensive understanding of the architecture, design system, state management, and development practices.**
-
----
 
 ## 1. Core Architecture & Tech Stack
 
