@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -33,28 +32,6 @@ const toggleTag = (tag: string) => {
       <div class="px-2">
         <Input v-model="searchQuery" placeholder="Search tasks..." />
       </div>
-
-      <!-- Navigation -->
-      <nav class="px-2 space-y-1">
-        <RouterLink to="/" custom v-slot="{ navigate, isActive }">
-          <Button
-            @click="navigate"
-            :variant="isActive ? 'secondary' : 'ghost'"
-            class="justify-start w-full"
-          >
-            Items
-          </Button>
-        </RouterLink>
-        <RouterLink to="/about" custom v-slot="{ navigate, isActive }">
-          <Button
-            @click="navigate"
-            :variant="isActive ? 'secondary' : 'ghost'"
-            class="justify-start w-full"
-          >
-            About
-          </Button>
-        </RouterLink>
-      </nav>
 
       <Separator />
 
