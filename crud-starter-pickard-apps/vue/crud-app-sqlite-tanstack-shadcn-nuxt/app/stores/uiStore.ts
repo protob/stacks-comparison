@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { toast } from 'vue-sonner';
 import type { NotificationType, Item } from '@/types';
-
+import { useStorage } from '@vueuse/core'; // ← ADD THIS
 type Theme = 'light' | 'dark' | 'system';
 
 export const useUiStore = defineStore('ui', () => {
