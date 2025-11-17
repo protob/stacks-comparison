@@ -1,7 +1,7 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 20:49:44 CET
-**Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
+**Generated on:** pon, 17 lis 2025, 11:10:42 CET
+**Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/crud-app-sqlite-tanstack/frontend
 
 ---
 
