@@ -51,9 +51,11 @@ const handleDelete = () => {
         <div class="flex items-center justify-between">
             <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
             <div class="flex gap-2">
-                <!-- Edit button can be added here -->
+                <Button size="sm" variant="ghost" @click="() => {}">
+                    <icon-lucide-pencil class="w-4 h-4" />
+                </Button>
                 <Button size="sm" variant="destructive" @click="handleDelete">
-                    Delete
+                    <icon-lucide-trash-2 class="w-4 h-4" />
                 </Button>
             </div>
         </div>
