@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { TagInput } from '@/components/common/TagInput';
 import type { Item } from '@/types';
 
@@ -29,6 +28,13 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
       const result = itemFormSchema.safeParse(value);
       if (!result.success) {
         console.error('Validation failed:', result.error);
+        // Show validation errors in form
+        result.error.issues.forEach((issue) => {
+          form.setFieldMeta(issue.path[0] as string, (meta) => ({
+            ...meta,
+            errors: [issue.message]
+          }));
+        });
         return;
       }
       onSubmit(value);
@@ -40,117 +46,130 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
       <form.Field
         name="name"
         children={(field) => (
-          <FormItem>
-            <FormLabel>Task Name</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="e.g., Finalize project report" 
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-              />
-            </FormControl>
+          <div className="space-y-2">
+            <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Task Name
+            </label>
+            <Input 
+              id={field.name}
+              placeholder="e.g., Finalize project report" 
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+            />
             {field.state.meta.errors && field.state.meta.errors.length > 0 && (
-              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
+              <p className="text-sm font-medium text-destructive">
+                {field.state.meta.errors[0]}
+              </p>
             )}
-          </FormItem>
+          </div>
         )}
       />
 
       <form.Field
         name="text"
         children={(field) => (
-          <FormItem>
-            <FormLabel>Description</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Add more details about the task..." 
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-              />
-            </FormControl>
+          <div className="space-y-2">
+            <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Description
+            </label>
+            <Textarea 
+              id={field.name}
+              placeholder="Add more details about the task..." 
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+            />
             {field.state.meta.errors && field.state.meta.errors.length > 0 && (
-              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
+              <p className="text-sm font-medium text-destructive">
+                {field.state.meta.errors[0]}
+              </p>
             )}
-          </FormItem>
+          </div>
         )}
       />
         
       <form.Field
         name="categories"
         children={(field) => (
-          <FormItem>
-            <FormLabel>Category</FormLabel>
-            <FormControl>
-              <Input 
-                placeholder="e.g., Work" 
-                value={field.state.value[0]}
-                onChange={(e) => field.handleChange([e.target.value])}
-                onBlur={field.handleBlur}
-              />
-            </FormControl>
+          <div className="space-y-2">
+            <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Category
+            </label>
+            <Input 
+              id={field.name}
+              placeholder="e.g., Work" 
+              value={field.state.value[0]}
+              onChange={(e) => field.handleChange([e.target.value])}
+              onBlur={field.handleBlur}
+            />
             {field.state.meta.errors && field.state.meta.errors.length > 0 && (
-              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
+              <p className="text-sm font-medium text-destructive">
+                {field.state.meta.errors[0]}
+              </p>
             )}
-          </FormItem>
+          </div>
         )}
       />
 
       <form.Field
         name="priority"
         children={(field) => (
-          <FormItem className="space-y-3">
-            <FormLabel>Priority</FormLabel>
-            <FormControl>
-              <RadioGroup
-                value={field.state.value}
-                onValueChange={(value) => field.handleChange(value as any)}
-                className="flex items-center space-x-4"
-              >
-                <FormItem className="flex items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="low" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Low</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="mid" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Medium</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-2 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="high" />
-                  </FormControl>
-                  <FormLabel className="font-normal">High</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
+          <div className="space-y-3">
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Priority
+            </label>
+            <RadioGroup
+              value={field.state.value}
+              onValueChange={(value) => field.handleChange(value as any)}
+              className="flex items-center space-x-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="low" id="priority-low" />
+                <label htmlFor="priority-low" className="text-sm font-normal">
+                  Low
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="mid" id="priority-mid" />
+                <label htmlFor="priority-mid" className="text-sm font-normal">
+                  Medium
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="high" id="priority-high" />
+                <label htmlFor="priority-high" className="text-sm font-normal">
+                  High
+                </label>
+              </div>
+            </RadioGroup>
             {field.state.meta.errors && field.state.meta.errors.length > 0 && (
-              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
+              <p className="text-sm font-medium text-destructive">
+                {field.state.meta.errors[0]}
+              </p>
             )}
-          </FormItem>
+          </div>
         )}
       />
 
       <form.Field
         name="tags"
         children={(field) => (
-          <FormItem>
-            <FormLabel>Tags</FormLabel>
-            <FormControl>
-              <TagInput
-                tags={field.state.value}
-                onTagsChange={field.handleChange}
-                placeholder="Add a tag..."
-              />
-            </FormControl>
+          <div className="space-y-2">
+            <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Tags
+            </label>
+            <TagInput
+              tags={field.state.value}
+              onTagsChange={field.handleChange}
+              placeholder="Add a tag..."
+            />
             {field.state.meta.errors && field.state.meta.errors.length > 0 && (
-              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
+              <p className="text-sm font-medium text-destructive">
+                {field.state.meta.errors[0]}
+              </p>
             )}
-          </FormItem>
+          </div>
         )}
       />
 
