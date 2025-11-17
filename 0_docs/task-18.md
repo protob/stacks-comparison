@@ -37,6 +37,7 @@ bun x --bun shadcn-vue@latest add button && bun x --bun shadcn-vue@latest add di
 
 **Phase 3: Directory and File Structure Creation**
 
+
 Create the necessary directories and empty files to match the target architecture.
 
 ```bash
