@@ -33,14 +33,18 @@ export function ItemItem({ item, onToggleComplete, onDelete, onEdit }: ItemItemP
               <h3 className="text-size-base font-bold hover:underline">{item.name}</h3>
             </Link>
             <div className="flex items-center gap-2">
-              <span className={`tag-sm rounded-button ${priorityClasses[item.priority]}`}>
+              <span className={`tag-sm rounded-button ${
+                item.priority === 'high' ? 'bg-danger text-text-inverse' :
+                item.priority === 'mid' ? 'bg-primary text-text-inverse' :
+                'bg-surface-hover text-text-primary'
+              }`}>
                 {item.priority}
               </span>
               <Button size="sm" variant="ghost" onClick={() => onEdit(item)}>
-                <Edit className="h-4 w-4" />
+                <Edit className="h-3 w-3" />
               </Button>
               <Button size="sm" variant="ghost" onClick={() => onDelete(item)} className="text-destructive">
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3 w-3" />
               </Button>
             </div>
           </div>

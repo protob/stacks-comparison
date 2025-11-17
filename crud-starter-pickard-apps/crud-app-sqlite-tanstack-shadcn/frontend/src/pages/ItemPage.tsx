@@ -128,7 +128,7 @@ export default function ItemPage() {
             </p>
           </div>
             <Button onClick={() => openAddModal()}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-3 w-3 mr-2" />
               Add Item
             </Button>
         </div>
@@ -178,7 +178,7 @@ export default function ItemPage() {
               </Button>
             ) : (
               <Button onClick={() => openAddModal()}>
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-3 w-3 mr-2" />
                 Create Item
               </Button>
             )}
@@ -199,7 +199,7 @@ export default function ItemPage() {
                     className="text-neutral-400 hover:text-neutral-200"
                     aria-label={`Add item to ${categoryName}`}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-3 w-3" />
                   </Button>
                   <h2 className="text-lg font-medium text-neutral-200">{categoryName}</h2>
                   <span className="text-sm text-neutral-500">({categoryItems.length})</span>

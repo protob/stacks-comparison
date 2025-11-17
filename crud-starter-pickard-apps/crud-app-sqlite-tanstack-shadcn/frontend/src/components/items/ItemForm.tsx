@@ -125,19 +125,19 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
               className="flex items-center space-x-4"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="low" id="priority-low" />
+                <RadioGroupItem value="low" id="priority-low" className="h-4 w-4" />
                 <label htmlFor="priority-low" className="text-sm font-normal">
                   Low
                 </label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="mid" id="priority-mid" />
+                <RadioGroupItem value="mid" id="priority-mid" className="h-4 w-4" />
                 <label htmlFor="priority-mid" className="text-sm font-normal">
                   Medium
                 </label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="high" id="priority-high" />
+                <RadioGroupItem value="high" id="priority-high" className="h-4 w-4" />
                 <label htmlFor="priority-high" className="text-sm font-normal">
                   High
                 </label>
