@@ -1,0 +1,110 @@
+.
+├── ./api
+│   ├── ./api/apiClient.ts
+│   └── ./api/itemApi.ts
+├── ./app
+│   ├── ./app/app.vue
+│   ├── ./app/assets
+│   │   ├── ./app/assets/css
+│   │   └── ./app/assets/tailwind.css
+│   ├── ./app/components
+│   │   └── ./app/components/ui
+│   │       ├── ./app/components/ui/badge
+│   │       │   ├── ./app/components/ui/badge/Badge.vue
+│   │       │   └── ./app/components/ui/badge/index.ts
+│   │       ├── ./app/components/ui/button
+│   │       │   ├── ./app/components/ui/button/Button.vue
+│   │       │   └── ./app/components/ui/button/index.ts
+│   │       ├── ./app/components/ui/card
+│   │       │   ├── ./app/components/ui/card/CardAction.vue
+│   │       │   ├── ./app/components/ui/card/CardContent.vue
+│   │       │   ├── ./app/components/ui/card/CardDescription.vue
+│   │       │   ├── ./app/components/ui/card/CardFooter.vue
+│   │       │   ├── ./app/components/ui/card/CardHeader.vue
+│   │       │   ├── ./app/components/ui/card/CardTitle.vue
+│   │       │   ├── ./app/components/ui/card/Card.vue
+│   │       │   └── ./app/components/ui/card/index.ts
+│   │       ├── ./app/components/ui/checkbox
+│   │       │   ├── ./app/components/ui/checkbox/Checkbox.vue
+│   │       │   └── ./app/components/ui/checkbox/index.ts
+│   │       ├── ./app/components/ui/dialog
+│   │       │   ├── ./app/components/ui/dialog/DialogClose.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogContent.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogDescription.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogFooter.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogHeader.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogOverlay.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogScrollContent.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogTitle.vue
+│   │       │   ├── ./app/components/ui/dialog/DialogTrigger.vue
+│   │       │   ├── ./app/components/ui/dialog/Dialog.vue
+│   │       │   └── ./app/components/ui/dialog/index.ts
+│   │       ├── ./app/components/ui/input
+│   │       │   ├── ./app/components/ui/input/index.ts
+│   │       │   └── ./app/components/ui/input/Input.vue
+│   │       ├── ./app/components/ui/label
+│   │       │   ├── ./app/components/ui/label/index.ts
+│   │       │   └── ./app/components/ui/label/Label.vue
+│   │       ├── ./app/components/ui/radio-group
+│   │       │   ├── ./app/components/ui/radio-group/index.ts
+│   │       │   ├── ./app/components/ui/radio-group/RadioGroupItem.vue
+│   │       │   └── ./app/components/ui/radio-group/RadioGroup.vue
+│   │       ├── ./app/components/ui/separator
+│   │       │   ├── ./app/components/ui/separator/index.ts
+│   │       │   └── ./app/components/ui/separator/Separator.vue
+│   │       └── ./app/components/ui/sonner
+│   │           ├── ./app/components/ui/sonner/index.ts
+│   │           └── ./app/components/ui/sonner/Sonner.vue
+│   ├── ./app/lib
+│   │   └── ./app/lib/utils.ts
+│   └── ./app/plugins
+│       ├── ./app/plugins/ssr-width.ts
+│       └── ./app/plugins/vue-sonner.ts
+├── ./assets
+│   └── ./assets/css
+│       └── ./assets/css/main.css
+├── ./bun.lock
+├── ./components
+│   ├── ./components/items
+│   │   ├── ./components/items/ItemForm.vue
+│   │   └── ./components/items/ItemItem.vue
+│   └── ./components/layout
+│       ├── ./components/layout/AppSidebar.vue
+│       ├── ./components/layout/FilterBar.vue
+│       └── ./components/layout/TopBar.vue
+├── ./components.json
+├── ./composables
+│   ├── ./composables/useItemFilters.ts
+│   ├── ./composables/useItemsApi.ts
+│   └── ./composables/useThemeUpdater.ts
+├── ./.gitignore
+├── ./layouts
+│   └── ./layouts/default.vue
+├── ./lib
+│   └── ./lib/utils.ts
+├── ./nuxt.config.ts
+├── ./package.json
+├── ./pages
+│   ├── ./pages/about.vue
+│   ├── ./pages/index.vue
+│   └── ./pages/items
+│       └── ./pages/items/[categorySlug]
+│           └── ./pages/items/[categorySlug]/[itemSlug].vue
+├── ./public
+│   ├── ./public/favicon.ico
+│   └── ./public/robots.txt
+├── ./README.md
+├── ./schemas
+│   └── ./schemas/itemSchema.ts
+├── ./stores
+│   ├── ./stores/itemStore.ts
+│   └── ./stores/uiStore.ts
+├── ./tree2.txt
+├── ./tsconfig.json
+├── ./types
+│   └── ./types/index.ts
+└── ./utils
+    ├── ./utils/helpers.ts
+    └── ./utils/slugify.ts
+
+35 directories, 73 files
