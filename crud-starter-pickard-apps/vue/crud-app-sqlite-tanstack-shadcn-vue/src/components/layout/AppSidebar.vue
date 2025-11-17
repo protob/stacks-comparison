@@ -54,7 +54,7 @@ const toggleTag = (tag: string) => {
 
       <!-- Add New Item Button -->
       <div class="px-2 mt-4">
-        <Button class="w-full">
+        <Button class="w-full" @click="uiStore.openForm()">
           + Add Item
         </Button>
       </div>

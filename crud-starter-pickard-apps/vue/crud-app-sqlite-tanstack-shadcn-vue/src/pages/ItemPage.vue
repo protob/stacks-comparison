@@ -5,8 +5,10 @@ import { useItemFilters } from '@/composables/useItemFilters';
 import FilterBar from '@/components/layout/FilterBar.vue';
 import ItemItem from '@/components/items/ItemItem.vue';
 import ItemForm from '@/components/items/ItemForm.vue';
+import { useUiStore } from '@/stores/uiStore';
 
 const { data: itemTree, isLoading, error } = useItemTree();
+const uiStore = useUiStore();
 
 const filters = ref({
   searchQuery: '',
@@ -19,8 +21,6 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
   computed(() => itemTree.value || {}),
   filters
 );
-
-const isFormOpen = ref(false);
 </script>
 
 <template>
@@ -64,8 +64,9 @@ const isFormOpen = ref(false);
 
     <!-- The ItemForm will be triggered from the sidebar -->
     <ItemForm
-      v-if="isFormOpen"
-      @close="isFormOpen = false"
+      v-if="uiStore.isFormOpen"
+      :item="uiStore.editingItem"
+      @close="uiStore.closeForm"
     />
   </MainLayout>
 </template>

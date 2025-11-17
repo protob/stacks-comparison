@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { toast } from 'vue-sonner'; 
-import type { NotificationType } from '@/types';
+import type { NotificationType, Item } from '@/types';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -8,6 +8,10 @@ export const useUiStore = defineStore('ui', () => {
   const isLoading = ref(false);
   const loadingMessage = ref<string | null>(null);
   const theme = useStorage<Theme>('theme', 'system');
+  
+  // Form state
+  const isFormOpen = ref(false);
+  const editingItem = ref<Item | null>(null);
 
   const setIsLoading = (status: boolean, message?: string) => {
     isLoading.value = status;
@@ -41,13 +45,27 @@ export const useUiStore = defineStore('ui', () => {
     theme.value = theme.value === 'dark' ? 'light' : 'dark';
   };
 
+  const openForm = (item?: Item) => {
+    isFormOpen.value = true;
+    editingItem.value = item || null;
+  };
+
+  const closeForm = () => {
+    isFormOpen.value = false;
+    editingItem.value = null;
+  };
+
   return {
     isLoading,
     loadingMessage,
     theme,
+    isFormOpen,
+    editingItem,
     setIsLoading,
     showNotification,
     setTheme,
     toggleTheme,
+    openForm,
+    closeForm,
   };
 });

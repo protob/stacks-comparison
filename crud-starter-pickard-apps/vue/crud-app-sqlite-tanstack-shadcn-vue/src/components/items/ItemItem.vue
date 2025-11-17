@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useUpdateItem, useDeleteItem } from '@/composables/useItemsApi';
 import { formatDate } from '@/utils/helpers';
+import { useUiStore } from '@/stores/uiStore';
 import type { Item } from '@/types';
 
 const props = defineProps<{ item: Item }>();
 
 const { mutate: updateItem } = useUpdateItem();
 const { mutate: deleteItem } = useDeleteItem();
+const uiStore = useUiStore();
 
 const toggleComplete = () => {
   updateItem({
@@ -51,7 +53,7 @@ const handleDelete = () => {
         <div class="flex items-center justify-between">
             <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
             <div class="flex gap-2">
-                <Button size="sm" variant="ghost" @click="() => {}">
+                <Button size="sm" variant="ghost" @click="uiStore.openForm(item)">
                     <icon-lucide-pencil class="w-4 h-4" />
                 </Button>
                 <Button size="sm" variant="destructive" @click="handleDelete">
