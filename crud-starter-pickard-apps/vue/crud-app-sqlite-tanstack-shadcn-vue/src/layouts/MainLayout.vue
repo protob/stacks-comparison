@@ -4,15 +4,23 @@ import TopBar from '@/components/layout/TopBar.vue';
 </script>
 
 <template>
-  <div class="grid min-h-screen grid-cols-[var(--sidebar-width)_1fr]">
-    <!-- Sidebar: Constrained by the first column of the grid. -->
+  <!-- 
+    TODO: Investigate grid layout solution for better control
+    Previous grid implementation: grid-cols-[var(--sidebar-width)_1fr]
+    Grid preferred for better layout control, but flexbox used temporarily due to overlap issues
+    Need to investigate CSS custom variables and grid column sizing conflicts
+  -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar: Fixed width -->
     <AppSidebar />
 
-    <!-- Main Content: Fills the remaining space and handles its own scrolling. -->
-    <main class="overflow-y-auto p-fluid-4 md:p-fluid-6 lg:p-fluid-8">
-      <TopBar />
-      <div class="flex-1">
-        <slot />
+    <!-- Main Content: Takes remaining space -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-fluid-4 md:p-fluid-6 lg:p-fluid-8">
+        <TopBar />
+        <div class="flex-1">
+          <slot />
+        </div>
       </div>
     </main>
   </div>
