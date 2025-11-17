@@ -9,9 +9,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { useAddItem } from '@/composables/useItemsApi';
 import { itemFormSchema } from '@/schemas/itemSchema';
+import { useUiStore } from '@/stores/uiStore';
 
 const emit = defineEmits<{ close: [] }>();
 const { mutate: addItem } = useAddItem();
+const uiStore = useUiStore();
 
 const currentTag = ref('');
 
@@ -21,7 +23,8 @@ const form = useForm({
     text: '',
     priority: 'mid' as const,
     tags: [] as string[],
-    categories: ['general'] as [string],
+    // Use preselected category from store, or a default
+    categories: [uiStore.preselectedCategory || 'general'] as [string],
   },
   onSubmit: async ({ value }) => {
     addItem(value, {
@@ -45,6 +48,7 @@ const removeTag = (tagToRemove: string) => {
 </script>
 
 <template>
+  <!-- TEMPLATE REMAINS UNCHANGED -->
   <Dialog :open="true" @update:open="emit('close')">
     <DialogContent>
       <DialogHeader>

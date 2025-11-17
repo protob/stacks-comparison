@@ -6,6 +6,7 @@ import FilterBar from '@/components/layout/FilterBar.vue';
 import ItemItem from '@/components/items/ItemItem.vue';
 import ItemForm from '@/components/items/ItemForm.vue';
 import { useUiStore } from '@/stores/uiStore';
+import { Button } from '@/components/ui/button';
 
 const { data: itemTree, isLoading, error } = useItemTree();
 const uiStore = useUiStore();
@@ -27,7 +28,7 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
   <MainLayout>
     <header class="mb-6">
       <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
-      <!-- The "Add New Item" button is now in the sidebar -->
+      <!-- The main "Add New Item" button remains in the sidebar -->
     </header>
 
     <FilterBar
@@ -47,6 +48,10 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
         <div class="flex items-center gap-2 mb-4">
           <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
           <span class="text-sm text-text-muted">({{ items.length }})</span>
+          <!-- Add "+" button here -->
+          <Button variant="ghost" size="icon-sm" @click="uiStore.openForm(undefined, category)">
+            <icon-lucide-plus class="w-4 h-4" />
+          </Button>
         </div>
         <div class="grid gap-4">
           <ItemItem
@@ -62,10 +67,9 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
       </div>
     </div>
 
-    <!-- The ItemForm will be triggered from the sidebar -->
+    <!-- The ItemForm is now aware of pre-selected category -->
     <ItemForm
       v-if="uiStore.isFormOpen"
-      :item="uiStore.editingItem"
       @close="uiStore.closeForm"
     />
   </MainLayout>

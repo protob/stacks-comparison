@@ -22,7 +22,7 @@ const toggleTag = (tag: string) => {
 </script>
 
 <template>
-  <aside class="flex flex-col p-4 border-r w-72 bg-surface border-border">
+  <aside class="flex flex-col p-4 border-r bg-surface border-border">
     <div class="p-2 mb-4">
       <h2 class="text-xl font-bold">TodoApp</h2>
     </div>

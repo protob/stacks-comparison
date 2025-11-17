@@ -12,6 +12,7 @@ export const useUiStore = defineStore('ui', () => {
   // Form state
   const isFormOpen = ref(false);
   const editingItem = ref<Item | null>(null);
+  const preselectedCategory = ref<string | null>(null); // Added state
 
   const setIsLoading = (status: boolean, message?: string) => {
     isLoading.value = status;
@@ -45,14 +46,18 @@ export const useUiStore = defineStore('ui', () => {
     theme.value = theme.value === 'dark' ? 'light' : 'dark';
   };
 
-  const openForm = (item?: Item) => {
+  // Modified openForm to accept an optional category
+  const openForm = (item?: Item, category?: string) => {
     isFormOpen.value = true;
     editingItem.value = item || null;
+    preselectedCategory.value = category || null;
   };
 
+  // Modified closeForm to reset new state
   const closeForm = () => {
     isFormOpen.value = false;
     editingItem.value = null;
+    preselectedCategory.value = null;
   };
 
   return {
@@ -61,6 +66,7 @@ export const useUiStore = defineStore('ui', () => {
     theme,
     isFormOpen,
     editingItem,
+    preselectedCategory, // Expose new state
     setIsLoading,
     showNotification,
     setTheme,

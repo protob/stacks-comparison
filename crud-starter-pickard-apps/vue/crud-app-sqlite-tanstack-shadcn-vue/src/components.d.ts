@@ -44,6 +44,7 @@ declare module 'vue' {
     FilterBar: typeof import('./components/layout/FilterBar.vue')['default']
     IconLucideMoon: typeof import('~icons/lucide/moon')['default']
     IconLucidePencil: typeof import('~icons/lucide/pencil')['default']
+    IconLucidePlus: typeof import('~icons/lucide/plus')['default']
     IconLucideSun: typeof import('~icons/lucide/sun')['default']
     IconLucideTrash2: typeof import('~icons/lucide/trash2')['default']
     Input: typeof import('./components/ui/input/Input.vue')['default']
