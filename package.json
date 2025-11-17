@@ -1,8 +1,22 @@
 {
   "dependencies": {
+    "@tanstack/vue-form": "^1.25.0",
+    "@tanstack/vue-query": "^5.91.2",
+    "@tanstack/vue-query-devtools": "^6.0.0",
+    "@tanstack/zod-form-adapter": "^0.42.1",
+    "@vueuse/core": "^14.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "ofetch": "^1.5.1",
+    "pinia": "^3.0.4",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "vue-router": "^4.6.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@pinia/testing": "^1.0.3",
+    "unplugin-auto-import": "^20.2.0"
   }
 }
