@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** pon, 17 lis 2025, 15:47:47 CET
+**Generated on:** pon, 17 lis 2025, 16:49:40 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-vue
 
 ---
@@ -70,11 +70,14 @@
     "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.73",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",
     "tw-animate-css": "^1.4.0",
     "typescript": "~5.9.3",
+    "unplugin-icons": "^22.5.0",
+    "unplugin-vue-components": "^30.0.0",
     "vite": "npm:rolldown-vite@7.2.2",
     "vue-tsc": "^3.1.3"
   },
@@ -170,11 +173,15 @@ import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import Icons from 'unplugin-icons/vite'
+import IconsResolver from 'unplugin-icons/resolver'
 
 export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
+    
     AutoImport({
       include: [/\.[tj]sx?$/, /\.vue$/],
       imports: [
@@ -186,6 +193,7 @@ export default defineConfig({
           '@tanstack/vue-form': ['useForm'],
           'ofetch': ['ofetch'],
           '@vueuse/core': ['useStorage', 'useDark', 'useToggle'],
+          'vue-sonner': ['toast'],
         },
       ],
       dts: 'src/auto-imports.d.ts',
@@ -198,25 +206,43 @@ export default defineConfig({
       ],
       vueTemplate: true,
     }),
+
+    // Add Components with Icons resolver
+    Components({
+      resolvers: [
+        IconsResolver({
+          prefix: 'icon',
+        }),
+      ],
+      dts: 'src/components.d.ts',
+    }),
+
+    // Add Icons plugin
+    Icons({
+      compiler: 'vue3',
+      autoInstall: true,
+    }),
   ],
+  
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
   },
+  
   server: {
     watch: {
       ignored: ['**/server-node/data/**']
     },
   },
+  
   build: {
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
           'vendor': ['vue', 'vue-router', 'pinia'],
-          'icons': ['lucide-vue-next'],
         }
       }
     }
@@ -233,12 +259,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Badge } from '@/components/ui/badge';
 import { useAddItem } from '@/composables/useItemsApi';
 import { itemFormSchema } from '@/schemas/itemSchema';
 
 const emit = defineEmits<{ close: [] }>();
 const { mutate: addItem } = useAddItem();
+
+const currentTag = ref('');
 
 const form = useForm({
   defaultValues: {
@@ -255,87 +284,134 @@ const form = useForm({
   },
   validatorAdapter: zodValidator(),
 });
+
+const addTag = () => {
+  const newTag = currentTag.value.trim();
+  if (newTag && !form.state.values.tags.includes(newTag)) {
+    form.setFieldValue('tags', [...form.state.values.tags, newTag]);
+  }
+  currentTag.value = '';
+};
+
+const removeTag = (tagToRemove: string) => {
+  form.setFieldValue('tags', form.state.values.tags.filter(tag => tag !== tagToRemove));
+};
 </script>
 
 <template>
   <Dialog :open="true" @update:open="emit('close')">
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Add New Item</DialogTitle>
+        <DialogTitle>Add New Task</DialogTitle>
       </DialogHeader>
       
-      <form
-        @submit.prevent="form.handleSubmit()"
-        class="space-y-4"
-      >
-        <form.Field
-          name="name"
-          :validators="{
-            onChange: itemFormSchema.shape.name,
-          }"
-        >
+      <form @submit.prevent="form.handleSubmit()" class="space-y-4">
+        <!-- Name Field -->
+        <form.Field name="name" :validators="{ onChange: itemFormSchema.shape.name }">
           <template #default="{ field }">
             <div>
-              <Label>Name</Label>
+              <Label>Task Name</Label>
               <Input
                 :model-value="field.state.value"
                 @update:model-value="field.handleChange"
+                placeholder="e.g., Finalize project report"
               />
-              <span v-if="field.state.meta.errors.length" class="text-sm text-destructive">
+              <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
                 {{ field.state.meta.errors[0] }}
-              </span>
+              </p>
             </div>
           </template>
         </form.Field>
 
-        <form.Field
-          name="text"
-          :validators="{
-            onChange: itemFormSchema.shape.text,
-          }"
-        >
+        <!-- Description Field -->
+        <form.Field name="text" :validators="{ onChange: itemFormSchema.shape.text }">
           <template #default="{ field }">
             <div>
               <Label>Description</Label>
               <Input
                 :model-value="field.state.value"
                 @update:model-value="field.handleChange"
+                placeholder="Add more details about the task..."
               />
-              <span v-if="field.state.meta.errors.length" class="text-sm text-destructive">
+               <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
                 {{ field.state.meta.errors[0] }}
-              </span>
+              </p>
             </div>
           </template>
         </form.Field>
 
+        <!-- Category Field -->
+        <form.Field name="categories" :validators="{ onChange: itemFormSchema.shape.categories }">
+           <template #default="{ field }">
+             <div>
+               <Label>Category</Label>
+               <Input
+                 :model-value="field.state.value[0]"
+                 @update:model-value="field.handleChange([$event])"
+                 placeholder="e.g., Work"
+               />
+               <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
+                {{ field.state.meta.errors[0] }}
+              </p>
+             </div>
+           </template>
+        </form.Field>
+
+        <!-- Priority Field -->
         <form.Field name="priority">
           <template #default="{ field }">
             <div>
               <Label>Priority</Label>
-              <Select
+              <RadioGroup
                 :model-value="field.state.value"
                 @update:model-value="field.handleChange"
+                class="flex items-center gap-4 mt-2"
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="mid">Mid</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
+                <div class="flex items-center space-x-2">
+                  <RadioGroupItem id="p-low" value="low" />
+                  <Label for="p-low">Low</Label>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <RadioGroupItem id="p-mid" value="mid" />
+                  <Label for="p-mid">Mid</Label>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <RadioGroupItem id="p-high" value="high" />
+                  <Label for="p-high">High</Label>
+                </div>
+              </RadioGroup>
             </div>
           </template>
         </form.Field>
 
-        <div class="flex justify-end gap-2">
-          <Button type="button" variant="outline" @click="emit('close')">
-            Cancel
-          </Button>
-          <Button type="submit">
-            Create Item
-          </Button>
+        <!-- Tags Field -->
+        <div>
+          <Label>Tags</Label>
+          <div class="flex items-center gap-2 mt-2">
+            <Input
+              v-model="currentTag"
+              @keydown.enter.prevent="addTag"
+              placeholder="Add a tag..."
+            />
+            <Button type="button" variant="outline" @click="addTag">Add</Button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <Badge
+              v-for="tag in form.state.values.tags"
+              :key="tag"
+              variant="secondary"
+              class="cursor-pointer"
+              @click="removeTag(tag)"
+            >
+              {{ tag }} &times;
+            </Badge>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" @click="emit('close')">Cancel</Button>
+          <Button type="submit">Create Task</Button>
         </div>
       </form>
     </DialogContent>
@@ -349,13 +425,17 @@ const form = useForm({
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useUpdateItem, useDeleteItem } from '@/composables/useItemsApi';
+import { formatDate } from '@/utils/helpers';
+import { useUiStore } from '@/stores/uiStore';
 import type { Item } from '@/types';
 
 const props = defineProps<{ item: Item }>();
 
 const { mutate: updateItem } = useUpdateItem();
 const { mutate: deleteItem } = useDeleteItem();
+const uiStore = useUiStore();
 
 const toggleComplete = () => {
   updateItem({
@@ -372,24 +452,41 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <Card>
-    <CardContent class="p-4">
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <h3 class="mb-2 font-semibold text-size-lg">{{ item.name }}</h3>
-          <p class="mb-2 text-text-secondary">{{ item.text }}</p>
-          <div class="flex gap-2">
-            <Badge :class="`tag-priority-${item.priority}`">{{ item.priority }}</Badge>
-            <Badge v-if="item.isCompleted" class="bg-success-light">Completed</Badge>
-          </div>
+  <Card :class="{ 'opacity-60': item.isCompleted }">
+    <CardContent class="flex items-start gap-4 p-4">
+      <Checkbox
+        :checked="item.isCompleted"
+        @update:checked="toggleComplete"
+        class="mt-1"
+      />
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+            <h3 
+              class="font-semibold text-size-lg"
+              :class="{ 'line-through text-text-muted': item.isCompleted }"
+            >
+              {{ item.name }}
+            </h3>
+             <Badge :class="`tag-priority-${item.priority}`" variant="outline">
+               {{ item.priority }}
+            </Badge>
         </div>
-        <div class="flex gap-2">
-          <Button size="sm" variant="outline" @click="toggleComplete">
-            {{ item.isCompleted ? 'Undo' : 'Complete' }}
-          </Button>
-          <Button size="sm" variant="destructive" @click="handleDelete">
-            Delete
-          </Button>
+        <p class="mb-3 text-text-secondary">{{ item.text }}</p>
+
+        <div class="flex items-center justify-between">
+            <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
+            <div class="flex gap-2">
+                <Button size="sm" variant="ghost" @click="uiStore.openForm(item)">
+                    <icon-lucide-pencil class="w-4 h-4" />
+                </Button>
+                <Button size="sm" variant="destructive" @click="handleDelete">
+                    <icon-lucide-trash-2 class="w-4 h-4" />
+                </Button>
+            </div>
+        </div>
+
+        <div class="flex gap-2 mt-3">
+          <Badge v-for="tag in item.tags" :key="tag" variant="secondary">{{ tag }}</Badge>
         </div>
       </div>
     </CardContent>
@@ -397,42 +494,103 @@ const handleDelete = () => {
 </template>
 ```
 
-## `src/components/layout/AppSidebar.vue`
+## `src/components/layout/TopBar.vue`
 ```
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
-import { Button } from '@/components/ui/button';
-import { useUiStore } from '@/stores/uiStore';
+import { RouterLink, useRoute } from 'vue-router';
 
-const uiStore = useUiStore();
+const route = useRoute();
 </script>
 
 <template>
-  <aside class="w-64 p-4 border-r bg-surface border-border">
-    <nav class="space-y-2">
-      <RouterLink to="/" custom v-slot="{ navigate, isActive }">
-        <Button
-          @click="navigate"
-          :variant="isActive ? 'default' : 'ghost'"
-          class="justify-start w-full"
-        >
-          Items
-        </Button>
+  <header class="flex justify-end items-center pb-4 mb-4 border-b border-border">
+    <nav class="flex items-center gap-4">
+      <RouterLink 
+        to="/" 
+        :class="route.path === '/' ? 'text-primary font-bold' : 'text-text-secondary hover:text-text-primary'"
+      >
+        Home
       </RouterLink>
-      <RouterLink to="/about" custom v-slot="{ navigate, isActive }">
-        <Button
-          @click="navigate"
-          :variant="isActive ? 'default' : 'ghost'"
-          class="justify-start w-full"
-        >
-          About
-        </Button>
+      <RouterLink 
+        to="/about" 
+        :class="route.path === '/about' ? 'text-primary font-bold' : 'text-text-secondary hover:text-text-primary'"
+      >
+        About
       </RouterLink>
     </nav>
-    
-    <div class="mt-8">
-      <Button variant="outline" @click="uiStore.toggleTheme()">
-        Toggle Theme
+  </header>
+</template>
+```
+
+## `src/components/layout/AppSidebar.vue`
+```
+<script setup lang="ts">
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { useUiStore } from '@/stores/uiStore';
+
+// These would eventually be props or come from a store
+const searchQuery = ref('');
+const allTags = ref(['project', 'personal', 'work']); // Example tags
+const selectedTags = ref<string[]>([]);
+
+const uiStore = useUiStore();
+
+const toggleTag = (tag: string) => {
+  const index = selectedTags.value.indexOf(tag);
+  if (index > -1) {
+    selectedTags.value.splice(index, 1);
+  } else {
+    selectedTags.value.push(tag);
+  }
+};
+</script>
+
+<template>
+  <aside class="flex flex-col p-4 border-r w-72 bg-surface border-border">
+    <div class="p-2 mb-4">
+      <h2 class="text-xl font-bold">TodoApp</h2>
+    </div>
+
+    <div class="flex-1 space-y-4">
+      <!-- Search -->
+      <div class="px-2">
+        <Input v-model="searchQuery" placeholder="Search tasks..." />
+      </div>
+
+      <Separator />
+
+      <!-- Tags Section -->
+      <div class="px-2">
+        <h3 class="mb-2 text-sm font-semibold text-text-muted">Tags</h3>
+        <div class="flex flex-wrap gap-2">
+          <Button
+            v-for="tag in allTags"
+            :key="tag"
+            @click="toggleTag(tag)"
+            :variant="selectedTags.includes(tag) ? 'default' : 'outline'"
+            size="sm"
+            class="rounded-full"
+          >
+            {{ tag }}
+          </Button>
+        </div>
+      </div>
+
+      <!-- Add New Item Button -->
+      <div class="px-2 mt-4">
+        <Button class="w-full" @click="uiStore.openForm()">
+          + Add Item
+        </Button>
+      </div>
+    </div>
+
+    <!-- Footer / Theme Toggle -->
+    <div class="mt-auto">
+      <Button variant="ghost" @click="uiStore.toggleTheme()" class="justify-start w-full">
+        <icon-lucide-sun v-if="!uiStore.isDark" class="w-4 h-4" />
+        <icon-lucide-moon v-else class="w-4 h-4" />
       </Button>
     </div>
   </aside>
@@ -442,66 +600,72 @@ const uiStore = useUiStore();
 ## `src/components/layout/FilterBar.vue`
 ```
 <script setup lang="ts">
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
 
 defineProps<{
-  search: string;
   priority: string;
   showCompleted: boolean;
-  selectedTags: string[];
-  allTags: string[];
   hasActiveFilters: boolean;
 }>();
 
 const emit = defineEmits<{
-  'update:search': [value: string];
   'update:priority': [value: string];
   'update:showCompleted': [value: boolean];
-  'update:selectedTags': [value: string[]];
-  clear: [];
+  'clear': [];
 }>();
 </script>
 
 <template>
-  <div class="p-4 mb-6 space-y-4 bg-surface rounded-card">
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <Input
-        :model-value="search"
-        @update:model-value="emit('update:search', $event)"
-        placeholder="Search items..."
-      />
-      
-      <Select
-        :model-value="priority"
-        @update:model-value="emit('update:priority', $event)"
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Priority" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Priorities</SelectItem>
-          <SelectItem value="low">Low</SelectItem>
-          <SelectItem value="mid">Mid</SelectItem>
-          <SelectItem value="high">High</SelectItem>
-        </SelectContent>
-      </Select>
+  <div class="p-4 space-y-4 border rounded-lg bg-surface border-border">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div>
+        <Label class="block mb-2">Priority</Label>
+        <RadioGroup
+          :model-value="priority"
+          @update:model-value="emit('update:priority', $event as string)"
+          class="flex items-center gap-4"
+        >
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="r-all" value="all" />
+            <Label for="r-all">All</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="r-low" value="low" />
+            <Label for="r-low">Low</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="r-mid" value="mid" />
+            <Label for="r-mid">Mid</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="r-high" value="high" />
+            <Label for="r-high">High</Label>
+          </div>
+        </RadioGroup>
+      </div>
 
-      <div class="flex items-center gap-2">
-        <Checkbox
-          :checked="showCompleted"
-          @update:checked="emit('update:showCompleted', $event)"
-        />
-        <label>Show Completed</label>
+      <div>
+        <Label class="block mb-2">Status</Label>
+        <div class="flex items-center gap-2">
+          <Checkbox
+            id="show-completed"
+            :checked="showCompleted"
+            @update:checked="emit('update:showCompleted', $event as boolean)"
+          />
+          <Label for="show-completed">Show Completed</Label>
+        </div>
       </div>
     </div>
 
     <Button
       v-if="hasActiveFilters"
-      variant="outline"
+      variant="ghost"
+      size="sm"
       @click="emit('clear')"
+      class="mt-4"
     >
       Clear Filters
     </Button>
@@ -2126,7 +2290,7 @@ app.mount('#app');
 ```
 import { defineStore } from 'pinia';
 import { toast } from 'vue-sonner'; 
-import type { NotificationType } from '@/types';
+import type { NotificationType, Item } from '@/types';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -2134,6 +2298,10 @@ export const useUiStore = defineStore('ui', () => {
   const isLoading = ref(false);
   const loadingMessage = ref<string | null>(null);
   const theme = useStorage<Theme>('theme', 'system');
+  
+  // Form state
+  const isFormOpen = ref(false);
+  const editingItem = ref<Item | null>(null);
 
   const setIsLoading = (status: boolean, message?: string) => {
     isLoading.value = status;
@@ -2167,14 +2335,28 @@ export const useUiStore = defineStore('ui', () => {
     theme.value = theme.value === 'dark' ? 'light' : 'dark';
   };
 
+  const openForm = (item?: Item) => {
+    isFormOpen.value = true;
+    editingItem.value = item || null;
+  };
+
+  const closeForm = () => {
+    isFormOpen.value = false;
+    editingItem.value = null;
+  };
+
   return {
     isLoading,
     loadingMessage,
     theme,
+    isFormOpen,
+    editingItem,
     setIsLoading,
     showNotification,
     setTheme,
     toggleTheme,
+    openForm,
+    closeForm,
   };
 });
 ```
@@ -2923,6 +3105,37 @@ export const useItemStore = defineStore('item', () => {
 }
 ```
 
+## `src/layouts/MainLayout.vue`
+```
+<script setup lang="ts">
+import AppSidebar from '@/components/layout/AppSidebar.vue';
+import TopBar from '@/components/layout/TopBar.vue';
+</script>
+
+<template>
+  <!-- 
+    TODO: Investigate grid layout solution for better control
+    Previous grid implementation: grid-cols-[var(--sidebar-width)_1fr]
+    Grid preferred for better layout control, but flexbox used temporarily due to overlap issues
+    Need to investigate CSS custom variables and grid column sizing conflicts
+  -->
+  <div class="flex min-h-screen">
+    <!-- Sidebar: Fixed width -->
+    <AppSidebar />
+
+    <!-- Main Content: Takes remaining space -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-fluid-4 md:p-fluid-6 lg:p-fluid-8">
+        <TopBar />
+        <div class="flex-1">
+          <slot />
+        </div>
+      </div>
+    </main>
+  </div>
+</template>
+```
+
 ## `src/style.css`
 ```
 @import "tailwindcss";
@@ -3452,14 +3665,16 @@ const { data: item, isLoading, error } = useItemDetail(categorySlug, itemSlug);
 ## `src/pages/ItemPage.vue`
 ```
 <script setup lang="ts">
+import MainLayout from '@/layouts/MainLayout.vue';
 import { useItemTree } from '@/composables/useItemsApi';
 import { useItemFilters } from '@/composables/useItemFilters';
-import AppSidebar from '@/components/layout/AppSidebar.vue';
 import FilterBar from '@/components/layout/FilterBar.vue';
 import ItemItem from '@/components/items/ItemItem.vue';
 import ItemForm from '@/components/items/ItemForm.vue';
+import { useUiStore } from '@/stores/uiStore';
 
 const { data: itemTree, isLoading, error } = useItemTree();
+const uiStore = useUiStore();
 
 const filters = ref({
   searchQuery: '',
@@ -3472,56 +3687,54 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
   computed(() => itemTree.value || {}),
   filters
 );
-
-const isFormOpen = ref(false);
 </script>
 
 <template>
-  <div class="flex min-h-screen">
-    <AppSidebar />
-    
-    <main class="flex-1 p-fluid-6">
-      <header class="mb-6">
-        <h1 class="mb-2 font-bold text-size-2xl">Items</h1>
-        <button
-          @click="isFormOpen = true"
-          class="btn-md bg-primary text-primary-foreground hover:bg-primary-hover rounded-button"
-        >
-          Add New Item
-        </button>
-      </header>
+  <MainLayout>
+    <header class="mb-6">
+      <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
+      <!-- The "Add New Item" button is now in the sidebar -->
+    </header>
 
-      <FilterBar
-        v-model:search="filters.searchQuery"
-        v-model:priority="filters.selectedPriority"
-        v-model:showCompleted="filters.showCompleted"
-        v-model:selectedTags="filters.selectedTags"
-        :all-tags="allTags"
-        :has-active-filters="hasActiveFilters"
-        @clear="clearFilters"
-      />
+    <FilterBar
+      v-model:search="filters.searchQuery"
+      v-model:priority="filters.selectedPriority"
+      v-model:showCompleted="filters.showCompleted"
+      v-model:selectedTags="filters.selectedTags"
+      :all-tags="allTags"
+      :has-active-filters="hasActiveFilters"
+      @clear="clearFilters"
+    />
 
-      <div v-if="isLoading">Loading...</div>
-      <div v-else-if="error">Error: {{ error.message }}</div>
-      <div v-else class="space-y-8">
-        <section v-for="(items, category) in filteredItemTree" :key="category">
-          <h2 class="mb-4 font-semibold text-size-xl">{{ category }}</h2>
-          <div class="grid gap-4">
-            <ItemItem
-              v-for="item in items"
-              :key="item.id"
-              :item="item"
-            />
-          </div>
-        </section>
+    <div v-if="isLoading">Loading...</div>
+    <div v-else-if="error">Error: {{ error.message }}</div>
+    <div v-else class="mt-6 space-y-8">
+      <section v-for="(items, category) in filteredItemTree" :key="category">
+        <div class="flex items-center gap-2 mb-4">
+          <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
+          <span class="text-sm text-text-muted">({{ items.length }})</span>
+        </div>
+        <div class="grid gap-4">
+          <ItemItem
+            v-for="item in items"
+            :key="item.id"
+            :item="item"
+          />
+        </div>
+      </section>
+      <div v-if="Object.keys(filteredItemTree).length === 0 && !isLoading" class="py-10 text-center text-text-muted">
+        <p>No items found.</p>
+        <p v-if="hasActiveFilters">Try adjusting your filters.</p>
       </div>
+    </div>
 
-      <ItemForm
-        v-if="isFormOpen"
-        @close="isFormOpen = false"
-      />
-    </main>
-  </div>
+    <!-- The ItemForm will be triggered from the sidebar -->
+    <ItemForm
+      v-if="uiStore.isFormOpen"
+      :item="uiStore.editingItem"
+      @close="uiStore.closeForm"
+    />
+  </MainLayout>
 </template>
 ```
 
