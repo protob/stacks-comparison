@@ -5,11 +5,11 @@ import { useSearch } from '@/App';
 import { slugify } from '@/utils/slugify';
 import type { Item } from '@/types';
 import FilterBar from '@/components/layout/FilterBar';
-import ItemForm from '@/components/items/ItemForm';
+import { ItemForm } from '@/components/items/ItemForm';
 import ItemItem from '@/components/items/ItemItem';
-import Modal from '@/components/common/Modal';
-import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal';
-import Button from '@/components/common/Button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
+import { Button } from '@/components/ui/button';
 
 export default function ItemPage() {
   const { data: itemTree = {}, isLoading, error } = useGetItemTree();
@@ -26,7 +26,6 @@ export default function ItemPage() {
   // Modal state
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
-  const [prefilledCategory, setPrefilledCategory] = useState<string>('');
 
   // Delete state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -52,13 +51,11 @@ export default function ItemPage() {
   // Event handlers
   const openAddModal = useCallback((categoryName?: string) => {
     setEditingItem(null);
-    setPrefilledCategory(categoryName || '');
     setShowFormModal(true);
   }, []);
 
   const openEditModal = useCallback((item: Item) => {
     setEditingItem({ ...item });
-    setPrefilledCategory('');
     setShowFormModal(true);
   }, []);
 
@@ -76,7 +73,6 @@ export default function ItemPage() {
       }
       setShowFormModal(false);
       setEditingItem(null);
-      setPrefilledCategory('');
     } catch (error) {
       // Error handling is done in the mutation
     }
@@ -112,7 +108,6 @@ export default function ItemPage() {
   const handleCloseFormModal = useCallback(() => {
     setShowFormModal(false);
     setEditingItem(null);
-    setPrefilledCategory('');
   }, []);
 
   const handleCloseDeleteModal = useCallback(() => {
@@ -131,7 +126,7 @@ export default function ItemPage() {
               {hasActiveFilters ? `${totalFilteredItems} of ${totalItems}` : `${totalItems} total`} items
             </p>
           </div>
-            <Button onClick={() => openAddModal()} variant="primary" icon="Plus">
+            <Button onClick={() => openAddModal()}>
               Add Item
             </Button>
         </div>
@@ -159,7 +154,7 @@ export default function ItemPage() {
           <div className="p-6 text-center bg-red-900/20 border border-red-800 rounded">
             <div className="w-8 h-8 text-red-400 mx-auto mb-2">⚠</div>
             <p className="text-red-300 mb-3">{error.message}</p>
-            <Button onClick={() => window.location.reload()} variant="danger">
+            <Button onClick={() => window.location.reload()} variant="destructive">
               Retry
             </Button>
           </div>
@@ -176,11 +171,11 @@ export default function ItemPage() {
               {hasActiveFilters ? 'Try adjusting your filters' : 'Create your first item to get started'}
             </p>
             {hasActiveFilters ? (
-              <Button onClick={clearAllFilters} variant="secondary">
+              <Button onClick={clearAllFilters} variant="outline">
                 Clear Filters
               </Button>
             ) : (
-              <Button onClick={() => openAddModal()} variant="primary" icon="Plus">
+              <Button onClick={() => openAddModal()}>
                 Create Item
               </Button>
             )}
@@ -195,13 +190,14 @@ export default function ItemPage() {
                 {/* Category Header */}
                 <div className="flex items-center gap-3 pb-2 border-b border-neutral-700">
                   <Button 
-                    variant="text" 
+                    variant="ghost" 
                     size="sm" 
-                    icon="Plus" 
                     onClick={() => openAddModal(categoryName)}
                     className="text-neutral-400 hover:text-neutral-200"
                     aria-label={`Add item to ${categoryName}`}
-                  />
+                  >
+                    +
+                  </Button>
                   <h2 className="text-lg font-medium text-neutral-200">{categoryName}</h2>
                   <span className="text-sm text-neutral-500">({categoryItems.length})</span>
                 </div>
@@ -224,20 +220,19 @@ export default function ItemPage() {
         )}
 
         {/* Add/Edit Modal */}
-        <Modal 
-          isOpen={showFormModal} 
-          onClose={handleCloseFormModal} 
-          title={editingItem ? 'Edit Item' : 'New Item'}
-          size="md"
-        >
-          <ItemForm
-            item={editingItem}
-            isLoading={addItemMutation.isPending || updateItemMutation.isPending}
-            prefilledCategory={prefilledCategory}
-            onSubmit={handleFormSubmit}
-            onCancel={handleCloseFormModal}
-          />
-        </Modal>
+        <Dialog open={showFormModal} onOpenChange={handleCloseFormModal}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{editingItem ? 'Edit Item' : 'New Item'}</DialogTitle>
+            </DialogHeader>
+            <ItemForm
+              item={editingItem}
+              isSubmitting={addItemMutation.isPending || updateItemMutation.isPending}
+              onSubmit={handleFormSubmit}
+              onCancel={handleCloseFormModal}
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* Delete Confirmation */}
         <ConfirmDeleteModal
@@ -245,9 +240,7 @@ export default function ItemPage() {
           onClose={handleCloseDeleteModal}
           onConfirm={executeDelete}
           title="Delete Item"
-          message={deleteConfirmationMessage}
-          confirmText="Delete"
-          isLoading={deleteItemMutation.isPending}
+          description={deleteConfirmationMessage}
         />
       </div>
     </div>

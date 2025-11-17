@@ -6,13 +6,13 @@ import { useSearch } from '@/App';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 export function AppSidebar() {
-    const { searchQuery, setSearchQuery, selectedTags, setSelectedTags, setAvailableTags, toggleTag, clearSearch, clearTags } = useSearch();
+    const { searchQuery, setSearchQuery, selectedTags, toggleTag } = useSearch();
     const { data: itemTree = {} } = useGetItemTree();
     const { allTags: availableTags } = useItemFilters(itemTree, {
-        searchQuery: '',
+        searchQuery,
         selectedPriority: 'all',
         showCompleted: true,
-        selectedTags: [],
+        selectedTags,
     });
 
         return (

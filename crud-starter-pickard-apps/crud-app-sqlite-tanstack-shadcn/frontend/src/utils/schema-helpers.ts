@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-export function unwrapZodType(schema: z.ZodTypeAny): z.ZodTypeAny {
+export function unwrapZodType(schema: any): any {
   if (
     schema instanceof z.ZodOptional ||
     schema instanceof z.ZodNullable ||
     schema instanceof z.ZodDefault
   ) {
-    const inner = schema._def.innerType || (typeof (schema as any).unwrap === 'function' ? (schema as any).unwrap() : undefined);
+    const inner = schema._def.innerType || (typeof schema.unwrap === 'function' ? schema.unwrap() : undefined);
     return inner ? unwrapZodType(inner) : schema;
   }
   if (schema instanceof z.ZodEffects) {

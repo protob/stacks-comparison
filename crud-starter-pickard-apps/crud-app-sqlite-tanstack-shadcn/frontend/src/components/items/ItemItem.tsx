@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import type { Item } from '@/types';
 import { formatDate } from '@/utils/helpers';
-import Button from '../common/Button';
+import { Button } from '@/components/ui/button';
 
 interface ItemItemProps {
   item: Item;
@@ -35,8 +35,8 @@ export default function ItemItem({ item, onToggleComplete, onDelete, onEdit }: I
                   <span className={`tag-sm rounded-button ${priorityClasses[item.priority]}`}>
                     {item.priority}
                   </span>
-                  <Button size="sm" variant="ghost" icon="Edit" onClick={() => onEdit(item)} />
-                  <Button size="sm" variant="ghost" icon="Trash2" onClick={() => onDelete(item)} className="text-danger" />
+                  <Button size="sm" variant="ghost" onClick={() => onEdit(item)}>✏️</Button>
+                  <Button size="sm" variant="ghost" onClick={() => onDelete(item)} className="text-destructive">🗑️</Button>
                 </div>
               </div>
               <p className="text-text-secondary text-size-sm mt-1">{item.text}</p>
