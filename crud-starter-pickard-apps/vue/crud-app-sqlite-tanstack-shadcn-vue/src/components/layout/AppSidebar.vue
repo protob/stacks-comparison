@@ -63,7 +63,8 @@ const toggleTag = (tag: string) => {
     <!-- Footer / Theme Toggle -->
     <div class="mt-auto">
       <Button variant="ghost" @click="uiStore.toggleTheme()" class="justify-start w-full">
-        Toggle Theme
+        <icon-lucide-sun v-if="!uiStore.isDark" class="w-4 h-4" />
+        <icon-lucide-moon v-else class="w-4 h-4" />
       </Button>
     </div>
   </aside>
