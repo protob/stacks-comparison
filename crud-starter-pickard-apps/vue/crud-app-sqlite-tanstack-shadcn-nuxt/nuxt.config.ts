@@ -1,9 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/icon', 'shadcn-nuxt', '@vueuse/nuxt','@peterbud/nuxt-query'],
+  
+  modules: [
+    '@nuxt/icon', 
+    'shadcn-nuxt', 
+    '@vueuse/nuxt',
+    '@pinia/nuxt',
+    '@peterbud/nuxt-query'
+  ],
 
   nuxtQuery: {
     autoImports: ['useQuery', 'useMutation', 'useQueryClient'],
@@ -17,24 +23,18 @@ export default defineNuxtConfig({
     },
   },
 
-   shadcn: {
-    /**
-     * Prefix for all the imported component.
-     * @default "Ui"
-     */
+  shadcn: {
     prefix: '',
-    /**
-     * Directory that the component lives in.
-     * Will respect the Nuxt aliases.
-     * @link https://nuxt.com/docs/api/nuxt-config#alias
-     * @default "@/components/ui"
-     */
-    componentDir: '@/components/ui'
+    componentDir: './components/ui'
   },
-   css: ['~/assets/css/tailwind.css'],
+
+  css: ['~/assets/css/main.css'],
+
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    // Note: @tailwindcss/vite is not needed here as the Nuxt Tailwind module handles it.
   },
+
+  alias: {
+    '@': '/.',
+  }
 })
