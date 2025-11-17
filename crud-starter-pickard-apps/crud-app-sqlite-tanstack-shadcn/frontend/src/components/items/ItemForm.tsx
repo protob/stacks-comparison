@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { TagInput } from '@/components/common/TagInput';
 import type { Item } from '@/types';
 
@@ -50,8 +50,8 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
                 onBlur={field.handleBlur}
               />
             </FormControl>
-            {field.state.meta.errors && (
-              <FormMessage>{field.state.meta.errors[0]?.message}</FormMessage>
+            {field.state.meta.errors && field.state.meta.errors.length > 0 && (
+              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
             )}
           </FormItem>
         )}
@@ -70,8 +70,8 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
                 onBlur={field.handleBlur}
               />
             </FormControl>
-            {field.state.meta.errors && (
-              <FormMessage>{field.state.meta.errors[0]?.message}</FormMessage>
+            {field.state.meta.errors && field.state.meta.errors.length > 0 && (
+              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
             )}
           </FormItem>
         )}
@@ -90,8 +90,8 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
                 onBlur={field.handleBlur}
               />
             </FormControl>
-            {field.state.meta.errors && (
-              <FormMessage>{field.state.meta.errors[0]?.message}</FormMessage>
+            {field.state.meta.errors && field.state.meta.errors.length > 0 && (
+              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
             )}
           </FormItem>
         )}
@@ -105,7 +105,7 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
             <FormControl>
               <RadioGroup
                 value={field.state.value}
-                onValueChange={field.handleChange}
+                onValueChange={(value) => field.handleChange(value as any)}
                 className="flex items-center space-x-4"
               >
                 <FormItem className="flex items-center space-x-2 space-y-0">
@@ -128,8 +128,8 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
                 </FormItem>
               </RadioGroup>
             </FormControl>
-            {field.state.meta.errors && (
-              <FormMessage>{field.state.meta.errors[0]?.message}</FormMessage>
+            {field.state.meta.errors && field.state.meta.errors.length > 0 && (
+              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
             )}
           </FormItem>
         )}
@@ -147,8 +147,8 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
                 placeholder="Add a tag..."
               />
             </FormControl>
-            {field.state.meta.errors && (
-              <FormMessage>{field.state.meta.errors[0]?.message}</FormMessage>
+            {field.state.meta.errors && field.state.meta.errors.length > 0 && (
+              <FormMessage>{String(field.state.meta.errors[0])}</FormMessage>
             )}
           </FormItem>
         )}

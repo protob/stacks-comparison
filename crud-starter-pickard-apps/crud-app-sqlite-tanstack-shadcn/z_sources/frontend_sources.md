@@ -1,7 +1,7 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** nie, 16 lis 2025, 20:49:44 CET
-**Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-app-sqlite-tanstack/frontend
+**Generated on:** pon, 17 lis 2025, 12:06:04 CET
+**Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/crud-app-sqlite-tanstack-shadcn/frontend
 
 ---
 
@@ -118,6 +118,8 @@ echo "3. Start development: npm run dev"
 ```
 {
   "compilerOptions": {
+
+
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
@@ -140,7 +142,8 @@ echo "3. Start development: npm run dev"
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/lib/*": ["src/lib/*"] 
     }
   },
   "include": [
@@ -168,15 +171,30 @@ echo "3. Start development: npm run dev"
     "route-gen": "vite-node src/router.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-radio-group": "^1.3.8",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.4",
     "@tanstack/react-form": "^1.25.0",
     "@tanstack/react-query": "^5.90.9",
     "@tanstack/react-router": "^1.136.6",
     "@tanstack/zod-form-adapter": "^0.42.1",
-    "clsx": "^2.1.0",
-    "lucide-react": "^0.379.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.554.0",
+    "next-themes": "^0.4.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "zod": "^3.23.8",
+    "react-hook-form": "^7.66.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.1.12",
     "zustand": "^4.5.0"
   },
   "devDependencies": {
@@ -474,6 +492,17 @@ export default defineConfig({
 
 ```
 
+## `src/lib/utils.ts`
+```
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+```
+
 ## `src/utils/slugify.ts`
 ```
 export function slugify(text: string): string {
@@ -500,35 +529,6 @@ export const formatDate = (dateString: string): string => {
     minute: '2-digit'
   });
 };
-```
-
-## `src/utils/schema-helpers.ts`
-```
-import { z } from 'zod';
-
-export function unwrapZodType(schema: z.ZodTypeAny): z.ZodTypeAny {
-  if (
-    schema instanceof z.ZodOptional ||
-    schema instanceof z.ZodNullable ||
-    schema instanceof z.ZodDefault
-  ) {
-    const inner = schema._def.innerType || (typeof (schema as any).unwrap === 'function' ? (schema as any).unwrap() : undefined);
-    return inner ? unwrapZodType(inner) : schema;
-  }
-  if (schema instanceof z.ZodEffects) {
-    return unwrapZodType(schema.innerType());
-  }
-  return schema;
-}
-
-export function getBaseSchema(schema: z.ZodTypeAny): z.ZodObject<any, any, any> | null {
-  const unwrapped = unwrapZodType(schema);
-  if (unwrapped instanceof z.ZodObject) {
-    return unwrapped;
-  }
-  console.error("getBaseSchema: Expected a ZodObject after unwrapping, but got:", unwrapped);
-  return null;
-}
 ```
 
 ## `src/stores/useItemStore.ts`
@@ -559,19 +559,18 @@ export const useItemStore = create<ItemState>()(
 ```
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { Notification, NotificationType } from '@/types';
+import { toast } from "sonner";
+import type { NotificationType } from '@/types';
 
 type Theme = 'light' | 'dark' | 'system';
 
 interface UiState {
   isLoading: boolean;
   loadingMessage: string | null;
-  notifications: Notification[];
   theme: Theme;
 
   setIsLoading: (status: boolean, message?: string) => void;
-  showNotification: (type: NotificationType, message: string, duration?: number) => string;
-  removeNotification: (id: string) => void;
+  showNotification: (type: NotificationType, message: string) => void;
   setTheme: (newTheme: Theme) => void;
   toggleTheme: () => void;
 }
@@ -592,37 +591,20 @@ export const useUiStore = create<UiState>()(
       (set, get) => ({
         isLoading: false,
         loadingMessage: null,
-        notifications: [],
         theme: getInitialTheme(),
 
         setIsLoading: (status: boolean, message?: string) =>
           set({ isLoading: status, loadingMessage: message || null }),
 
-        showNotification: (type: NotificationType, message: string, duration = 3000): string => {
-          const id = `notif-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-          const notification: Notification = {
-            id,
-            type,
-            message,
-            duration,
-            timestamp: Date.now()
-          };
-
-          set(state => ({
-            notifications: [...state.notifications, notification]
-          }));
-
-          if (duration > 0) {
-            setTimeout(() => get().removeNotification(id), duration);
+        showNotification: (type: NotificationType, message: string) => {
+          switch (type) {
+            case 'success': toast.success(message); break;
+            case 'error': toast.error(message); break;
+            case 'warning': toast.warning(message); break;
+            case 'info': toast.info(message); break;
+            default: toast(message);
           }
-
-          return id;
         },
-
-        removeNotification: (id: string) =>
-          set(state => ({
-            notifications: state.notifications.filter(n => n.id !== id)
-          })),
 
         setTheme: (newTheme: Theme) => set({ theme: newTheme }),
 
@@ -647,10 +629,22 @@ export const useUiStore = create<UiState>()(
  * Clean, minimal, functional - inspired by Bauhaus & Swiss typography
  * Optimized for React with fluid responsiveness, vertical rhythm, proportions
  */
+/*
+ ---break---
+ */
+@plugin "tailwindcss-animate";
 
 @config "../../tailwind.config.js";
 
 @import "tailwindcss";
+
+@import "tw-animate-css";
+
+/*
+ ---break---
+ */
+
+@custom-variant dark (&:is(.dark *));
 
 /* Define layer order for cascade control */
 @layer base, components, utilities;
@@ -1014,6 +1008,38 @@ export const useUiStore = create<UiState>()(
   --color-amber-50:  oklch(0.987 0.021 91);
   --color-amber-500: oklch(0.769 0.183 84);
   --color-amber-600: oklch(0.659 0.181 75);
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 /* Dark mode overrides (class strategy) */
@@ -1040,6 +1066,37 @@ export const useUiStore = create<UiState>()(
   --color-backdrop: rgb(0 0 0 / 0.85);
   --color-modal-bg: var(--color-gray-800);
   --color-modal-border: var(--color-gray-700);
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
 }
 
 /* ============================================
@@ -1175,6 +1232,61 @@ export const useUiStore = create<UiState>()(
   }
 }
 
+/*
+ ---break---
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/*
+ ---break---
+ */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
 ```
 
 ## `src/schemas/itemSchema.ts`
@@ -1188,9 +1300,7 @@ export const itemFormSchema = z.object({
     .min(3, 'Name must be at least 3 characters'),
   text: z.string()
     .min(1, 'Description is required'),
-  priority: z.enum(['low', 'mid', 'high'], {
-    errorMap: () => ({ message: 'Please select a priority' })
-  }),
+  priority: z.enum(['low', 'mid', 'high']),
   tags: z.array(z.string()).optional(),
   categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
 });
@@ -1541,97 +1651,60 @@ export interface Notification {
 @import "./styles/main.css";
 
 @layer base {
+  :root {
+    --background: var(--color-background);
+    --foreground: var(--color-text-primary);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text-primary);
+    --popover: var(--color-surface);
+    --popover-foreground: var(--color-text-primary);
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-text-inverse);
+    --secondary: var(--color-gray-200);
+    --secondary-foreground: var(--color-text-primary);
+    --muted: var(--color-text-muted);
+    --muted-foreground: var(--color-text-secondary);
+    --accent: var(--color-primary-light);
+    --accent-foreground: var(--color-primary);
+    --destructive: var(--color-danger);
+    --destructive-foreground: var(--color-text-inverse);
+    --border: var(--color-border);
+    --input: var(--color-border);
+    --ring: var(--color-border-focus);
+    --radius: 0.375rem; /* Corresponds to your --radius-lg */
+  }
+
+  .dark {
+    --background: var(--color-background);
+    --foreground: var(--color-text-primary);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text-primary);
+    --popover: var(--color-surface);
+    --popover-foreground: var(--color-text-primary);
+    --primary: var(--color-primary);
+    --primary-foreground: var(--color-text-inverse);
+    --secondary: var(--color-gray-800);
+    --secondary-foreground: var(--color-text-primary);
+    --muted: var(--color-text-muted);
+    --muted-foreground: var(--color-text-secondary);
+    --accent: var(--color-primary-light);
+    --accent-foreground: var(--color-primary);
+    --destructive: var(--color-danger);
+    --destructive-foreground: var(--color-text-inverse);
+    --border: var(--color-border);
+    --input: var(--color-input-border, var(--color-gray-600));
+    --ring: var(--color-border-focus);
+  }
+
+  /* Keep original base styles */
   body {
     background-color: var(--color-background);
     color: var(--color-text-primary);
     font-family: theme(fontFamily.sans);
     min-height: 100vh;
   }
-
-  input, textarea, select {
-    width: 100%;
-    padding: var(--input-padding-y) var(--input-padding-x);
-    border: var(--input-border-width) solid var(--color-border);
-    border-radius: var(--input-radius);
-    background-color: var(--color-surface);
-    color: var(--color-text-primary);
-    font-size: var(--input-font-size);
-  }
-
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--color-border-focus);
-    outline: none;
-    box-shadow: 0 0 0 1px var(--color-border-focus);
-  }
-
-  input[type="checkbox"], input[type="radio"] {
-    width: var(--checkbox-size);
-    height: var(--checkbox-size);
-    padding: 0;
-    flex-shrink: 0;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    display: inline-block;
-    position: relative;
-    vertical-align: middle;
-    cursor: pointer;
-  }
-
-  input[type="checkbox"] {
-    border-radius: var(--checkbox-radius);
-  }
-
-  input[type="radio"] {
-    border-radius: 50%;
-  }
-
-  /* Checked state - custom styling */
-  input[type="checkbox"]:checked,
-  input[type="radio"]:checked {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-
-  /* Checkmark for checkbox */
-  input[type="checkbox"]:checked::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) rotate(45deg);
-    width: 0.25rem;
-    height: 0.5rem;
-    border: solid var(--color-text-inverse);
-    border-width: 0 2px 2px 0;
-  }
-
-  /* Dot for radio */
-  input[type="radio"]:checked::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background-color: var(--color-text-inverse);
-  }
-
-  /* Focus states */
-  input[type="checkbox"]:focus-visible,
-  input[type="radio"]:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  /* Disabled state */
-  input[type="checkbox"]:disabled,
-  input[type="radio"]:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  
+  /* ... rest of your original styles from index.css ... */
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -1849,6 +1922,9 @@ module.exports = {
         'radio': 'var(--radio-size)',
       },
       borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
         'button': 'var(--button-radius)',
         'card': 'var(--card-radius)',
         'input': 'var(--input-radius)',
@@ -1862,18 +1938,46 @@ module.exports = {
         'grid': 'var(--gap-grid-items)',
       },
       keyframes: {
-        'fade-in-up': {
-          '0%': { opacity: '0', transform: 'translateY(10px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
+        "accordion-down": { from: { height: "0" }, to: { height: "var(--radix-accordion-content-height)" } },
+        "accordion-up": { from: { height: "var(--radix-accordion-content-height)" }, to: { height: "0" } },
+        'fade-in-up': { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
       },
       animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
         'fade-in-up': 'fade-in-up 0.3s ease-out',
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 };
+
+```
+
+## `components.json`
+```
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.js",
+    "css": "src/styles/main.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {}
+}
 
 ```
 

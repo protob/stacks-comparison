@@ -1,5 +1,4 @@
-import { Tags, Search } from 'lucide-react';
-import { useUiStore } from '@/stores/useUiStore';
+import { Tags, Search, Plus } from 'lucide-react';
 import { useItemFilters } from '@/hooks/useItemFilters';
 import { useGetItemTree } from '@/hooks/useItemsApi';
 import { useSearch } from '@/App';

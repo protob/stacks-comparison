@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { Plus } from 'lucide-react';
 import { useGetItemTree, useAddItem, useUpdateItem, useToggleItemCompletion, useDeleteItem } from '@/hooks/useItemsApi';
 import { useItemFilters } from '@/hooks/useItemFilters';
 import { useSearch } from '@/App';
@@ -6,7 +7,7 @@ import { slugify } from '@/utils/slugify';
 import type { Item } from '@/types';
 import FilterBar from '@/components/layout/FilterBar';
 import { ItemForm } from '@/components/items/ItemForm';
-import ItemItem from '@/components/items/ItemItem';
+import { ItemItem } from '@/components/items/ItemItem';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ConfirmDeleteModal } from '@/components/common/ConfirmDeleteModal';
 import { Button } from '@/components/ui/button';
@@ -49,7 +50,7 @@ export default function ItemPage() {
   }, [itemToDelete]);
 
   // Event handlers
-  const openAddModal = useCallback((categoryName?: string) => {
+  const openAddModal = useCallback((_categoryName?: string) => {
     setEditingItem(null);
     setShowFormModal(true);
   }, []);
@@ -127,6 +128,7 @@ export default function ItemPage() {
             </p>
           </div>
             <Button onClick={() => openAddModal()}>
+              <Plus className="h-4 w-4 mr-2" />
               Add Item
             </Button>
         </div>
@@ -176,6 +178,7 @@ export default function ItemPage() {
               </Button>
             ) : (
               <Button onClick={() => openAddModal()}>
+                <Plus className="h-4 w-4 mr-2" />
                 Create Item
               </Button>
             )}
@@ -196,7 +199,7 @@ export default function ItemPage() {
                     className="text-neutral-400 hover:text-neutral-200"
                     aria-label={`Add item to ${categoryName}`}
                   >
-                    +
+                    <Plus className="h-4 w-4" />
                   </Button>
                   <h2 className="text-lg font-medium text-neutral-200">{categoryName}</h2>
                   <span className="text-sm text-neutral-500">({categoryItems.length})</span>
@@ -220,7 +223,7 @@ export default function ItemPage() {
         )}
 
         {/* Add/Edit Modal */}
-        <Dialog open={showFormModal} onOpenChange={handleCloseFormModal}>
+        <Dialog open={showFormModal} onOpenChange={(open) => !open && handleCloseFormModal()}>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>{editingItem ? 'Edit Item' : 'New Item'}</DialogTitle>
