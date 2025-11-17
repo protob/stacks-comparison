@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** pon, 17 lis 2025, 13:09:24 CET
+**Generated on:** pon, 17 lis 2025, 13:25:18 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/crud-app-sqlite-tanstack-shadcn/frontend
 
 ---
@@ -844,6 +844,10 @@ export const useUiStore = create<UiState>()(
   --color-warning: var(--color-amber-600);
   --color-warning-light: var(--color-amber-50);
 
+  /* -- ADD THESE TWO NEW LINES FOR THE 'MID' PRIORITY BADGE -- */
+  --color-priority-mid-bg: var(--color-amber-50);
+  --color-priority-mid-text: var(--color-amber-600);
+
   /* Borders */
   --color-border: var(--color-gray-200);
   --color-border-hover: var(--color-gray-300);
@@ -1113,6 +1117,10 @@ export const useUiStore = create<UiState>()(
   --color-backdrop: rgb(0 0 0 / 0.85);
   --color-modal-bg: var(--color-gray-800);
   --color-modal-border: var(--color-gray-700);
+
+  /* -- ADD THESE TWO LINES TO FIX THE 'MID' PRIORITY BADGE -- */
+  --color-priority-mid-bg: var(--color-amber-500);
+  --color-priority-mid-text: var(--color-gray-950);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -1216,6 +1224,11 @@ export const useUiStore = create<UiState>()(
     line-height: var(--line-height-tight);
     white-space: nowrap;
     gap: var(--spacing-1);
+  }
+
+  /* -- ADD THIS NEW CLASS FOR THE 'MID' PRIORITY BADGE -- */
+  .tag-priority-mid {
+    @apply bg-[--color-priority-mid-bg] text-[--color-priority-mid-text] rounded-full;
   }
 
   /* Button Size Utilities - Icon Only */

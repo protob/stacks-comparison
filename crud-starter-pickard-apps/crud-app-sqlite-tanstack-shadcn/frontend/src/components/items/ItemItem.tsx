@@ -14,7 +14,7 @@ interface ItemItemProps {
 
 const priorityClasses: { [key in Item['priority']]: string } = {
   high: 'bg-danger text-text-inverse',
-  mid: 'bg-primary text-text-inverse',
+  mid: 'tag-priority-mid',
   low: 'bg-surface-hover text-text-secondary',
 };
 
@@ -35,7 +35,7 @@ export function ItemItem({ item, onToggleComplete, onDelete, onEdit }: ItemItemP
             <div className="flex items-center gap-2">
               <span className={`tag-sm rounded-button ${
                 item.priority === 'high' ? 'bg-danger text-text-inverse' :
-                item.priority === 'mid' ? 'bg-primary text-text-inverse' :
+                item.priority === 'mid' ? 'tag-priority-mid' :
                 'bg-surface-hover text-text-primary'
               }`}>
                 {item.priority}
