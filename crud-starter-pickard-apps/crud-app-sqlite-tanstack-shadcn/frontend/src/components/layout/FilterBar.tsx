@@ -17,14 +17,14 @@ export default function FilterBar({
     onShowCompletedChange
 }: FilterBarProps) {
     return (
-        <div className="p-4 bg-surface rounded-card">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-fluid-4 bg-surface rounded-card">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-fluid-4">
                 <div>
                     <h4 className="font-semibold mb-2">Priority</h4>
                     <RadioGroup
                         value={selectedPriority}
                         onValueChange={(value) => onPriorityChange(value as any)}
-                        className="flex items-center gap-4"
+                        className="flex items-center gap-fluid-4"
                     >
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="all" id="priority-all" className="h-4 w-4" />

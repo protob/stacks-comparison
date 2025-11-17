@@ -41,12 +41,10 @@ module.exports = {
         'nav': 'var(--nav-padding)',
       },
       width: {
-        'checkbox': 'var(--checkbox-size)',
-        'radio': 'var(--radio-size)',
+        // 'checkbox' and 'radio' removed
       },
       height: {
-        'checkbox': 'var(--checkbox-size)',
-        'radio': 'var(--radio-size)',
+        // 'checkbox' and 'radio' removed
       },
       borderRadius: {
         lg: "var(--radius)",

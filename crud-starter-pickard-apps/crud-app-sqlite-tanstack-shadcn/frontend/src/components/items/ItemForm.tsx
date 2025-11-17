@@ -42,11 +42,11 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-fluid-6">
       <form.Field
         name="name"
         children={(field) => (
-          <div className="space-y-2">
+          <div className="space-y-fluid-2">
             <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Task Name
             </label>
@@ -69,7 +69,7 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
       <form.Field
         name="text"
         children={(field) => (
-          <div className="space-y-2">
+          <div className="space-y-fluid-2">
             <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Description
             </label>
@@ -92,7 +92,7 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
       <form.Field
         name="categories"
         children={(field) => (
-          <div className="space-y-2">
+          <div className="space-y-fluid-2">
             <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Category
             </label>
@@ -115,7 +115,7 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
       <form.Field
         name="priority"
         children={(field) => (
-          <div className="space-y-3">
+          <div className="space-y-fluid-3">
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Priority
             </label>
@@ -155,7 +155,7 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
       <form.Field
         name="tags"
         children={(field) => (
-          <div className="space-y-2">
+          <div className="space-y-fluid-2">
             <label htmlFor={field.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Tags
             </label>
@@ -173,7 +173,7 @@ export function ItemForm({ onSubmit, onCancel, item, isSubmitting }: ItemFormPro
         )}
       />
 
-      <div className="flex justify-end gap-4">
+      <div className="flex justify-end gap-fluid-4">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>

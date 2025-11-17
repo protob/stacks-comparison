@@ -16,7 +16,7 @@ export function MainLayout() {
       <AppSidebar />
 
       {/* Main Content: Fills the remaining space and handles its own scrolling. */}
-      <main className="overflow-y-auto p-4 md:p-6 lg:p-8">
+      <main className="overflow-y-auto p-fluid-4 md:p-fluid-6 lg:p-fluid-8">
         <TopBar />
         <div className="flex-1">
           <Outlet />
