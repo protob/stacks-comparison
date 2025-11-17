@@ -1,11 +1,161 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** pon, 17 lis 2025, 23:21:48 CET
+**Generated on:** wto, 18 lis 2025, 00:49:29 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
 
-## `components/items/ItemForm.vue`
+## `tsconfig.json`
+```
+{
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "files": [],
+  "references": [
+    {
+      "path": "./.nuxt/tsconfig.app.json"
+    },
+    {
+      "path": "./.nuxt/tsconfig.server.json"
+    },
+    {
+      "path": "./.nuxt/tsconfig.shared.json"
+    },
+    {
+      "path": "./.nuxt/tsconfig.node.json"
+    }
+  ]
+}
+
+```
+
+## `package.json`
+```
+{
+  "name": "shadcn-simple-nuxt",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/icon": "2.1.0",
+    "@pinia/nuxt": "0.11.3",
+    "@tanstack/vue-form": "^1.25.0",
+    "@tanstack/vue-query": "^5.91.2",
+    "@tanstack/zod-form-adapter": "^0.42.1",
+    "@vueuse/core": "^14.0.0",
+    "@vueuse/nuxt": "^14.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-vue-next": "^0.553.0",
+    "nuxt": "^4.2.1",
+    "ofetch": "^1.5.1",
+    "pinia": "^3.0.4",
+    "radix-vue": "^1.9.17",
+    "reka-ui": "^2.6.0",
+    "shadcn-nuxt": "2.3.3",
+    "tailwind-merge": "^3.4.0",
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.3",
+    "vue-sonner": "^2.0.9",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@peterbud/nuxt-query": "^1.2.0",
+    "@tailwindcss/vite": "^4.1.17",
+    "tailwindcss": "^4.1.17",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^5.9.3"
+  }
+}
+
+```
+
+## `README.md`
+```
+# Nuxt Minimal Starter
+
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+
+## Setup
+
+Make sure to install dependencies:
+
+```bash
+# npm
+npm install
+
+# pnpm
+pnpm install
+
+# yarn
+yarn install
+
+# bun
+bun install
+```
+
+## Development Server
+
+Start the development server on `http://localhost:3000`:
+
+```bash
+# npm
+npm run dev
+
+# pnpm
+pnpm dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
+```
+
+## Production
+
+Build the application for production:
+
+```bash
+# npm
+npm run build
+
+# pnpm
+pnpm build
+
+# yarn
+yarn build
+
+# bun
+bun run build
+```
+
+Locally preview production build:
+
+```bash
+# npm
+npm run preview
+
+# pnpm
+pnpm preview
+
+# yarn
+yarn preview
+
+# bun
+bun run preview
+```
+
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+```
+
+## `app/components/items/ItemForm.vue`
 ```
 <script setup lang="ts">
 import { useForm } from '@tanstack/vue-form';
@@ -170,7 +320,7 @@ const removeTag = (tagToRemove: string) => {
 </template>
 ```
 
-## `components/items/ItemItem.vue`
+## `app/components/items/ItemItem.vue`
 ```
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card';
@@ -245,7 +395,7 @@ const handleDelete = () => {
 </template>
 ```
 
-## `components/layout/TopBar.vue`
+## `app/components/layout/TopBar.vue`
 ```
 <script setup lang="ts">
 const route = useRoute();
@@ -271,7 +421,7 @@ const route = useRoute();
 </template>
 ```
 
-## `components/layout/AppSidebar.vue`
+## `app/components/layout/AppSidebar.vue`
 ```
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
@@ -341,7 +491,7 @@ const toggleTag = (tag: string) => {
 </template>
 ```
 
-## `components/layout/FilterBar.vue`
+## `app/components/layout/FilterBar.vue`
 ```
 <script setup lang="ts">
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -415,546 +565,6 @@ const emit = defineEmits<{
     </Button>
   </div>
 </template>
-```
-
-## `tsconfig.json`
-```
-{
-  // https://nuxt.com/docs/guide/concepts/typescript
-  "files": [],
-  "references": [
-    {
-      "path": "./.nuxt/tsconfig.app.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.server.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.shared.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.node.json"
-    }
-  ],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"],
-      "@/lib/*": ["./lib/*"]
-    }
-  }
-}
-
-```
-
-## `lib/utils.ts`
-```
-import type { ClassValue } from "clsx"
-import { clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-```
-
-## `package.json`
-```
-{
-  "name": "shadcn-simple-nuxt",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
-  },
-  "dependencies": {
-    "@nuxt/icon": "2.1.0",
-    "@pinia/nuxt": "0.11.3",
-    "@tanstack/vue-query": "^5.91.2",
-    "@vueuse/core": "^14.0.0",
-    "@vueuse/nuxt": "14.0.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-vue-next": "^0.553.0",
-    "nuxt": "^4.2.1",
-    "pinia": "^3.0.4",
-    "radix-vue": "^1.9.17",
-    "reka-ui": "^2.6.0",
-    "shadcn-nuxt": "2.3.3",
-    "tailwind-merge": "^3.4.0",
-    "vue": "^3.5.24",
-    "vue-router": "^4.6.3",
-    "vue-sonner": "^2.0.9"
-  },
-  "devDependencies": {
-    "@peterbud/nuxt-query": "^1.2.0",
-    "@tailwindcss/vite": "^4.1.17",
-    "tailwindcss": "^4.1.17",
-    "tw-animate-css": "^1.4.0",
-    "typescript": "^5.9.3"
-  }
-}
-
-```
-
-## `utils/slugify.ts`
-```
-export function slugify(text: string): string {
-  return text
-    .toString()
-    .normalize('NFKD')
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
-    .replace(/--+/g, '-');
-}
-```
-
-## `utils/helpers.ts`
-```
-export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
-```
-
-## `stores/uiStore.ts`
-```
-import { defineStore } from 'pinia';
-import { toast } from 'vue-sonner';
-import type { NotificationType, Item } from '@/types';
-
-type Theme = 'light' | 'dark' | 'system';
-
-export const useUiStore = defineStore('ui', () => {
-  const theme = useStorage<Theme>('theme', 'system');
-  
-  const isFormOpen = ref(false);
-  const editingItem = ref<Item | null>(null);
-  const preselectedCategory = ref<string | null>(null);
-
-  const isDark = computed(() => theme.value === 'dark');
-
-  const showNotification = (type: NotificationType, message: string) => {
-    switch (type) {
-      case 'success': toast.success(message); break;
-      case 'error': toast.error(message); break;
-      case 'warning': toast.warning(message); break;
-      case 'info': toast.info(message); break;
-      default: toast(message);
-    }
-  };
-
-  const toggleTheme = () => {
-    theme.value = theme.value === 'dark' ? 'light' : 'dark';
-  };
-
-  const openForm = (item?: Item, category?: string) => {
-    isFormOpen.value = true;
-    editingItem.value = item || null;
-    preselectedCategory.value = category || (item ? item.categorySlug : null);
-  };
-
-  const closeForm = () => {
-    isFormOpen.value = false;
-    editingItem.value = null;
-    preselectedCategory.value = null;
-  };
-
-  return {
-    theme,
-    isFormOpen,
-    editingItem,
-    preselectedCategory,
-    isDark,
-    showNotification,
-    toggleTheme,
-    openForm,
-    closeForm,
-  };
-});
-```
-
-## `stores/itemStore.ts`
-```
-import { defineStore } from 'pinia';
-
-export const useItemStore = defineStore('item', () => {
-  const clientOnlyState = ref('Ready');
-
-  const setClientOnlyState = (value: string) => {
-    clientOnlyState.value = value;
-  };
-
-  return {
-    clientOnlyState,
-    setClientOnlyState,
-  };
-});
-```
-
-## `layouts/default.vue`
-```
-<script setup lang="ts">
-import AppSidebar from '@/components/layout/AppSidebar.vue';
-import TopBar from '@/components/layout/TopBar.vue';
-</script>
-
-<template>
-  <div class="grid min-h-screen" style="grid-template-columns: var(--sidebar-width) 1fr;">
-    <AppSidebar />
-    <main class="min-w-0 overflow-y-auto">
-      <div class="p-fluid-4 md:p-fluid-6 lg:p-fluid-8">
-        <TopBar />
-        <div class="flex-1">
-          <slot />
-        </div>
-      </div>
-    </main>
-  </div>
-</template>
-```
-
-## `README.md`
-```
-# Nuxt Minimal Starter
-
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
-## Setup
-
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-
-```
-
-## `schemas/itemSchema.ts`
-```
-import { z } from 'zod';
-import type { SingleCategory } from '@/types';
-
-export const itemFormSchema = z.object({
-  name: z.string()
-    .min(1, 'Name is required')
-    .min(3, 'Name must be at least 3 characters'),
-  text: z.string()
-    .min(1, 'Description is required'),
-  priority: z.enum(['low', 'mid', 'high']),
-  tags: z.array(z.string()).optional(),
-  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
-});
-
-export type ItemFormData = z.infer<typeof itemFormSchema>;
-```
-
-## `composables/useItemFilters.ts`
-```
-import type { ItemTree, Item, Priority } from '@/types';
-
-export interface FilterOptions {
-  searchQuery: string;
-  selectedPriority: 'all' | Priority;
-  showCompleted: boolean;
-  selectedTags: string[];
-}
-
-export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptions>) {
-  const allTags = computed(() => {
-    const tags = new Set<string>();
-    Object.values(itemTree.value).forEach(items => {
-      items.forEach(item => {
-        item.tags?.forEach(tag => tags.add(tag));
-      });
-    });
-    return Array.from(tags).sort();
-  });
-
-  const hasActiveFilters = computed(() => {
-    return filters.value.searchQuery.trim() !== '' ||
-           filters.value.selectedPriority !== 'all' ||
-           !filters.value.showCompleted ||
-           filters.value.selectedTags.length > 0;
-  });
-
-  const filteredItemTree = computed(() => {
-    const filtered: Record<string, Item[]> = {};
-    
-    Object.entries(itemTree.value).forEach(([categoryName, items]) => {
-      const filteredItems = items.filter(item => {
-        if (filters.value.searchQuery.trim()) {
-          const query = filters.value.searchQuery.toLowerCase();
-          const matchesSearch = 
-            item.name.toLowerCase().includes(query) ||
-            item.text.toLowerCase().includes(query) ||
-            item.tags?.some(tag => tag.toLowerCase().includes(query));
-          if (!matchesSearch) return false;
-        }
-
-        if (filters.value.selectedPriority !== 'all' && item.priority !== filters.value.selectedPriority) {
-          return false;
-        }
-
-        if (!filters.value.showCompleted && item.isCompleted) {
-          return false;
-        }
-
-        if (filters.value.selectedTags.length > 0) {
-          const hasMatchingTag = filters.value.selectedTags.some(selectedTag =>
-            item.tags?.includes(selectedTag)
-          );
-          if (!hasMatchingTag) return false;
-        }
-
-        return true;
-      });
-
-      if (filteredItems.length > 0) {
-        filtered[categoryName] = filteredItems;
-      }
-    });
-
-    return filtered;
-  });
-
-  const clearFilters = () => {
-    filters.value = {
-      searchQuery: '',
-      selectedPriority: 'all',
-      showCompleted: true,
-      selectedTags: [],
-    };
-  };
-
-  return {
-    allTags,
-    hasActiveFilters,
-    filteredItemTree,
-    clearFilters,
-  };
-}
-```
-
-## `composables/useThemeUpdater.ts`
-```
-import { useUiStore } from '@/stores/uiStore';
-
-export function useThemeUpdater() {
-  const uiStore = useUiStore();
-  const colorMode = useColorMode();
-
-  watch(
-    () => uiStore.theme,
-    (newTheme) => {
-      colorMode.preference = newTheme;
-    },
-    { immediate: true }
-  );
-}
-```
-
-## `composables/useItemsApi.ts`
-```
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getItemTree, getItemBySlug, createItem, updateItem, deleteItem } from '@/api/itemApi';
-import { useUiStore } from '@/stores/uiStore';
-import type { CreateItemPayload, UpdateItemPayload } from '@/types';
-
-export const itemKeys = {
-  all: ['items'] as const,
-  tree: () => [...itemKeys.all, 'tree'] as const,
-  detail: (categorySlug: string, itemSlug: string) =>
-    [...itemKeys.all, 'detail', categorySlug, itemSlug] as const,
-};
-
-export function useItemTree() {
-  return useQuery({
-    queryKey: itemKeys.tree(),
-    queryFn: getItemTree,
-  });
-}
-
-export function useItemDetail(categorySlug: Ref<string>, itemSlug: Ref<string>) {
-  return useQuery({
-    queryKey: computed(() => itemKeys.detail(categorySlug.value, itemSlug.value)),
-    queryFn: () => getItemBySlug(categorySlug.value, itemSlug.value),
-    enabled: computed(() => !!categorySlug.value && !!itemSlug.value),
-  });
-}
-
-export function useAddItem() {
-  const queryClient = useQueryClient();
-  const uiStore = useUiStore();
-
-  return useMutation({
-    mutationFn: (payload: CreateItemPayload) => createItem(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
-      uiStore.showNotification('success', 'Item created successfully');
-    },
-    onError: (error: any) => {
-      uiStore.showNotification('error', error.message || 'Failed to create item');
-    },
-  });
-}
-
-export function useUpdateItem() {
-  const queryClient = useQueryClient();
-  const uiStore = useUiStore();
-
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateItemPayload }) =>
-      updateItem(id, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
-      uiStore.showNotification('success', 'Item updated successfully');
-    },
-    onError: (error: any) => {
-      uiStore.showNotification('error', error.message || 'Failed to update item');
-    },
-  });
-}
-
-export function useDeleteItem() {
-  const queryClient = useQueryClient();
-  const uiStore = useUiStore();
-
-  return useMutation({
-    mutationFn: (id: number) => deleteItem(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
-      uiStore.showNotification('success', 'Item deleted successfully');
-    },
-    onError: (error: any) => {
-      uiStore.showNotification('error', error.message || 'Failed to delete item');
-    },
-  });
-}
-```
-
-## `types/index.ts`
-```
-export type Priority = 'low' | 'mid' | 'high';
-export type NotificationType = 'success' | 'error' | 'warning' | 'info';
-
-export type SingleCategory<T = number> = [T];
-
-export interface Item {
-  id: number;
-  name: string;
-  text: string;
-  priority: Priority;
-  isCompleted: boolean;
-  slug: string;
-  tags?: string[];
-  categories: SingleCategory<number>;
-  categorySlug: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ItemTree {
-  [categorySlug: string]: Item[];
-}
-
-export interface CreateItemPayload {
-  name: string;
-  text: string;
-  priority: Priority;
-  tags?: string[];
-  categories: SingleCategory<string>;
-}
-
-export interface UpdateItemPayload extends Partial<CreateItemPayload> {
-  isCompleted?: boolean;
-}
-
-export interface ApiErrorData {
-  message: string;
-  statusCode: number;
-  details?: any;
-}
-
-export type Result<T, E> =
-  | { success: true; data: T }
-  | { success: false; error: E };
 ```
 
 ## `app/components/ui/button/Button.vue`
@@ -1906,6 +1516,109 @@ export function cn(...inputs: ClassValue[]) {
 
 ```
 
+## `app/utils/slugify.ts`
+```
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .normalize('NFKD')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-');
+}
+```
+
+## `app/utils/helpers.ts`
+```
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+```
+
+## `app/stores/uiStore.ts`
+```
+import { defineStore } from 'pinia';
+import { toast } from 'vue-sonner';
+import type { NotificationType, Item } from '@/types';
+import { useStorage } from '@vueuse/core'; // ← ADD THIS
+type Theme = 'light' | 'dark' | 'system';
+
+export const useUiStore = defineStore('ui', () => {
+  const theme = useStorage<Theme>('theme', 'system');
+  
+  const isFormOpen = ref(false);
+  const editingItem = ref<Item | null>(null);
+  const preselectedCategory = ref<string | null>(null);
+
+  const isDark = computed(() => theme.value === 'dark');
+
+  const showNotification = (type: NotificationType, message: string) => {
+    switch (type) {
+      case 'success': toast.success(message); break;
+      case 'error': toast.error(message); break;
+      case 'warning': toast.warning(message); break;
+      case 'info': toast.info(message); break;
+      default: toast(message);
+    }
+  };
+
+  const toggleTheme = () => {
+    theme.value = theme.value === 'dark' ? 'light' : 'dark';
+  };
+
+  const openForm = (item?: Item, category?: string) => {
+    isFormOpen.value = true;
+    editingItem.value = item || null;
+    preselectedCategory.value = category || (item ? item.categorySlug : null);
+  };
+
+  const closeForm = () => {
+    isFormOpen.value = false;
+    editingItem.value = null;
+    preselectedCategory.value = null;
+  };
+
+  return {
+    theme,
+    isFormOpen,
+    editingItem,
+    preselectedCategory,
+    isDark,
+    showNotification,
+    toggleTheme,
+    openForm,
+    closeForm,
+  };
+});
+```
+
+## `app/stores/itemStore.ts`
+```
+import { defineStore } from 'pinia';
+
+export const useItemStore = defineStore('item', () => {
+  const clientOnlyState = ref('Ready');
+
+  const setClientOnlyState = (value: string) => {
+    clientOnlyState.value = value;
+  };
+
+  return {
+    clientOnlyState,
+    setClientOnlyState,
+  };
+});
+```
+
 ## `app/app.vue`
 ```
 <script setup lang="ts">
@@ -1926,153 +1639,258 @@ useThemeUpdater();
 
 ```
 
-## `app/assets/tailwind.css`
+## `app/schemas/itemSchema.ts`
 ```
-@import "tailwindcss";
-@import "tw-animate-css";
+import { z } from 'zod';
+import type { SingleCategory } from '@/types';
 
-@custom-variant dark (&:is(.dark *));
+export const itemFormSchema = z.object({
+  name: z.string()
+    .min(1, 'Name is required')
+    .min(3, 'Name must be at least 3 characters'),
+  text: z.string()
+    .min(1, 'Description is required'),
+  priority: z.enum(['low', 'mid', 'high']),
+  tags: z.array(z.string()).optional(),
+  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
+});
 
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+export type ItemFormData = z.infer<typeof itemFormSchema>;
+```
+
+## `app/composables/useItemFilters.ts`
+```
+import type { ItemTree, Item, Priority } from '@/types';
+
+export interface FilterOptions {
+  searchQuery: string;
+  selectedPriority: 'all' | Priority;
+  showCompleted: boolean;
+  selectedTags: string[];
 }
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptions>) {
+  const allTags = computed(() => {
+    const tags = new Set<string>();
+    Object.values(itemTree.value).forEach(items => {
+      items.forEach(item => {
+        item.tags?.forEach(tag => tags.add(tag));
+      });
+    });
+    return Array.from(tags).sort();
+  });
+
+  const hasActiveFilters = computed(() => {
+    return filters.value.searchQuery.trim() !== '' ||
+           filters.value.selectedPriority !== 'all' ||
+           !filters.value.showCompleted ||
+           filters.value.selectedTags.length > 0;
+  });
+
+  const filteredItemTree = computed(() => {
+    const filtered: Record<string, Item[]> = {};
+    
+    Object.entries(itemTree.value).forEach(([categoryName, items]) => {
+      const filteredItems = items.filter(item => {
+        if (filters.value.searchQuery.trim()) {
+          const query = filters.value.searchQuery.toLowerCase();
+          const matchesSearch = 
+            item.name.toLowerCase().includes(query) ||
+            item.text.toLowerCase().includes(query) ||
+            item.tags?.some(tag => tag.toLowerCase().includes(query));
+          if (!matchesSearch) return false;
+        }
+
+        if (filters.value.selectedPriority !== 'all' && item.priority !== filters.value.selectedPriority) {
+          return false;
+        }
+
+        if (!filters.value.showCompleted && item.isCompleted) {
+          return false;
+        }
+
+        if (filters.value.selectedTags.length > 0) {
+          const hasMatchingTag = filters.value.selectedTags.some(selectedTag =>
+            item.tags?.includes(selectedTag)
+          );
+          if (!hasMatchingTag) return false;
+        }
+
+        return true;
+      });
+
+      if (filteredItems.length > 0) {
+        filtered[categoryName] = filteredItems;
+      }
+    });
+
+    return filtered;
+  });
+
+  const clearFilters = () => {
+    filters.value = {
+      searchQuery: '',
+      selectedPriority: 'all',
+      showCompleted: true,
+      selectedTags: [],
+    };
+  };
+
+  return {
+    allTags,
+    hasActiveFilters,
+    filteredItemTree,
+    clearFilters,
+  };
+}
+```
+
+## `app/composables/useThemeUpdater.ts`
+```
+import { useUiStore } from '@/stores/uiStore';
+
+export function useThemeUpdater() {
+  const uiStore = useUiStore();
+  const colorMode = useColorMode();
+
+  watch(
+    () => uiStore.theme,
+    (newTheme) => {
+      colorMode.preference = newTheme;
+    },
+    { immediate: true }
+  );
+}
+```
+
+## `app/composables/useItemsApi.ts`
+```
+import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
+import { getItemTree, getItemBySlug, createItem, updateItem, deleteItem } from '@/api/itemApi';
+import { useUiStore } from '@/stores/uiStore';
+import type { CreateItemPayload, UpdateItemPayload } from '@/types';
+
+export const itemKeys = {
+  all: ['items'] as const,
+  tree: () => [...itemKeys.all, 'tree'] as const,
+  detail: (categorySlug: string, itemSlug: string) =>
+    [...itemKeys.all, 'detail', categorySlug, itemSlug] as const,
+};
+
+export function useItemTree() {
+  return useQuery({
+    queryKey: itemKeys.tree(),
+    queryFn: getItemTree,
+  });
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+export function useItemDetail(categorySlug: Ref<string>, itemSlug: Ref<string>) {
+  return useQuery({
+    queryKey: computed(() => itemKeys.detail(categorySlug.value, itemSlug.value)),
+    queryFn: () => getItemBySlug(categorySlug.value, itemSlug.value),
+    enabled: computed(() => !!categorySlug.value && !!itemSlug.value),
+  });
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+export function useAddItem() {
+  const queryClient = useQueryClient();
+  const uiStore = useUiStore();
+
+  return useMutation({
+    mutationFn: (payload: CreateItemPayload) => createItem(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      uiStore.showNotification('success', 'Item created successfully');
+    },
+    onError: (error: any) => {
+      uiStore.showNotification('error', error.message || 'Failed to create item');
+    },
+  });
 }
 
+export function useUpdateItem() {
+  const queryClient = useQueryClient();
+  const uiStore = useUiStore();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateItemPayload }) =>
+      updateItem(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      uiStore.showNotification('success', 'Item updated successfully');
+    },
+    onError: (error: any) => {
+      uiStore.showNotification('error', error.message || 'Failed to update item');
+    },
+  });
+}
+
+export function useDeleteItem() {
+  const queryClient = useQueryClient();
+  const uiStore = useUiStore();
+
+  return useMutation({
+    mutationFn: (id: number) => deleteItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      uiStore.showNotification('success', 'Item deleted successfully');
+    },
+    onError: (error: any) => {
+      uiStore.showNotification('error', error.message || 'Failed to delete item');
+    },
+  });
+}
 ```
 
-## `app/plugins/ssr-width.ts`
+## `app/types/index.ts`
 ```
-import { provideSSRWidth } from '@vueuse/core'
-// for shadcn
-export default defineNuxtPlugin((nuxtApp) => {
-  provideSSRWidth(1024, nuxtApp.vueApp)
-})
+export type Priority = 'low' | 'mid' | 'high';
+export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 
+export type SingleCategory<T = number> = [T];
+
+export interface Item {
+  id: number;
+  name: string;
+  text: string;
+  priority: Priority;
+  isCompleted: boolean;
+  slug: string;
+  tags?: string[];
+  categories: SingleCategory<number>;
+  categorySlug: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ItemTree {
+  [categorySlug: string]: Item[];
+}
+
+export interface CreateItemPayload {
+  name: string;
+  text: string;
+  priority: Priority;
+  tags?: string[];
+  categories: SingleCategory<string>;
+}
+
+export interface UpdateItemPayload extends Partial<CreateItemPayload> {
+  isCompleted?: boolean;
+}
+
+export interface ApiErrorData {
+  message: string;
+  statusCode: number;
+  details?: any;
+}
+
+export type Result<T, E> =
+  | { success: true; data: T }
+  | { success: false; error: E };
 ```
 
-## `app/plugins/vue-sonner.ts`
-```
-// plugins/vue-sonner.ts
-import { Toaster } from 'vue-sonner'
-
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.component('Toaster', Toaster)
-})
-
-```
-
-## `assets/css/main.css`
+## `app/assets/css/main.css`
 ```
 /*
  * MODERNIST DESIGN SYSTEM - Tailwind v4 CSS-First for Todo App
@@ -2281,7 +2099,132 @@ export default defineNuxtPlugin((nuxtApp) => {
 }
 ```
 
-## `pages/about.vue`
+## `app/assets/css/tailwind.css`
+```
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+```
+
+## `app/pages/about.vue`
 ```
 <template>
   <div class="space-y-6">
@@ -2321,7 +2264,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 </template>
 ```
 
-## `pages/items/[categorySlug]/[itemSlug].vue`
+## `app/pages/items/[categorySlug]/[itemSlug].vue`
 ```
 <script setup lang="ts">
 import { useItemDetail } from '@/composables/useItemsApi';
@@ -2360,7 +2303,7 @@ const { data: item, isLoading, error } = useItemDetail(categorySlug, itemSlug);
 </template>
 ```
 
-## `pages/index.vue`
+## `app/pages/index.vue`
 ```
 <script setup lang="ts">
 import { useItemTree, itemKeys } from '@/composables/useItemsApi';
@@ -2437,51 +2380,7 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
 </template>
 ```
 
-## `nuxt.config.ts`
-```
-// https://nuxt.com/docs/api/configuration/nuxt-config
-export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
-  
-  modules: [
-    '@nuxt/icon', 
-    'shadcn-nuxt', 
-    '@vueuse/nuxt',
-    '@pinia/nuxt',
-    '@peterbud/nuxt-query'
-  ],
-
-  nuxtQuery: {
-    autoImports: ['useQuery', 'useMutation', 'useQueryClient'],
-    queryClientOptions: {
-      defaultOptions: {
-        queries: {
-          refetchOnWindowFocus: false,
-          staleTime: 5000,
-        },
-      },
-    },
-  },
-
-  shadcn: {
-    prefix: '',
-    componentDir: './components/ui'
-  },
-
-  css: ['~/assets/css/main.css'],
-
-  vite: {
-    // Note: @tailwindcss/vite is not needed here as the Nuxt Tailwind module handles it.
-  },
-
-  alias: {
-    '@': '/.',
-  }
-})
-```
-
-## `api/itemApi.ts`
+## `app/api/itemApi.ts`
 ```
 import { get, post, patch, del } from './apiClient';
 import type { Item, ItemTree, CreateItemPayload, UpdateItemPayload } from '@/types';
@@ -2501,7 +2400,7 @@ export const deleteItem = (id: number) =>
   del<{ deleted: boolean }>(`/items/${id}`);
 ```
 
-## `api/apiClient.ts`
+## `app/api/apiClient.ts`
 ```
 import { ofetch } from 'ofetch';
 import type { ApiErrorData, Result } from '@/types';
@@ -2546,6 +2445,76 @@ export const del = <TResponse = { deleted: boolean }>(endpoint: string) =>
   unwrapResult(apiClient.delete<TResponse>(endpoint));
 ```
 
+## `app/plugins/ssr-width.ts`
+```
+import { provideSSRWidth } from '@vueuse/core'
+// for shadcn
+export default defineNuxtPlugin((nuxtApp) => {
+  provideSSRWidth(1024, nuxtApp.vueApp)
+})
+
+```
+
+## `app/plugins/vue-sonner.ts`
+```
+// plugins/vue-sonner.ts
+import { Toaster } from 'vue-sonner'
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.component('Toaster', Toaster)
+})
+
+```
+
+## `nuxt.config.ts`
+```
+// https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
+export default defineNuxtConfig({
+  compatibilityDate: '2025-07-15',
+  devtools: { enabled: true },
+  modules: [
+    '@nuxt/icon',
+    'shadcn-nuxt',
+    '@vueuse/nuxt',
+    '@pinia/nuxt',
+    '@peterbud/nuxt-query'
+  ],
+
+  nuxtQuery: {
+    autoImports: ['useQuery', 'useMutation', 'useQueryClient'],
+    queryClientOptions: {
+      defaultOptions: {
+        queries: {
+          refetchOnWindowFocus: false,
+          staleTime: 5000,
+        },
+      },
+    },
+ },
+   shadcn: {
+    /**
+     * Prefix for all the imported component.
+     * @default "Ui"
+     */
+    prefix: '',
+    /**
+     * Directory that the component lives in.
+     * Will respect the Nuxt aliases.
+     * @link https://nuxt.com/docs/api/nuxt-config#alias
+     * @default "@/components/ui"
+     */
+    componentDir: '@/components/ui'
+  },
+   css: ['~/assets/css/tailwind.css'],
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ],
+  },
+})
+```
+
 ## `components.json`
 ```
 {
@@ -2553,8 +2522,8 @@ export const del = <TResponse = { deleted: boolean }>(endpoint: string) =>
   "style": "new-york",
   "typescript": true,
   "tailwind": {
-    "config": "tailwind.config.js",
-    "css": "assets/css/main.css",
+    "config": "",
+    "css": "app/assets/tailwind.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
@@ -2563,8 +2532,11 @@ export const del = <TResponse = { deleted: boolean }>(endpoint: string) =>
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
-    "ui": "@/components/ui"
-  }
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "composables": "@/composables"
+  },
+  "registries": {}
 }
 
 ```
