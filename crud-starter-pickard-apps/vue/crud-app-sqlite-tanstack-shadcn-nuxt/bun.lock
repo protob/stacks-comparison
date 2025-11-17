@@ -8,7 +8,7 @@
         "@pinia/nuxt": "0.11.3",
         "@tanstack/vue-query": "^5.91.2",
         "@vueuse/core": "^14.0.0",
-        "@vueuse/nuxt": "14.0.0",
+        "@vueuse/nuxt": "^14.0.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "lucide-vue-next": "^0.553.0",
