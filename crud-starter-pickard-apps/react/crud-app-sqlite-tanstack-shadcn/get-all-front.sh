@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FRONTEND_DIR="$ROOT_DIR/frontend"
 OUTPUT_DIR="$ROOT_DIR/z_sources"
-OUTPUT_FILE="$OUTPUT_DIR/frontend_sources.md"
+OUTPUT_FILE="$OUTPUT_DIR/shad-cn-tanstack-react-frontend_sources.md"
 
 # Directories to exclude (these won't be descended into at all)
 EXCLUDES=("node_modules" ".git" "dist" "build" ".output" ".nuxt" ".cache" "public" ".vite")
