@@ -3,7 +3,20 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/icon', 'shadcn-nuxt', '@vueuse/nuxt'],
+  modules: ['@nuxt/icon', 'shadcn-nuxt', '@vueuse/nuxt','@peterbud/nuxt-query'],
+
+  nuxtQuery: {
+    autoImports: ['useQuery', 'useMutation', 'useQueryClient'],
+    queryClientOptions: {
+      defaultOptions: {
+        queries: {
+          refetchOnWindowFocus: false,
+          staleTime: 5000,
+        },
+      },
+    },
+  },
+
    shadcn: {
     /**
      * Prefix for all the imported component.

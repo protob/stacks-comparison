@@ -31,16 +31,8 @@ bun add -d @iconify-json/lucide
 Add all the required UI components from `shadcn-vue`. The CLI will ask to overwrite files like `tailwind.config.js`; allow it.
 
 ```bash
-bun x --bun shadcn-nuxt@latest add button
-bun x --bun shadcn-nuxt@latest add dialog
-bun x --bun shadcn-nuxt@latest add input
-bun x --bun shadcn-nuxt@latest add label
-bun x --bun shadcn-nuxt@latest add radio-group
-bun x --bun shadcn-nuxt@latest add badge
-bun x --bun shadcn-nuxt@latest add card
-bun x --bun shadcn-nuxt@latest add checkbox
-bun x --bun shadcn-nuxt@latest add separator
-bun x --bun shadcn-nuxt@latest add sonner
+bun x --bun shadcn-vue@latest add button && bun x --bun shadcn-vue@latest add dialog && bun x --bun shadcn-vue@latest add input && bun x --bun shadcn-vue@latest add label && bun x --bun shadcn-vue@latest add radio-group && bun x --bun shadcn-vue@latest add badge && bun x --bun shadcn-vue@latest add card && bun x --bun shadcn-vue@latest add checkbox && bun x --bun shadcn-vue@latest add separator && bun x --bun shadcn-vue@latest add sonner
+
 ```
 
 **Phase 3: Directory and File Structure Creation**
