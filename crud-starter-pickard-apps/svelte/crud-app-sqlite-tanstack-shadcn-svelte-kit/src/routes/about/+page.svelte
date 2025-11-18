@@ -1,7 +1,3 @@
-<!-- /src/routes/about/+page.svelte -->
-<script lang="ts">
-</script>
-
 <div class="space-y-6">
   <header>
     <h1 class="font-bold text-size-3xl">About This Application</h1>
@@ -9,7 +5,7 @@
 
   <div class="p-6 border rounded-lg bg-surface border-border">
     <p class="mb-4 text-text-secondary">
-      This is a modern, responsive Svelte 5 frontend for managing items.
+      This is a modern, responsive Svelte 5 frontend for managing items, ported to SvelteKit.
     </p>
 
     <h2 class="mb-3 font-semibold text-size-xl">Core Technologies Used:</h2>
@@ -20,7 +16,11 @@
         For building a reactive and performant user interface with Runes.
       </li>
       <li>
-        <span class="font-medium text-text-primary">TanStack Query (Svelte Query):</span>
+        <span class="font-medium text-text-primary">SvelteKit:</span>
+        File-based routing and server-side rendering.
+      </li>
+      <li>
+        <span class="font-medium text-text-primary">TanStack Query:</span>
         Manages all server state.
       </li>
       <li>
