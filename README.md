@@ -109,7 +109,7 @@ These are the base templates used by the Go CLI. They operate on **FileSystem/YA
 Port all existing legacy backends from YAML file storage to **SQLite**.
 - [ ] **Node.js** (Port to SQLite)
 - [ ] **Golang** (Port to SQLite)
-- [ ] **Gleam** (Port to SQLite)
+- [ ] **Gleam** (Port to SQLite , review gleam backend while functional, it may really to much on external Erlang libs / patterns for yaml or other formats parsing etc ) 
 - [ ] **Elixir** (Port to SQLite)
 - [ ] **Clojure** (Port to SQLite)
 
