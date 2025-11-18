@@ -1,6 +1,7 @@
 // src/lib/stores/uiStore.ts
 import { toast } from 'svelte-sonner';
 import type { NotificationType, Item } from '$lib/types';
+import { browser } from '$app/environment';
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -35,6 +36,8 @@ class UiStore {
   }
 
   showNotification(type: NotificationType, message: string) {
+    if (!browser) return; // Skip toast during SSR
+    
     switch (type) {
       case 'success':
         toast.success(message);
