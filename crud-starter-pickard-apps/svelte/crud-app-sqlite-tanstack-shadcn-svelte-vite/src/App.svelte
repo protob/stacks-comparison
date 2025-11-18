@@ -1,19 +1,20 @@
+<!-- src/App.svelte -->
 <script lang="ts">
   import './app.css';
-  import svelteLogo from './assets/svelte.svg';
-  import viteLogo from '/vite.svg';
-  import Counter from './lib/Counter.svelte';
-    import { Button } from "$lib/components/ui/button/index.js";
+  import { QueryClientProvider } from '@tanstack/svelte-query';
+  import { Toaster } from 'svelte-sonner';
+  import { createAppQueryClient } from '$lib/api/itemsQuery';
+  import Router from '$lib/router/Router.svelte';
+  import { useThemeUpdater } from '$lib/utils/themeUpdater';
+
+  const queryClient = createAppQueryClient();
+
+  useThemeUpdater();
 </script>
 
-<main>
-  <div>
-
-  <Button>ShadCN Button</Button>
- 
-
+<main class="min-h-screen bg-background text-foreground">
+  <QueryClientProvider client={queryClient}>
+    <Toaster position="top-right" richColors />
+    <Router />
+  </QueryClientProvider>
 </main>
-
-<style>
-
-</style>
