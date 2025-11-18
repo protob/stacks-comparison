@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Toaster } from "@/components/ui/sonner";
+import { useColorMode } from "@vueuse/core";
 
-// Color mode is now handled automatically by @nuxtjs/color-mode
+// Initialize color mode early
+const colorMode = useColorMode();
 </script>
 
 <template>
