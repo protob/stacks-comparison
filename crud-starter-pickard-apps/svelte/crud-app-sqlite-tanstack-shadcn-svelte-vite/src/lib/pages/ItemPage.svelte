@@ -5,7 +5,7 @@
   import FilterBar from '$lib/components/layout/FilterBar.svelte';
   import ItemItem from '$lib/components/items/ItemItem.svelte';
   import ItemForm from '$lib/components/items/ItemForm.svelte';
-  import { uiStore } from '$lib/stores/uiStore'; // <-- Only import the singleton
+  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
   import { Button } from '$lib/components/ui/button';
   import { createEventDispatcher } from 'svelte';
   import { Plus } from '@lucide/svelte'; // Import icon directly

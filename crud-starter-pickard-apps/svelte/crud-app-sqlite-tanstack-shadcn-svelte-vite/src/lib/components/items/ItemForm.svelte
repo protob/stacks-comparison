@@ -7,7 +7,7 @@
   import { Badge } from '$lib/components/ui/badge';
   import { useAddItem, useUpdateItem } from '$lib/api/itemsQuery'; // Import update hook
   import { itemFormSchema } from '$lib/schemas/itemSchema';
-  import { uiStore } from '$lib/stores/uiStore';
+  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
 
   let { onClose } = $props<{ onClose: () => void }>();
 

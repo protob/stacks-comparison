@@ -2,7 +2,7 @@
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Separator } from '$lib/components/ui/separator';
-  import { uiStore } from '$lib/stores/uiStore';
+  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
   import { Sun, Moon } from '@lucide/svelte';
 
   let searchQuery = $state('');

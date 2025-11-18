@@ -1,6 +1,6 @@
 // src/lib/utils/themeUpdater.ts
 import { onMount } from 'svelte';
-import { uiStore, type Theme } from '$lib/stores/uiStore';
+import { uiStore, type Theme } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
 
 export function useThemeUpdater() {
   onMount(() => {

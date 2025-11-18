@@ -4,7 +4,7 @@
    import { Checkbox } from '$lib/components/ui/checkbox';
    import { useUpdateItem, useDeleteItem } from '$lib/api/itemsQuery';
    import { formatDate } from '$lib/utils/helpers';
-   import { uiStore } from '$lib/stores/uiStore';
+   import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
    import type { Item } from '$lib/types';
    import { Pencil, Trash2 } from '@lucide/svelte';
  
