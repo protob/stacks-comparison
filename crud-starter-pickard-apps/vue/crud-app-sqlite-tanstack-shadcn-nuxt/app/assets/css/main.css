@@ -1,40 +1,18 @@
 /*
  * MODERNIST DESIGN SYSTEM - Tailwind v4 CSS-First for Todo App
  * Clean, minimal, functional - inspired by Bauhaus & Swiss typography
- * Optimized for Vue with fluid responsiveness, vertical rhythm, proportions
  */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* CSS Custom Properties (Design Tokens) */
+:root {
+    /* Layout */
+    --sidebar-width: clamp(200px, 15vw, 280px);
 
-/* Define layer order for cascade control */
-@layer base, components, utilities;
-
-/* ============================================
-   BASE CONSTRAINTS - Minimum viewport
-   ============================================ */
-@layer base {
-    html {
-        min-width: 320px;
-    }
-
-    body {
-        min-width: 320px;
-    }
-}
-
-/* ============================================
-   DESIGN TOKENS - Three-tier architecture
-   ============================================ */
-
-@theme {
-    /* =========================
-     1. PRIMITIVE TOKENS - Raw values
-     ========================= */
-
-    /* Grayscale Palette - OKLCH for better perceptual uniformity */
-    --color-gray-0: oklch(1 0 0); /* Pure white */
+    /* Grayscale Palette */
+    --color-gray-0: oklch(1 0 0);
     --color-gray-50: oklch(0.985 0.002 247);
     --color-gray-100: oklch(0.973 0.003 247);
     --color-gray-200: oklch(0.935 0.006 247);
@@ -45,10 +23,10 @@
     --color-gray-700: oklch(0.321 0.02 247);
     --color-gray-800: oklch(0.215 0.019 247);
     --color-gray-900: oklch(0.141 0.015 247);
-    --color-gray-950: oklch(0.075 0.01 247); /* Near black */
+    --color-gray-950: oklch(0.075 0.01 247);
 
-    /* Primary Palette - Blue for trust & professionalism */
-    --color-blue-50: oklch(0.96 0.025 240); /* Very light blue */
+    /* Primary Palette */
+    --color-blue-50: oklch(0.96 0.025 240);
     --color-blue-100: oklch(0.92 0.045 240);
     --color-blue-200: oklch(0.86 0.075 240);
     --color-blue-300: oklch(0.78 0.115 240);
@@ -59,182 +37,57 @@
     --color-blue-800: oklch(0.35 0.175 240);
     --color-blue-900: oklch(0.3 0.15 240);
 
-    /* Accent Colors - Semantic use for Todo app */
+    /* Accent Colors */
     --color-green-50: oklch(0.971 0.018 142);
     --color-green-500: oklch(0.647 0.19 142);
     --color-green-600: oklch(0.519 0.195 142);
-
     --color-red-50: oklch(0.971 0.018 27);
     --color-red-500: oklch(0.637 0.237 27);
     --color-red-600: oklch(0.577 0.237 27);
-
     --color-amber-50: oklch(0.987 0.021 91);
     --color-amber-500: oklch(0.769 0.183 84);
     --color-amber-600: oklch(0.659 0.181 75);
 
-    /* Typography Scale - Modular (1.2 ratio) - Fluid with clamp for auto scaling */
-    --font-size-xs: clamp(0.625rem, 0.6rem + 0.125vw, 0.694rem); /* 10-11px */
-    --font-size-sm: clamp(0.75rem, 0.72rem + 0.14vw, 0.833rem); /* 12-13px */
-    --font-size-base: clamp(0.875rem, 0.825rem + 0.25vw, 1rem); /* 14-16px */
-    --font-size-lg: clamp(1.05rem, 0.99rem + 0.3vw, 1.2rem); /* 17-19px */
-    --font-size-xl: clamp(1.26rem, 1.188rem + 0.36vw, 1.44rem); /* 20-23px */
-    --font-size-2xl: clamp(1.512rem, 1.425rem + 0.435vw, 1.728rem); /* 24-28px */
-    --font-size-3xl: clamp(1.814rem, 1.71rem + 0.52vw, 2.074rem); /* 29-33px */
-    --font-size-4xl: clamp(2.177rem, 2.052rem + 0.625vw, 2.488rem); /* 35-40px */
-    --font-size-5xl: clamp(2.612rem, 2.462rem + 0.75vw, 2.986rem); /* 42-48px */
+    /* Design Tokens */
+    --font-size-xs: clamp(0.625rem, 0.6rem + 0.125vw, 0.694rem);
+    --font-size-sm: clamp(0.75rem, 0.72rem + 0.14vw, 0.833rem);
+    --font-size-base: clamp(0.875rem, 0.825rem + 0.25vw, 1rem);
+    --font-size-lg: clamp(1.05rem, 0.99rem + 0.3vw, 1.2rem);
+    --font-size-xl: clamp(1.26rem, 1.188rem + 0.36vw, 1.44rem);
 
-    /* Spacing - Custom Fluid Scale */
-    --spacing-fluid-4: clamp(1rem, 0.8rem + 1vw, 2rem);
-    --spacing-fluid-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
-    --spacing-fluid-8: clamp(2rem, 1.6rem + 2vw, 4rem);
-
-    /* Layout */
-    --sidebar-width: clamp(200px, 15vw, 280px);
-}
-
-/* ============================================
-   CSS CUSTOM PROPERTIES
-   ============================================ */
-
-:root {
-    --radius: 0.5rem;
+    /* Basic Colors */
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
+
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
+
     --primary: oklch(0.145 0 0);
     --primary-foreground: oklch(0.985 0 0);
+
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.145 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.145 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.145 0 0);
 
-    /* Custom Semantic Tokens */
-    --color-text-primary: oklch(0.141 0.015 247);
-    --color-text-secondary: oklch(0.428 0.02 247);
-    --color-text-muted: oklch(0.539 0.018 247);
-    --color-surface: oklch(0.985 0.002 247);
-    --color-priority-low-bg: #d1fadf;
-    --color-priority-low-text: #16a34a;
-    --color-priority-mid-bg: oklch(0.987 0.021 91);
-    --color-priority-mid-text: oklch(0.659 0.181 75);
-    --color-priority-high-bg: #fed7d7;
-    --color-priority-high-text: #dc2626;
-    --color-success-light: oklch(0.971 0.018 142);
+    --border: oklch(0.922 0 0);
+
+    /* Semantic */
+    --color-surface: var(--color-gray-50);
+    --color-text-primary: var(--color-gray-900);
+    --color-text-muted: var(--color-gray-500);
+    --color-priority-mid-bg: var(--color-amber-50);
+    --color-priority-mid-text: var(--color-amber-600);
+
     --radius-full: 9999px;
 }
 
+/* Dark mode overrides */
 .dark {
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.145 0 0);
     --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.145 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.922 0 0);
-
-    /* Custom Semantic Tokens */
-    --color-text-primary: oklch(0.985 0.002 247);
-    --color-text-secondary: oklch(0.707 0.015 247);
-    --color-text-muted: oklch(0.539 0.018 247);
-    --color-surface: oklch(0.215 0.019 247);
-    --color-priority-low-bg: oklch(0.519 0.195 142);
-    --color-priority-low-text: oklch(0.971 0.018 142);
-    --color-priority-mid-bg: oklch(0.769 0.183 84);
-    --color-priority-mid-text: oklch(0.075 0.01 247);
-    --color-priority-high-bg: oklch(0.637 0.237 27);
-    --color-priority-high-text: oklch(0.971 0.018 27);
-    --color-success-light: oklch(0.519 0.195 142 / 20%);
-}
-
-@layer base {
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-        font-feature-settings:
-            "rlig" 1,
-            "calt" 1;
-    }
-}
-
-@layer utilities {
-    .text-size-xs {
-        font-size: var(--font-size-xs);
-    }
-    .text-size-sm {
-        font-size: var(--font-size-sm);
-    }
-    .text-size-base {
-        font-size: var(--font-size-base);
-    }
-    .text-size-lg {
-        font-size: var(--font-size-lg);
-    }
-    .text-size-xl {
-        font-size: var(--font-size-xl);
-    }
-    .text-size-2xl {
-        font-size: var(--font-size-2xl);
-    }
-    .text-size-3xl {
-        font-size: var(--font-size-3xl);
-    }
-
-    .p-fluid-4 {
-        padding: var(--spacing-fluid-4);
-    }
-    .p-fluid-6 {
-        padding: var(--spacing-fluid-6);
-    }
-    .p-fluid-8 {
-        padding: var(--spacing-fluid-8);
-    }
-
-    .tag-sm {
-        display: inline-flex;
-        align-items: center;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        padding-top: 0.125rem;
-        padding-bottom: 0.125rem;
-        font-size: var(--font-size-xs);
-        font-weight: 500;
-    }
-
-    .tag-priority-low {
-        background-color: var(--color-priority-low-bg);
-        color: var(--color-priority-low-text);
-        border-radius: var(--radius-full);
-    }
-    .tag-priority-mid {
-        background-color: var(--color-priority-mid-bg);
-        color: var(--color-priority-mid-text);
-        border-radius: var(--radius-full);
-    }
-    .tag-priority-high {
-        background-color: var(--color-priority-high-bg);
-        color: var(--color-priority-high-text);
-        border-radius: var(--radius-full);
-    }
+    --color-surface: var(--color-gray-900);
+    --color-text-primary: var(--color-gray-50);
+    --color-priority-mid-bg: var(--color-amber-500);
+    --color-priority-mid-text: var(--color-gray-950);
 }
