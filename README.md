@@ -100,9 +100,6 @@ These are the base templates used by the Go CLI. They operate on **FileSystem/YA
 *   Clojure (`server-clojure`)
 
 =====
-Haha, touché! It is genuinely hilarious (and a bit painful for JS developers) that PHP might actually ship a native pipe operator while the JavaScript proposal is still fighting the "Hack vs. F#" syntax wars in committee.
-
-Here is the updated **Roadmap** section, corrected for **PHP 8.5** and that sweet, sweet pipe operator.
 
 ## 🚧 Roadmap & Planned Features
 
