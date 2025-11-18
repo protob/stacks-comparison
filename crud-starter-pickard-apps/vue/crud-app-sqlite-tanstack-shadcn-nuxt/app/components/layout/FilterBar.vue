@@ -36,8 +36,17 @@ const filterStore = useFilterStore();
             <div>
                 <Label class="block mb-2">Status</Label>
                 <div class="flex items-center gap-2">
-                    <Checkbox id="show-completed" :checked="filterStore.showCompleted" @update:checked="(value) => (filterStore.showCompleted = !!value)" />
-                    <Label for="show-completed" class="cursor-pointer"> Show Completed Items </Label>
+                    <Checkbox
+                        id="show-completed"
+                        :checked="filterStore.showCompleted"
+                        @update:modelValue="(val) => (filterStore.showCompleted = val as boolean)"
+                    />
+                    <Label
+                        for="show-completed"
+                        class="text-sm font-medium leading-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                    >
+                        Show Completed Items
+                    </Label>
                 </div>
             </div>
         </div>

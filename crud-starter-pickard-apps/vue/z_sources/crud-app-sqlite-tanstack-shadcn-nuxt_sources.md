@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 03:19:21 CET
+**Generated on:** wto, 18 lis 2025, 03:28:21 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -482,18 +482,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { useFilterStore } from "@/stores/filterStore";
 
-defineProps<{
-    priority: string;
-    showCompleted: boolean;
-    hasActiveFilters: boolean;
-}>();
-
-const emit = defineEmits<{
-    "update:priority": [value: string];
-    "update:showCompleted": [value: boolean];
-    clear: [];
-}>();
+const filterStore = useFilterStore();
 </script>
 
 <template>
@@ -501,7 +492,7 @@ const emit = defineEmits<{
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <Label class="block mb-2">Priority</Label>
-                <RadioGroup :model-value="priority" @update:model-value="emit('update:priority', $event as string)" class="flex items-center gap-4">
+                <RadioGroup v-model="filterStore.selectedPriority" class="flex items-center gap-4">
                     <div class="flex items-center space-x-2">
                         <RadioGroupItem id="r-all" value="all" />
                         <Label for="r-all">All</Label>
@@ -524,13 +515,13 @@ const emit = defineEmits<{
             <div>
                 <Label class="block mb-2">Status</Label>
                 <div class="flex items-center gap-2">
-                    <Checkbox id="show-completed" :checked="showCompleted" @update:checked="(val) => emit('update:showCompleted', !!val)" />
+                    <Checkbox id="show-completed" :checked="filterStore.showCompleted" @update:checked="(value) => (filterStore.showCompleted = !!value)" />
                     <Label for="show-completed" class="cursor-pointer"> Show Completed Items </Label>
                 </div>
             </div>
         </div>
 
-        <Button v-if="hasActiveFilters" variant="ghost" size="sm" @click="emit('clear')" class="mt-4"> Clear Filters </Button>
+        <Button v-if="filterStore.hasActiveFilters" variant="ghost" size="sm" @click="filterStore.clearFilters()" class="mt-4"> Clear Filters </Button>
     </div>
 </template>
 
@@ -1590,6 +1581,40 @@ export const useItemStore = defineStore('item', () => {
 });
 ```
 
+## `app/stores/filterStore.ts`
+```
+import { defineStore } from "pinia";
+import type { Priority } from "@/types";
+
+export const useFilterStore = defineStore("filter", () => {
+  const searchQuery = ref("");
+  const selectedPriority = ref<"all" | Priority>("all");
+  const showCompleted = ref(false);
+  const selectedTags = ref<string[]>([]);
+
+  const hasActiveFilters = computed(() => {
+    return searchQuery.value.trim() !== "" || selectedPriority.value !== "all" || selectedTags.value.length > 0;
+  });
+
+  const clearFilters = () => {
+    searchQuery.value = "";
+    selectedPriority.value = "all";
+    showCompleted.value = false;
+    selectedTags.value = [];
+  };
+
+  return {
+    searchQuery,
+    selectedPriority,
+    showCompleted,
+    selectedTags,
+    hasActiveFilters,
+    clearFilters,
+  };
+});
+
+```
+
 ## `app/layouts/default.vue`
 ```
 <script setup lang="ts">
@@ -1659,7 +1684,10 @@ export interface FilterOptions {
   selectedTags: string[];
 }
 
-export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref<FilterOptions>) {
+export function useItemFilters(
+  itemTree: Ref<ItemTree | undefined>,
+  filters: ComputedRef<FilterOptions>, // Changed from Ref to ComputedRef
+) {
   const allTags = computed(() => {
     if (!itemTree.value) return [];
 
@@ -1672,13 +1700,6 @@ export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref
     return Array.from(tags).sort();
   });
 
-  const hasActiveFilters = computed(() => {
-    return (
-      filters.value.searchQuery.trim() !== "" || filters.value.selectedPriority !== "all" || filters.value.selectedTags.length > 0
-      // Removed showCompleted from here - it's a view toggle, not a filter
-    );
-  });
-
   const filteredItemTree = computed(() => {
     if (!itemTree.value) return {};
 
@@ -1686,7 +1707,6 @@ export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref
 
     Object.entries(itemTree.value).forEach(([categoryName, items]) => {
       const filteredItems = items.filter((item) => {
-        // Search filter
         if (filters.value.searchQuery.trim()) {
           const query = filters.value.searchQuery.toLowerCase();
           const matchesSearch =
@@ -1694,19 +1714,14 @@ export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref
           if (!matchesSearch) return false;
         }
 
-        // Priority filter
         if (filters.value.selectedPriority !== "all" && item.priority !== filters.value.selectedPriority) {
           return false;
         }
 
-        // Show/hide completed items
-        // If showCompleted is FALSE, hide completed items
-        // If showCompleted is TRUE, show all items (including completed)
         if (!filters.value.showCompleted && item.isCompleted) {
           return false;
         }
 
-        // Tags filter
         if (filters.value.selectedTags.length > 0) {
           const hasMatchingTag = filters.value.selectedTags.some((selectedTag) => item.tags?.includes(selectedTag));
           if (!hasMatchingTag) return false;
@@ -1723,20 +1738,9 @@ export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref
     return filtered;
   });
 
-  const clearFilters = () => {
-    filters.value = {
-      searchQuery: "",
-      selectedPriority: "all",
-      showCompleted: false, // Reset to default: hide completed
-      selectedTags: [],
-    };
-  };
-
   return {
     allTags,
-    hasActiveFilters,
     filteredItemTree,
-    clearFilters,
   };
 }
 
@@ -2889,20 +2893,22 @@ import FilterBar from "@/components/layout/FilterBar.vue";
 import ItemItem from "@/components/items/ItemItem.vue";
 import ItemForm from "@/components/items/ItemForm.vue";
 import { useUiStore } from "@/stores/uiStore";
+import { useFilterStore } from "@/stores/filterStore";
 import { Button } from "@/components/ui/button";
 
 const { data: itemTree, isLoading, error } = useItemTree();
-
 const uiStore = useUiStore();
+const filterStore = useFilterStore();
 
-const filters = ref({
-    searchQuery: "",
-    selectedPriority: "all" as const,
-    showCompleted: false, // Changed from true to false
-    selectedTags: [],
-});
+// Convert store state to computed ref for the composable
+const filters = computed(() => ({
+    searchQuery: filterStore.searchQuery,
+    selectedPriority: filterStore.selectedPriority,
+    showCompleted: filterStore.showCompleted,
+    selectedTags: filterStore.selectedTags,
+}));
 
-const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
+const { filteredItemTree } = useItemFilters(
     computed(() => itemTree.value || {}),
     filters,
 );
@@ -2914,12 +2920,7 @@ const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
             <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
         </header>
 
-        <FilterBar
-            v-model:priority="filters.selectedPriority"
-            v-model:showCompleted="filters.showCompleted"
-            :has-active-filters="hasActiveFilters"
-            @clear="clearFilters"
-        />
+        <FilterBar />
 
         <div v-if="isLoading" class="py-10 text-center text-text-muted">Loading...</div>
 
@@ -2928,7 +2929,9 @@ const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
         <div v-else-if="itemTree" class="mt-6 space-y-8">
             <section v-for="(items, category) in filteredItemTree" :key="category">
                 <div class="flex items-center gap-2 mb-4">
-                    <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
+                    <h2 class="font-semibold capitalize text-size-xl">
+                        {{ category }}
+                    </h2>
                     <span class="text-sm text-text-muted">({{ items.length }})</span>
                     <Button variant="ghost" size="icon-sm" @click="uiStore.openForm(undefined, category)">
                         <Icon name="lucide:plus" class="w-4 h-4" />
@@ -2942,7 +2945,11 @@ const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
 
             <div v-if="Object.keys(filteredItemTree).length === 0" class="py-10 text-center text-text-muted">
                 <p>No items found.</p>
-                <p v-if="hasActiveFilters">Try adjusting your filters.</p>
+                <p v-if="filterStore.hasActiveFilters">Try adjusting your filters.</p>
+                <p v-if="!filterStore.showCompleted" class="mt-2">
+                    <span class="text-sm"> 💡 Completed items are hidden. </span>
+                    <button @click="filterStore.showCompleted = true" class="text-sm text-primary underline hover:no-underline">Show them?</button>
+                </p>
             </div>
         </div>
 
