@@ -99,3 +99,46 @@ These are the base templates used by the Go CLI. They operate on **FileSystem/YA
 *   Gleam (`server-gleam`)
 *   Elixir (`server-elixir`)
 *   Clojure (`server-clojure`)
+
+=====
+Haha, touché! It is genuinely hilarious (and a bit painful for JS developers) that PHP might actually ship a native pipe operator while the JavaScript proposal is still fighting the "Hack vs. F#" syntax wars in committee.
+
+Here is the updated **Roadmap** section, corrected for **PHP 8.5** and that sweet, sweet pipe operator.
+
+## 🚧 Roadmap & Planned Features
+
+**Note:** All boilerplates listed in the "Original Pickard Stacks" section (YAML/FS based) are considered **Baseline/Done**. The focus now shifts to SQLite migrations and specialized full-stack integrations.
+
+### 1. Backend Migration (FS → SQLite)
+Port all existing legacy backends from YAML file storage to **SQLite**.
+- [ ] **Node.js** (Port to SQLite)
+- [ ] **Golang** (Port to SQLite)
+- [ ] **Gleam** (Port to SQLite)
+- [ ] **Elixir** (Port to SQLite)
+- [ ] **Clojure** (Port to SQLite)
+
+### 2. New Framework-Specific Stacks
+Introduction of "non-linear" stacks where frontend and backend are tightly coupled or use specific bleeding-edge combinations.
+
+**The "Bleeding Edge" / Hyper-productive Stacks:**
+- [ ] **Bun Stack:** Bun + Elysia + SQLite + HTMX
+- [ ] **Go Fullstack:** Golang + sqlc + Go Templates + SQLite
+- [ ] **Gleam Fullstack:** Gleam + Lustre + Squirrel + SQLite
+- [ ] **Elixir:** Phoenix LiveView
+
+**Traditional / Robust Stacks:**
+- [ ] **PHP Framework:** Laravel + SQLite
+- [ ] **Modern PHP:** Plain PHP **8.5** (GA Nov 2025) REST API + SQLite.
+    *   *Focus:* Utilizing bleeding-edge features like the **Pipe Operator (`|>`)** 
+- [ ] **Python:** FastAPI + SQLite
+- [ ] **Python:** Flask + SQLite
+- [ ] **Python:** Django + SQLite
+
+### 3. Tooling Evolution: `pickard-bridge`
+As the matrix of choices grows (e.g., HTMX stacks vs. SPA stacks), a simple CLI linear flow (`Select Frontend -> Select Backend`) is becoming insufficient.
+
+- [ ] **Develop `pickard-bridge` (GUI Configurator):**
+    - A web-based GUI to help visualize and select complex stacks.
+    - **Architecture:** The Web App calls the existing CLI via REST/IPC.
+    - **Presets:** Introduce "Presets" to handle valid combinations (e.g., restricting HTMX frontends to compatible backends).
+    - **Goal:** The CLI remains the core engine, but the GUI handles the complexity of choice.
