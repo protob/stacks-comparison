@@ -1,45 +1,49 @@
-import type { ItemTree, Item, Priority } from '@/types';
+import type { ItemTree, Item, Priority } from "@/types";
 
 export interface FilterOptions {
   searchQuery: string;
-  selectedPriority: 'all' | Priority;
+  selectedPriority: "all" | Priority;
   showCompleted: boolean;
   selectedTags: string[];
 }
 
-export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptions>) {
+export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref<FilterOptions>) {
   const allTags = computed(() => {
+    if (!itemTree.value) return [];
+
     const tags = new Set<string>();
-    Object.values(itemTree.value).forEach(items => {
-      items.forEach(item => {
-        item.tags?.forEach(tag => tags.add(tag));
+    Object.values(itemTree.value).forEach((items) => {
+      items.forEach((item) => {
+        item.tags?.forEach((tag) => tags.add(tag));
       });
     });
     return Array.from(tags).sort();
   });
 
   const hasActiveFilters = computed(() => {
-    return filters.value.searchQuery.trim() !== '' ||
-           filters.value.selectedPriority !== 'all' ||
-           !filters.value.showCompleted ||
-           filters.value.selectedTags.length > 0;
+    return (
+      filters.value.searchQuery.trim() !== "" ||
+      filters.value.selectedPriority !== "all" ||
+      !filters.value.showCompleted ||
+      filters.value.selectedTags.length > 0
+    );
   });
 
   const filteredItemTree = computed(() => {
+    if (!itemTree.value) return {};
+
     const filtered: Record<string, Item[]> = {};
-    
+
     Object.entries(itemTree.value).forEach(([categoryName, items]) => {
-      const filteredItems = items.filter(item => {
+      const filteredItems = items.filter((item) => {
         if (filters.value.searchQuery.trim()) {
           const query = filters.value.searchQuery.toLowerCase();
-          const matchesSearch = 
-            item.name.toLowerCase().includes(query) ||
-            item.text.toLowerCase().includes(query) ||
-            item.tags?.some(tag => tag.toLowerCase().includes(query));
+          const matchesSearch =
+            item.name.toLowerCase().includes(query) || item.text.toLowerCase().includes(query) || item.tags?.some((tag) => tag.toLowerCase().includes(query));
           if (!matchesSearch) return false;
         }
 
-        if (filters.value.selectedPriority !== 'all' && item.priority !== filters.value.selectedPriority) {
+        if (filters.value.selectedPriority !== "all" && item.priority !== filters.value.selectedPriority) {
           return false;
         }
 
@@ -48,9 +52,7 @@ export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptio
         }
 
         if (filters.value.selectedTags.length > 0) {
-          const hasMatchingTag = filters.value.selectedTags.some(selectedTag =>
-            item.tags?.includes(selectedTag)
-          );
+          const hasMatchingTag = filters.value.selectedTags.some((selectedTag) => item.tags?.includes(selectedTag));
           if (!hasMatchingTag) return false;
         }
 
@@ -67,8 +69,8 @@ export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptio
 
   const clearFilters = () => {
     filters.value = {
-      searchQuery: '',
-      selectedPriority: 'all',
+      searchQuery: "",
+      selectedPriority: "all",
       showCompleted: true,
       selectedTags: [],
     };

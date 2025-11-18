@@ -3,10 +3,15 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/icon", "shadcn-nuxt", "@vueuse/nuxt", "@pinia/nuxt", "@peterbud/nuxt-query"],
+  modules: ["@nuxt/icon", "shadcn-nuxt", "@vueuse/nuxt", "@pinia/nuxt", "@peterbud/nuxt-query", "@nuxtjs/color-mode"],
   css: ["~/assets/css/tailwind.css", "~/assets/css/main.css"],
   // css: ["~/assets/css/tailwind.css"],
-
+  colorMode: {
+    classSuffix: "",
+    preference: "system",
+    fallback: "light",
+    storageKey: "theme",
+  },
   nuxtQuery: {
     autoImports: ["useQuery", "useMutation", "useQueryClient"],
     queryClientOptions: {

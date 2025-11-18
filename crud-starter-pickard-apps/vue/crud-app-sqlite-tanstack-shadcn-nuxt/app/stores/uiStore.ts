@@ -1,36 +1,43 @@
-import { defineStore } from 'pinia';
-import { toast } from 'vue-sonner';
-import type { NotificationType, Item } from '@/types';
-import { useStorage } from '@vueuse/core'; // ← ADD THIS
-type Theme = 'light' | 'dark' | 'system';
+import { defineStore } from "pinia";
+import { toast } from "vue-sonner";
+import type { NotificationType, Item } from "@/types";
 
-export const useUiStore = defineStore('ui', () => {
-  const theme = useStorage<Theme>('theme', 'system');
-  
+export const useUiStore = defineStore("ui", () => {
+  const colorMode = useColorMode();
+
   const isFormOpen = ref(false);
   const editingItem = ref<Item | null>(null);
   const preselectedCategory = ref<string | null>(null);
 
-  const isDark = computed(() => theme.value === 'dark');
+  const isDark = computed(() => colorMode.value === "dark");
 
   const showNotification = (type: NotificationType, message: string) => {
     switch (type) {
-      case 'success': toast.success(message); break;
-      case 'error': toast.error(message); break;
-      case 'warning': toast.warning(message); break;
-      case 'info': toast.info(message); break;
-      default: toast(message);
+      case "success":
+        toast.success(message);
+        break;
+      case "error":
+        toast.error(message);
+        break;
+      case "warning":
+        toast.warning(message);
+        break;
+      case "info":
+        toast.info(message);
+        break;
+      default:
+        toast(message);
     }
   };
 
   const toggleTheme = () => {
-    theme.value = theme.value === 'dark' ? 'light' : 'dark';
+    colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
   };
 
   const openForm = (item?: Item, category?: string) => {
     isFormOpen.value = true;
     editingItem.value = item || null;
-    preselectedCategory.value = category || (item ? item.categorySlug : null);
+    preselectedCategory.value = category || (item ? item.categories[0] : null);
   };
 
   const closeForm = () => {
@@ -40,11 +47,10 @@ export const useUiStore = defineStore('ui', () => {
   };
 
   return {
-    theme,
+    isDark,
     isFormOpen,
     editingItem,
     preselectedCategory,
-    isDark,
     showNotification,
     toggleTheme,
     openForm,

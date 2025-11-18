@@ -7,7 +7,6 @@ import ItemForm from "@/components/items/ItemForm.vue";
 import { useUiStore } from "@/stores/uiStore";
 import { Button } from "@/components/ui/button";
 
-// Use TanStack Query instead of useAsyncData
 const { data: itemTree, isLoading, error } = useItemTree();
 
 const uiStore = useUiStore();
@@ -19,7 +18,7 @@ const filters = ref({
     selectedTags: [],
 });
 
-const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFilters(
+const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
     computed(() => itemTree.value || {}),
     filters,
 );
@@ -38,9 +37,11 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
             @clear="clearFilters"
         />
 
-        <div v-if="isLoading">Loading...</div>
-        <div v-else-if="error">Error: {{ error.message }}</div>
-        <div v-else class="mt-6 space-y-8">
+        <div v-if="isLoading" class="py-10 text-center text-text-muted">Loading...</div>
+
+        <div v-else-if="error" class="py-10 text-center text-destructive">Error: {{ error.message }}</div>
+
+        <div v-else-if="itemTree" class="mt-6 space-y-8">
             <section v-for="(items, category) in filteredItemTree" :key="category">
                 <div class="flex items-center gap-2 mb-4">
                     <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
@@ -49,11 +50,13 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
                         <Icon name="lucide:plus" class="w-4 h-4" />
                     </Button>
                 </div>
+
                 <div class="grid gap-4">
                     <ItemItem v-for="item in items" :key="item.id" :item="item" />
                 </div>
             </section>
-            <div v-if="Object.keys(filteredItemTree).length === 0 && !isLoading" class="py-10 text-center text-text-muted">
+
+            <div v-if="Object.keys(filteredItemTree).length === 0" class="py-10 text-center text-text-muted">
                 <p>No items found.</p>
                 <p v-if="hasActiveFilters">Try adjusting your filters.</p>
             </div>

@@ -56,8 +56,9 @@ const toggleTag = (tag: string) => {
 
         <div class="mt-auto">
             <Button variant="ghost" @click="uiStore.toggleTheme()" class="justify-start w-full">
-                <Icon v-if="!uiStore.isDark" name="lucide:sun" class="w-4 h-4" />
-                <Icon v-else name="lucide:moon" class="w-4 h-4" />
+                <Icon v-if="uiStore.isDark" name="lucide:moon" class="w-4 h-4" />
+                <Icon v-else name="lucide:sun" class="w-4 h-4" />
+                <!-- <span class="ml-2">{{ uiStore.isDark ? "Dark" : "Light" }}</span> -->
             </Button>
         </div>
     </aside>
