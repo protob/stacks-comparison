@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 01:29:58 CET
+**Generated on:** wto, 18 lis 2025, 01:40:42 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -160,12 +160,12 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 <script setup lang="ts">
 import { useForm } from "@tanstack/vue-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Badge } from "~/components/ui/badge";
 import { useAddItem } from "@/composables/useItemsApi";
 import { itemFormSchema } from "@/schemas/itemSchema";
 import { useUiStore } from "@/stores/uiStore";
@@ -301,26 +301,31 @@ const removeTag = (tagToRemove: string) => {
 ## `app/components/items/ItemItem.vue`
 ```
 <script setup lang="ts">
-import Card from "@/components/ui/card";
-import CardContent from "@/components/ui/card/CardContent.vue";
-import Badge from "@/components/ui/badge";
-import Button from "@/components/ui/button";
-import Checkbox from "@/components/ui/checkbox";
+import { Card, CardContent } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import { useUpdateItem, useDeleteItem } from "@/composables/useItemsApi";
 import { formatDate } from "@/utils/helpers";
 import { useUiStore } from "@/stores/uiStore";
-import type { Item } from "~/types";
+import type { Item } from "@/types";
 
 const props = defineProps<{ item: Item }>();
-const mutateUpdate = useUpdateItem();
-const mutateDelete = useDeleteItem();
+
+const { mutate: updateItem } = useUpdateItem();
+const { mutate: deleteItem } = useDeleteItem();
 const uiStore = useUiStore();
 
-const toggleComplete = () => mutateUpdate.mutateAsync({ id: props.item.id, payload: { isCompleted: !props.item.isCompleted } });
+const toggleComplete = () => {
+    updateItem({
+        id: props.item.id,
+        payload: { isCompleted: !props.item.isCompleted },
+    });
+};
 
 const handleDelete = () => {
     if (confirm("Are you sure you want to delete this item?")) {
-        mutateDelete.mutateAsync(props.item.id);
+        deleteItem(props.item.id);
     }
 };
 </script>
@@ -331,23 +336,29 @@ const handleDelete = () => {
             <Checkbox :checked="item.isCompleted" @update:checked="toggleComplete" class="mt-1" />
             <div class="flex-1">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-semibold text-size-lg" :class="{ 'line-through text-text-muted': item.isCompleted }">{{ item.name }}</h3>
-                    <Badge :class="`tag-priority-${item.priority} tag-sm`" variant="outline">{{ item.priority }}</Badge>
+                    <h3 class="font-semibold text-size-lg" :class="{ 'line-through text-text-muted': item.isCompleted }">
+                        {{ item.name }}
+                    </h3>
+                    <Badge :class="`tag-priority-${item.priority} tag-sm`" variant="outline">
+                        {{ item.priority }}
+                    </Badge>
                 </div>
                 <p class="mb-3 text-text-secondary">{{ item.text }}</p>
+
                 <div class="flex items-center justify-between">
                     <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
+                    <div class="flex gap-2">
+                        <Button size="sm" variant="ghost" @click="uiStore.openForm(item)">
+                            <Icon name="lucide:pencil" class="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="destructive" @click="handleDelete">
+                            <Icon name="lucide:trash-2" class="w-4 h-4" />
+                        </Button>
+                    </div>
                 </div>
+
                 <div class="flex gap-2 mt-3">
                     <Badge v-for="tag in item.tags" :key="tag" variant="secondary">{{ tag }}</Badge>
-                </div>
-                <div class="flex gap-2 mt-2">
-                    <Button size="sm" variant="ghost" @click="uiStore.openForm(item)">
-                        <Icon name="lucide:pencil" class="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="destructive" @click="handleDelete">
-                        <Icon name="lucide:trash-2" class="w-4 h-4" />
-                    </Button>
                 </div>
             </div>
         </CardContent>
