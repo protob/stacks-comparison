@@ -120,7 +120,7 @@ Introduction of "non-linear" stacks where frontend and backend are tightly coupl
 - [ ] **Bun Stack:** Bun + Elysia + SQLite + HTMX
 - [ ] **Go Fullstack:** Golang + sqlc + Go-Tmpl + SQLite
 - [ ] **Gleam Fullstack:** Gleam + Lustre + Squirrel + SQLite
-- [ ] **Elixir:** Phoenix LiveView
+- [ ] **Elixir:** Phoenix LiveView (with SQLite)
 
 **Traditional / Robust Stacks:**
 - [ ] **PHP Framework:** Laravel + SQLite
