@@ -79,3 +79,23 @@ Minimal implementations using FileSystem/YAML storage.
 | :--- | :--- |
 | **Solid** | `./simple/solid-simple-crud` |
 | **Svelte** | `./simple/svelte-simple-crud` |
+
+
+========================
+
+## Original Pickard Stacks (Legacy CLI)
+
+These are the base templates used by the Go CLI. They operate on **FileSystem/YAML storage** (no SQLite).
+
+**Frontends** (`crud/frontends/`)
+*   React
+*   Svelte
+*   Vue
+*   Solid
+
+**Backends** (`crud/backends/`)
+*   Node.js (`server-node`)
+*   Golang (`server-golang`)
+*   Gleam (`server-gleam`)
+*   Elixir (`server-elixir`)
+*   Clojure (`server-clojure`)
