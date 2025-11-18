@@ -1,20 +1,17 @@
 import { useMemo, useState } from 'react';
-import type { Item, Priority } from '@/types';
+import { useFilterStore } from '@/stores/useFilterStore';
 import { ItemTree } from '@/lib/api/itemApi';
-
-interface FilterOptions {
-  searchQuery: string;
-  selectedPriority: 'all' | Priority;
-  showCompleted: boolean;
-  selectedTags: string[];
-}
+import type { Priority } from '@/types';
 
 export function useItemFilters(itemTree: ItemTree) {
-  const [searchQuery, setSearchQuery] = useState('');
+  // Global state from Sidebar
+  const { searchQuery, selectedTags } = useFilterStore();
+  
+  // Local state for Main Page controls
   const [selectedPriority, setSelectedPriority] = useState<'all' | Priority>('all');
   const [showCompleted, setShowCompleted] = useState(true);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  // Calculate all unique tags from tree
   const allTags = useMemo(() => {
     const tags = new Set<string>();
     Object.values(itemTree).forEach(items => {
@@ -25,15 +22,8 @@ export function useItemFilters(itemTree: ItemTree) {
     return Array.from(tags).sort();
   }, [itemTree]);
 
-  const hasActiveFilters = useMemo(() => {
-    return searchQuery.trim() !== '' ||
-           selectedPriority !== 'all' ||
-           !showCompleted ||
-           selectedTags.length > 0;
-  }, [searchQuery, selectedPriority, showCompleted, selectedTags]);
-
   const filteredItemTree = useMemo(() => {
-    const filtered: Record<string, Item[]> = {};
+    const filtered: Record<string, any[]> = {};
     
     Object.entries(itemTree).forEach(([categoryName, items]) => {
       const filteredItems = items.filter(item => {
@@ -84,15 +74,20 @@ export function useItemFilters(itemTree: ItemTree) {
     return Object.values(filteredItemTree).reduce((total, items) => total + items.length, 0);
   }, [filteredItemTree]);
 
+  const hasActiveFilters = useMemo(() => {
+    return searchQuery.trim() !== '' ||
+           selectedPriority !== 'all' ||
+           !showCompleted ||
+           selectedTags.length > 0;
+  }, [searchQuery, selectedPriority, showCompleted, selectedTags]);
+
   return {
-    searchQuery, setSearchQuery,
     selectedPriority, setSelectedPriority,
     showCompleted, setShowCompleted,
-    selectedTags, setSelectedTags,
     allTags,
-    hasActiveFilters,
     filteredItemTree,
     totalItems,
     totalFilteredItems,
+    hasActiveFilters,
   };
 }
