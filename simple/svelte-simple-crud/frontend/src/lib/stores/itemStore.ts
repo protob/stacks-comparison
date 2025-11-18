@@ -1,24 +1,8 @@
+// src/lib/stores/itemStore.ts
 import { writable, derived } from 'svelte/store';
-import type { Item, Priority } from '$lib/types';
+import type { Item, ItemTree, CreateItemPayload, UpdateItemPayload } from '$lib/types';
 import * as itemApi from '$lib/api/itemApi';
 import { slugify } from '$lib/utils/slugify';
-
-export interface ItemTree {
-	[categorySlug: string]: Item[];
-}
-
-export interface CreateItemPayload {
-	name: string;
-	text: string;
-	priority: Priority;
-	tags?: string[];
-	categories: string[];
-}
-
-export interface UpdateItemPayload extends Partial<Omit<CreateItemPayload, 'categories'>> {
-	isCompleted?: boolean;
-	categories?: string[];
-}
 
 function createItemStore() {
 	const itemTree = writable<ItemTree>({});
@@ -32,30 +16,31 @@ function createItemStore() {
 	const fetchItemTree = async (): Promise<ItemTree> => {
 		isLoading.set(true);
 		error.set(null);
+
 		try {
 			const tree = await itemApi.getItemTree();
 			console.log('Raw API response:', tree);
-			
+
 			// Ensure all categories have arrays of items
 			const normalizedTree: ItemTree = {};
-			
-			// Handle both direct data and wrapped response
-			const data = tree.data || tree;
-			
+
+			// Handle both direct data and wrapped response (defensive)
+			const data: ItemTree | any = (tree as any).data || tree;
+
 			if (data && typeof data === 'object') {
 				Object.entries(data).forEach(([categorySlug, items]) => {
-					normalizedTree[categorySlug] = Array.isArray(items) ? items : [];
+					normalizedTree[categorySlug] = Array.isArray(items) ? (items as Item[]) : [];
 				});
 			}
-			
+
 			console.log('Normalized tree:', normalizedTree);
 			itemTree.set(normalizedTree);
 			return normalizedTree;
 		} catch (e: any) {
-			const errorMessage = e.message || 'Failed to fetch items';
+			const errorMessage = e?.message || 'Failed to fetch items';
 			console.error('Fetch error:', e);
 			error.set(errorMessage);
-			const emptyTree = {};
+			const emptyTree: ItemTree = {};
 			itemTree.set(emptyTree);
 			return emptyTree;
 		} finally {
@@ -71,7 +56,7 @@ function createItemStore() {
 			await fetchItemTree();
 			return createdItem;
 		} catch (e: any) {
-			const errorMessage = e.message || 'Failed to add item';
+			const errorMessage = e?.message || 'Failed to add item';
 			error.set(errorMessage);
 			return undefined;
 		} finally {
@@ -91,7 +76,7 @@ function createItemStore() {
 			await fetchItemTree();
 			return updatedItem;
 		} catch (e: any) {
-			const errorMessage = e.message || 'Failed to update item';
+			const errorMessage = e?.message || 'Failed to update item';
 			error.set(errorMessage);
 			return undefined;
 		} finally {
@@ -100,7 +85,8 @@ function createItemStore() {
 	};
 
 	const toggleItemCompletion = async (item: Item): Promise<Item | undefined> => {
-		return updateItem(slugify(item.categories[0]), item.slug, {
+		const originalCategorySlug = slugify(item.categories[0]);
+		return updateItem(originalCategorySlug, item.slug, {
 			isCompleted: !item.isCompleted
 		});
 	};
@@ -121,7 +107,7 @@ function createItemStore() {
 			});
 			return true;
 		} catch (e: any) {
-			const errorMessage = e.message || 'Failed to delete item';
+			const errorMessage = e?.message || 'Failed to delete item';
 			error.set(errorMessage);
 			return false;
 		} finally {
@@ -135,7 +121,7 @@ function createItemStore() {
 		categories: { subscribe: categories.subscribe },
 		isLoading: { subscribe: isLoading.subscribe },
 		error: { subscribe: error.subscribe },
-		
+
 		// Actions
 		fetchItemTree,
 		addItem,

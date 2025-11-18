@@ -1,6 +1,5 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import ItemForm from '$lib/components/items/ItemForm.svelte';
 	import ItemItem from '$lib/components/items/ItemItem.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -10,15 +9,18 @@
 	import Button from '$lib/components/common/Button.svelte';
 	import { useItemStore } from '$lib/stores/itemStore';
 	import { useItemFilters } from '$lib/composables/useItemFilters';
-	import type { Item } from '$lib/types';
+	import type { Item, ItemTree } from '$lib/types';
 	import { slugify } from '$lib/utils/slugify';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 
 	const itemStore = useItemStore();
 
-	// Reactive state using runes
-	let itemTree = $state<Record<string, Item[]>>({});
+	// Reactive state using runes, seeded from load() data
+	let itemTree = $state<ItemTree>(data.itemTree ?? {});
 	let isLoading = $state(false);
-	let error = $state<string | null>(null);
+	let error = $state<string | null>(data.initialLoadError ?? null);
 
 	// Modal state
 	let showFormModal = $state(false);
@@ -104,7 +106,7 @@
 	const handleFormSubmit = async (formData: any) => {
 		console.log('handleFormSubmit called with:', formData);
 		console.log('editingItem:', editingItem);
-		
+
 		isSubmittingForm = true;
 		try {
 			if (editingItem?.id) {
@@ -117,16 +119,16 @@
 				const result = await itemStore.addItem(formData);
 				console.log('Add result:', result);
 			}
-			
+
 			console.log('Closing modal and refreshing data');
 			showFormModal = false;
 			editingItem = null;
 			prefilledCategory = '';
-			
+
 			// Refresh data
 			await fetchItemTree();
-		} catch (error) {
-			console.error('Error in handleFormSubmit:', error);
+		} catch (err) {
+			console.error('Error in handleFormSubmit:', err);
 		} finally {
 			isSubmittingForm = false;
 		}
@@ -157,34 +159,29 @@
 		}
 	};
 
-	// Initialize data
+	// Fetch helper used for retry and post‑mutation refresh
 	const fetchItemTree = async () => {
 		isLoading = true;
 		error = null;
 		try {
-			const data = await itemStore.fetchItemTree();
-			console.log('Fetched data in component:', data);
-			itemTree = data;
+			const dataTree = await itemStore.fetchItemTree();
+			console.log('Fetched data in component:', dataTree);
+			itemTree = dataTree;
 		} catch (err) {
 			console.error('Error in component:', err);
 			error = err instanceof Error ? err.message : 'Failed to fetch items';
-			itemTree = {}; // Reset to empty object on error
+			itemTree = {} as ItemTree; // Reset to empty object on error
 		} finally {
 			isLoading = false;
 		}
 	};
-
-	onMount(async () => {
-		await fetchItemTree();
-	});
 </script>
 
-<!-- Rest of the template remains the same -->
 <div class="min-h-screen bg-neutral-900 text-neutral-100">
 	<div class="flex">
 		<!-- Sidebar -->
 		<AppSidebar
-			searchQuery={searchQueryValue}
+			{searchQueryValue}
 			onSearchQueryChange={setSearchQuery}
 			availableTags={allTagsValue}
 			selectedTags={selectedTagsValue}
@@ -219,7 +216,6 @@
 				showCompleted={showCompletedValue}
 				onShowCompletedChange={setShowCompleted}
 			/>
-
 			{#if hasActiveFiltersValue}
 				<div class="mb-4">
 					<Button onclick={clearAllFilters} variant="text" size="sm">
@@ -228,8 +224,9 @@
 				</div>
 			{/if}
 
-			<!-- Loading State -->
+			<!-- Loading / Error / Data -->
 			{#if isLoading}
+				<!-- Loading State -->
 				<div class="flex items-center justify-center py-12">
 					<div class="text-neutral-400">Loading items...</div>
 				</div>
@@ -268,11 +265,11 @@
 									<h2 class="text-xl font-semibold capitalize text-neutral-200">
 										{categoryName.replace(/-/g, ' ')}
 									</h2>
-									<Button 
-										variant="text" 
-										size="sm" 
-										onclick={() => openAddModal(categoryName)} 
-										icon="Plus" 
+									<Button
+										variant="text"
+										size="sm"
+										onclick={() => openAddModal(categoryName)}
+										icon="Plus"
 										iconOnly
 										class="ml-2 text-blue-400 hover:text-blue-300"
 									/>
@@ -292,31 +289,31 @@
 					{/each}
 				{/if}
 			{/if}
+
+			<!-- Add/Edit Modal -->
+			<Modal bind:isOpen={showFormModal} title={editingItem ? 'Edit Item' : 'New Item'}>
+				<ItemForm
+					item={editingItem}
+					isLoading={isSubmittingForm}
+					prefilledCategory={prefilledCategory}
+					onSubmit={handleFormSubmit}
+					onCancel={() => {
+						console.log('Modal cancel clicked');
+						showFormModal = false;
+					}}
+				/>
+			</Modal>
+
+			<!-- Delete Confirmation -->
+			<ConfirmDeleteModal
+				bind:isOpen={showDeleteConfirm}
+				title="Delete Item"
+				message={deleteConfirmationMessage}
+				confirmText="Delete"
+				isLoading={isDeleting}
+				onConfirm={executeDelete}
+				onClose={() => (showDeleteConfirm = false)}
+			/>
 		</div>
 	</div>
 </div>
-
-<!-- Add/Edit Modal -->
-<Modal bind:isOpen={showFormModal} title={editingItem ? 'Edit Item' : 'New Item'}>
-	<ItemForm
-		item={editingItem}
-		isLoading={isSubmittingForm}
-		prefilledCategory={prefilledCategory}
-		onSubmit={handleFormSubmit}
-		onCancel={() => {
-			console.log('Modal cancel clicked');
-			showFormModal = false;
-		}}
-	/>
-</Modal>
-
-<!-- Delete Confirmation -->
-<ConfirmDeleteModal
-	bind:isOpen={showDeleteConfirm}
-	title="Delete Item"
-	message={deleteConfirmationMessage}
-	confirmText="Delete"
-	isLoading={isDeleting}
-	onConfirm={executeDelete}
-	onCancel={() => (showDeleteConfirm = false)}
-/>

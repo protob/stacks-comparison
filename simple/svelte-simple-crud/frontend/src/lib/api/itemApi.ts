@@ -1,22 +1,6 @@
+// src/lib/api/itemApi.ts
 import { get, post, patch, del } from './apiClient';
-import type { Item, Priority } from '$lib/types';
-
-export interface CreateItemPayload {
-	name: string;
-	text: string;
-	priority: Priority;
-	tags?: string[];
-	categories: string[];
-}
-
-export interface UpdateItemPayload extends Partial<Omit<CreateItemPayload, 'categories'>> {
-	isCompleted?: boolean;
-	categories?: string[];
-}
-
-export interface ItemTree {
-	[categorySlug: string]: Item[];
-}
+import type { Item, ItemTree, CreateItemPayload, UpdateItemPayload } from '$lib/types';
 
 export async function getItemTree(): Promise<ItemTree> {
 	return get<ItemTree>('/items/tree');
@@ -41,6 +25,11 @@ export async function updateItem(
 	);
 }
 
-export async function deleteItem(categorySlug: string, itemSlug: string): Promise<{ deleted: boolean }> {
-	return del<{ deleted: boolean }>(`/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`);
+export async function deleteItem(
+	categorySlug: string,
+	itemSlug: string
+): Promise<{ deleted: boolean }> {
+	return del<{ deleted: boolean }>(
+		`/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`
+	);
 }
