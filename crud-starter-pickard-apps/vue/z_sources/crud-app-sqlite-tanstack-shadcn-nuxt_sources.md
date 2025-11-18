@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 04:34:58 CET
+**Generated on:** wto, 18 lis 2025, 04:38:12 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -322,7 +322,8 @@ const toggleComplete = (value: boolean) => {
     if (!props.item?.id) return;
 
     updateItem({
-        id: props.item.id,
+        categorySlug: props.item.categorySlug,
+        itemSlug: props.item.slug,
         payload: { isCompleted: value },
     });
 };
@@ -331,7 +332,10 @@ const handleDelete = () => {
     if (!props.item?.id) return;
 
     if (confirm("Are you sure you want to delete this item?")) {
-        deleteItem(props.item.id);
+        deleteItem({
+            categorySlug: props.item.categorySlug,
+            itemSlug: props.item.slug,
+        });
     }
 };
 </script>
@@ -1777,10 +1781,7 @@ export interface FilterOptions {
   selectedTags: string[];
 }
 
-export function useItemFilters(
-  itemTree: Ref<ItemTree | undefined>,
-  filters: ComputedRef<FilterOptions>, // Changed from Ref to ComputedRef
-) {
+export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: ComputedRef<FilterOptions>) {
   const allTags = computed(() => {
     if (!itemTree.value) return [];
 
@@ -1798,33 +1799,38 @@ export function useItemFilters(
 
     const filtered: Record<string, Item[]> = {};
 
-    Object.entries(itemTree.value).forEach(([categoryName, items]) => {
-      const filteredItems = items.filter((item) => {
-        if (filters.value.searchQuery.trim()) {
-          const query = filters.value.searchQuery.toLowerCase();
-          const matchesSearch =
-            item.name.toLowerCase().includes(query) || item.text.toLowerCase().includes(query) || item.tags?.some((tag) => tag.toLowerCase().includes(query));
-          if (!matchesSearch) return false;
-        }
+    Object.entries(itemTree.value).forEach(([categorySlug, items]) => {
+      const filteredItems = items
+        .map((item) => ({
+          ...item,
+          categorySlug, // ADD categorySlug to each item
+        }))
+        .filter((item) => {
+          if (filters.value.searchQuery.trim()) {
+            const query = filters.value.searchQuery.toLowerCase();
+            const matchesSearch =
+              item.name.toLowerCase().includes(query) || item.text.toLowerCase().includes(query) || item.tags?.some((tag) => tag.toLowerCase().includes(query));
+            if (!matchesSearch) return false;
+          }
 
-        if (filters.value.selectedPriority !== "all" && item.priority !== filters.value.selectedPriority) {
-          return false;
-        }
+          if (filters.value.selectedPriority !== "all" && item.priority !== filters.value.selectedPriority) {
+            return false;
+          }
 
-        if (!filters.value.showCompleted && item.isCompleted) {
-          return false;
-        }
+          if (!filters.value.showCompleted && item.isCompleted) {
+            return false;
+          }
 
-        if (filters.value.selectedTags.length > 0) {
-          const hasMatchingTag = filters.value.selectedTags.some((selectedTag) => item.tags?.includes(selectedTag));
-          if (!hasMatchingTag) return false;
-        }
+          if (filters.value.selectedTags.length > 0) {
+            const hasMatchingTag = filters.value.selectedTags.some((selectedTag) => item.tags?.includes(selectedTag));
+            if (!hasMatchingTag) return false;
+          }
 
-        return true;
-      });
+          return true;
+        });
 
       if (filteredItems.length > 0) {
-        filtered[categoryName] = filteredItems;
+        filtered[categorySlug] = filteredItems;
       }
     });
 
@@ -1883,7 +1889,8 @@ export function useUpdateItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateItemPayload }) => updateItem(id, payload), // Changed from number to string
+    mutationFn: ({ categorySlug, itemSlug, payload }: { categorySlug: string; itemSlug: string; payload: UpdateItemPayload }) =>
+      updateItem(categorySlug, itemSlug, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item updated successfully");
@@ -1898,7 +1905,7 @@ export function useDeleteItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
   return useMutation({
-    mutationFn: deleteItem,
+    mutationFn: ({ categorySlug, itemSlug }: { categorySlug: string; itemSlug: string }) => deleteItem(categorySlug, itemSlug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item deleted successfully");
@@ -1911,40 +1918,23 @@ export function useDeleteItem() {
 
 ```
 
-## `app/composables/zz2del-useThemeUpdater.ts`
-```
-import { useUiStore } from '@/stores/uiStore';
-
-export function useThemeUpdater() {
-  const uiStore = useUiStore();
-  const colorMode = useColorMode();
-
-  watch(
-    () => uiStore.theme,
-    (newTheme) => {
-      colorMode.preference = newTheme;
-    },
-    { immediate: true }
-  );
-}
-```
-
 ## `app/types/index.ts`
 ```
 export type Priority = "low" | "mid" | "high";
 export type NotificationType = "success" | "error" | "warning" | "info";
 
-export type SingleCategory<T = string> = [T]; // Changed from number to string
+export type SingleCategory<T = string> = [T];
 
 export interface Item {
-  id: string; // Changed from number to string (UUID)
+  id: string;
   name: string;
   text: string;
   priority: Priority;
   isCompleted: boolean;
   slug: string;
   tags?: string[];
-  categories: string[]; // Changed from SingleCategory<number> to string[]
+  categories: string[];
+  categorySlug: string; // ADD THIS - the category slug from the tree key
   createdAt: string;
   updatedAt: string;
 }
@@ -1965,7 +1955,6 @@ export interface UpdateItemPayload extends Partial<CreateItemPayload> {
   isCompleted?: boolean;
 }
 
-// Add API response wrapper types
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -3058,10 +3047,15 @@ import { get, post, patch, del } from "./apiClient";
 import type { Item, ItemTree, CreateItemPayload, UpdateItemPayload } from "~/types";
 
 export const getItemTree = () => get<ItemTree>("items/tree");
+
 export const getItemBySlug = (categorySlug: string, itemSlug: string) => get<Item>(`items/${categorySlug}/${itemSlug}`);
+
 export const createItem = (payload: CreateItemPayload) => post<Item, CreateItemPayload>("items", payload);
-export const updateItem = (id: string, payload: UpdateItemPayload) => patch<Item, UpdateItemPayload>(`items/${id}`, payload); // Changed from number to string
-export const deleteItem = (id: string) => del(`items/${id}`); // Changed from number to string
+
+export const updateItem = (categorySlug: string, itemSlug: string, payload: UpdateItemPayload) =>
+  patch<Item, UpdateItemPayload>(`items/${categorySlug}/${itemSlug}`, payload);
+
+export const deleteItem = (categorySlug: string, itemSlug: string) => del(`items/${categorySlug}/${itemSlug}`);
 
 ```
 
