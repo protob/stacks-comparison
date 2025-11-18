@@ -1,7 +1,3 @@
-Of course, here is the updated, comprehensive technical documentation for the `crud-app-sqlite` frontend codebase. This new `README.md` reflects the integration of `shadcn/ui` and other changes based on the provided source files.
-
----
-
 # (Technical Documentation) Items App - Frontend
 
 **This document serves as a detailed technical guide for developers (human or AI) interacting with the `crud-app-sqlite` frontend codebase. Its purpose is to provide a comprehensive understanding of the architecture, design system, state management, and development practices.**
