@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 19:20:23 CET
+**Generated on:** wto, 18 lis 2025, 19:33:02 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-kit
 
 ---
@@ -724,7 +724,7 @@ export const options = {
 		app: ({ head, body, assets, nonce, env }) => "<!doctype html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"utf-8\" />\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n\t\t" + head + "\n\t</head>\n\t<body data-sveltekit-preload-data=\"hover\">\n\t\t<div style=\"display: contents\">" + body + "</div>\n\t</body>\n</html>\n",
 		error: ({ status, message }) => "<!doctype html>\n<html lang=\"en\">\n\t<head>\n\t\t<meta charset=\"utf-8\" />\n\t\t<title>" + message + "</title>\n\n\t\t<style>\n\t\t\tbody {\n\t\t\t\t--bg: white;\n\t\t\t\t--fg: #222;\n\t\t\t\t--divider: #ccc;\n\t\t\t\tbackground: var(--bg);\n\t\t\t\tcolor: var(--fg);\n\t\t\t\tfont-family:\n\t\t\t\t\tsystem-ui,\n\t\t\t\t\t-apple-system,\n\t\t\t\t\tBlinkMacSystemFont,\n\t\t\t\t\t'Segoe UI',\n\t\t\t\t\tRoboto,\n\t\t\t\t\tOxygen,\n\t\t\t\t\tUbuntu,\n\t\t\t\t\tCantarell,\n\t\t\t\t\t'Open Sans',\n\t\t\t\t\t'Helvetica Neue',\n\t\t\t\t\tsans-serif;\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: center;\n\t\t\t\theight: 100vh;\n\t\t\t\tmargin: 0;\n\t\t\t}\n\n\t\t\t.error {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tmax-width: 32rem;\n\t\t\t\tmargin: 0 1rem;\n\t\t\t}\n\n\t\t\t.status {\n\t\t\t\tfont-weight: 200;\n\t\t\t\tfont-size: 3rem;\n\t\t\t\tline-height: 1;\n\t\t\t\tposition: relative;\n\t\t\t\ttop: -0.05rem;\n\t\t\t}\n\n\t\t\t.message {\n\t\t\t\tborder-left: 1px solid var(--divider);\n\t\t\t\tpadding: 0 0 0 1rem;\n\t\t\t\tmargin: 0 0 0 1rem;\n\t\t\t\tmin-height: 2.5rem;\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t}\n\n\t\t\t.message h1 {\n\t\t\t\tfont-weight: 400;\n\t\t\t\tfont-size: 1em;\n\t\t\t\tmargin: 0;\n\t\t\t}\n\n\t\t\t@media (prefers-color-scheme: dark) {\n\t\t\t\tbody {\n\t\t\t\t\t--bg: #222;\n\t\t\t\t\t--fg: #ddd;\n\t\t\t\t\t--divider: #666;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>\n\t</head>\n\t<body>\n\t\t<div class=\"error\">\n\t\t\t<span class=\"status\">" + status + "</span>\n\t\t\t<div class=\"message\">\n\t\t\t\t<h1>" + message + "</h1>\n\t\t\t</div>\n\t\t</div>\n\t</body>\n</html>\n"
 	},
-	version_hash: "1mz27w6"
+	version_hash: "3f269c"
 };
 
 export async function get_hooks() {
@@ -1280,6 +1280,362 @@ export {};
     </form>
   </DialogContent>
 </Dialog>
+```
+
+## `src/lib/components/items/ItemItem.svelte`
+```
+<script lang="ts">
+   import { Badge } from '$lib/components/ui/badge';
+   import { Button } from '$lib/components/ui/button';
+   import { Checkbox } from '$lib/components/ui/checkbox';
+   import { useUpdateItem, useDeleteItem } from '$lib/api/itemsQuery';
+   import { formatDate } from '$lib/utils/helpers';
+   import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
+   import type { Item } from '$lib/types';
+   import { Pencil, Trash2 } from '@lucide/svelte';
+ 
+   let { item } = $props<{ item: Item }>();
+ 
+   const { mutate: updateItem } = useUpdateItem();
+   const { mutate: deleteItem } = useDeleteItem();
+ 
+   function toggleComplete() {
+     updateItem({
+       id: item.id,
+       payload: { isCompleted: !item.isCompleted },
+     });
+   }
+ 
+   function handleDelete() {
+     if (confirm('Are you sure you want to delete this item?')) {
+       deleteItem(item.id);
+     }
+   }
+ </script>
+ 
+<div class="flex items-start gap-4 p-4 border rounded-lg bg-card opacity-60" class:opacity-100={!item.isCompleted}>
+    <div class="mt-1">
+      <Checkbox
+        checked={item.isCompleted}
+        onchange={toggleComplete}
+      />
+    </div>
+    <div class="flex-1">
+      <div class="flex items-center justify-between">
+          <h3 
+            class="text-lg font-semibold"
+            class:line-through={item.isCompleted}
+            class:text-muted-foreground={item.isCompleted}
+          >
+            {item.name}
+          </h3>
+           <Badge class="tag-priority-{item.priority}" variant="outline">
+             {item.priority}
+           </Badge>
+      </div>
+      <p class="mb-3 text-muted-foreground">{item.text}</p>
+
+      <div class="flex items-center justify-between">
+          <p class="text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
+          <div class="flex gap-2">
+              <Button size="sm" variant="ghost" onclick={() => uiStore.openForm(item)}>
+                  <Pencil class="w-4 h-4" />
+              </Button>
+              <Button size="sm" variant="destructive" onclick={handleDelete}>
+                  <Trash2 class="w-4 h-4" />
+              </Button>
+          </div>
+      </div>
+
+      <div class="flex gap-2 mt-3">
+        {#each item.tags as tag (tag)}
+          <Badge variant="secondary">{tag}</Badge>
+        {/each}
+      </div>
+    </div>
+</div>
+```
+
+## `src/lib/components/items/ItemForm.svelte`
+```
+<script lang="ts">
+  import { Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
+  import { Label } from '$lib/components/ui/label';
+  import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group';
+  import { Badge } from '$lib/components/ui/badge';
+  import { useAddItem, useUpdateItem } from '$lib/api/itemsQuery'; // Import update hook
+  import { itemFormSchema } from '$lib/schemas/itemSchema';
+  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
+
+  let { onClose } = $props<{ onClose: () => void }>();
+
+  const { mutate: addItem } = useAddItem();
+  const { mutate: updateItem } = useUpdateItem();
+
+  let currentTag = $state('');
+  
+  // Initialize form data based on uiStore.editingItem
+  let formData = $state({
+    name: uiStore.editingItem?.name || '',
+    text: uiStore.editingItem?.text || '',
+    priority: (uiStore.editingItem?.priority || 'mid') as 'low' | 'mid' | 'high',
+    tags: uiStore.editingItem?.tags ? [...uiStore.editingItem.tags] : [] as string[],
+    categories: [uiStore.preselectedCategory || (uiStore.editingItem?.categories?.[0] ? String(uiStore.editingItem.categories[0]) : 'general')] as [string],
+  });
+
+  let errors = $state<Record<string, string>>({});
+
+  function validateForm() {
+    errors = {};
+    const result = itemFormSchema.safeParse(formData);
+    
+    if (!result.success) {
+      result.error.errors.forEach((error) => {
+        errors[error.path[0] as string] = error.message;
+      });
+      return false;
+    }
+    return true;
+  }
+
+  function handleSubmit() {
+    if (!validateForm()) return;
+
+    const payload = {
+      ...formData,
+      categories: [formData.categories[0]] as [string] // Ensure tuple type for API
+    };
+
+    const onSuccess = () => {
+      if (onClose) onClose();
+    };
+
+    if (uiStore.editingItem) {
+      updateItem({
+        id: uiStore.editingItem.id,
+        payload: payload
+      }, { onSuccess });
+    } else {
+      addItem(payload, { onSuccess });
+    }
+  }
+
+  function addTag() {
+    const newTag = currentTag.trim();
+    if (newTag && !formData.tags.includes(newTag)) {
+      formData.tags = [...formData.tags, newTag];
+    }
+    currentTag = '';
+  }
+
+  function removeTag(tagToRemove: string) {
+    formData.tags = formData.tags.filter(tag => tag !== tagToRemove);
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      addTag();
+    }
+  }
+</script>
+
+<Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>{uiStore.editingItem ? 'Edit Task' : 'Add New Task'}</DialogTitle>
+    </DialogHeader>
+    
+    <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-4">
+      <!-- Name Field -->
+      <div>
+        <Label for="name">Task Name</Label>
+        <Input
+          id="name"
+          bind:value={formData.name}
+          placeholder="e.g., Finalize project report"
+        />
+        {#if errors.name}
+          <p class="mt-1 text-sm text-destructive">{errors.name}</p>
+        {/if}
+      </div>
+
+      <!-- Description Field -->
+      <div>
+        <Label for="text">Description</Label>
+        <Input
+          id="text"
+          bind:value={formData.text}
+          placeholder="Add more details about task..."
+        />
+        {#if errors.text}
+          <p class="mt-1 text-sm text-destructive">{errors.text}</p>
+        {/if}
+      </div>
+
+      <!-- Category Field -->
+      <div>
+        <Label for="category">Category</Label>
+        <Input
+          id="category"
+          bind:value={formData.categories[0]}
+          placeholder="e.g., Work"
+        />
+        {#if errors.categories}
+          <p class="mt-1 text-sm text-destructive">{errors.categories}</p>
+        {/if}
+      </div>
+
+      <!-- Priority Field -->
+      <div>
+        <Label>Priority</Label>
+        <RadioGroup
+          bind:value={formData.priority}
+          class="flex items-center gap-4 mt-2"
+        >
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="p-low" value="low" />
+            <Label for="p-low">Low</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="p-mid" value="mid" />
+            <Label for="p-mid">Mid</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="p-high" value="high" />
+            <Label for="p-high">High</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <!-- Tags Field -->
+      <div>
+        <Label>Tags</Label>
+        <div class="flex items-center gap-2 mt-2">
+          <Input
+            bind:value={currentTag}
+            onkeydown={handleKeydown}
+            placeholder="Add a tag..."
+          />
+          <Button type="button" variant="outline" onclick={addTag}>Add</Button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-2">
+          {#each formData.tags as tag (tag)}
+            <Badge
+              variant="secondary"
+              class="cursor-pointer"
+              onclick={() => removeTag(tag)}
+            >
+              {tag} ×
+            </Badge>
+          {/each}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-2 pt-4">
+        <Button type="button" variant="outline" onclick={onClose}>Cancel</Button>
+        <Button type="submit">{uiStore.editingItem ? 'Update' : 'Create'} Task</Button>
+      </div>
+    </form>
+  </DialogContent>
+</Dialog>
+```
+
+## `src/lib/components/layout/FilterBar.svelte`
+```
+<script lang="ts">
+  import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group';
+  import { Label } from '$lib/components/ui/label';
+  import { Checkbox } from '$lib/components/ui/checkbox';
+  import { Button } from '$lib/components/ui/button';
+  import { createEventDispatcher } from 'svelte';
+
+  let { 
+    priority = $bindable('all'),
+    showCompleted = $bindable(true),
+    hasActiveFilters = false,
+    allTags = [],
+    selectedTags = $bindable([]),
+    search = $bindable('')
+  } = $props();
+
+  const dispatch = createEventDispatcher();
+
+  function handleClear() {
+    dispatch('clear');
+  }
+</script>
+
+<div class="p-4 space-y-4 border rounded-lg bg-surface border-border">
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div>
+      <Label class="block mb-2">Priority</Label>
+      <RadioGroup bind:value={priority} class="flex items-center gap-4">
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-all" value="all" />
+          <Label for="r-all">All</Label>
+        </div>
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-low" value="low" />
+          <Label for="r-low">Low</Label>
+        </div>
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-mid" value="mid" />
+          <Label for="r-mid">Mid</Label>
+        </div>
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-high" value="high" />
+          <Label for="r-high">High</Label>
+        </div>
+      </RadioGroup>
+    </div>
+
+    <div>
+      <Label class="block mb-2">Status</Label>
+      <div class="flex items-center gap-2">
+        <Checkbox
+          id="show-completed"
+          bind:checked={showCompleted}
+        />
+        <Label for="show-completed">Show Completed</Label>
+      </div>
+    </div>
+  </div>
+
+  {#if hasActiveFilters}
+    <Button
+      variant="ghost"
+      size="sm"
+      onclick={handleClear}
+      class="mt-4"
+    >
+      Clear Filters
+    </Button>
+  {/if}
+</div>
+```
+
+## `src/lib/components/layout/MainLayout.svelte`
+```
+<!-- src/lib/components/layout/MainLayout.svelte -->
+<script lang="ts">
+  import AppSidebar from '$lib/components/layout/AppSidebar.svelte';
+  import TopBar from '$lib/components/layout/TopBar.svelte';
+
+  export let currentPath: string;
+  export let onNavigate: (path: string) => void;
+</script>
+
+<div class="flex min-h-screen bg-background text-foreground">
+  <AppSidebar on:navigate={(e) => onNavigate(e.detail)} />
+  <div class="flex-1 max-w-5xl mx-auto p-fluid-6">
+    <TopBar currentPath={currentPath} on:navigate={(e) => onNavigate(e.detail)} />
+    <slot />
+  </div>
+</div>
 ```
 
 ## `src/lib/components/layout/layout/FilterBar.svelte`
@@ -2808,14 +3164,14 @@ export type Result<T, E> =
 ## `src/lib/pages/ItemPage.svelte`
 ```
 <script lang="ts">
-  import MainLayout from '$lib/components/layout/layout/MainLayout.svelte';
-  import { useItemTree } from '$lib/api/itemsQuery';
-  import { useItemFilters } from '$lib/utils/useItemFilters';
-  import FilterBar from '$lib/components/layout/layout/FilterBar.svelte';
-  import ItemItem from '$lib/components/items/items/ItemItem.svelte';
-  import ItemForm from '$lib/components/items/items/ItemForm.svelte';
-  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
-  import { Button } from '$lib/components/ui/button';
+  import MainLayout from 'lib/components/layout/MainLayout.svelte';
+  import { useItemTree } from 'lib/api/itemsQuery';
+  import { useItemFilters } from 'lib/utils/useItemFilters';
+  import FilterBar from 'lib/components/layout/FilterBar.svelte';
+  import ItemItem from 'lib/components/items/ItemItem.svelte';
+  import ItemForm from 'lib/components/items/ItemForm.svelte';
+  import { uiStore } from 'lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
+  import { Button } from 'lib/components/ui/button';
   import { Plus } from '@lucide/svelte'; // Import icon directly
 
   const itemTreeQuery = useItemTree();
@@ -3445,95 +3801,12 @@ export const load: PageLoad = async ({ params }) => {
 
 ## `src/routes/+page.svelte`
 ```
+<!-- /src/routes/+page.svelte -->
 <script lang="ts">
-  import { useItemTree } from '$lib/api/itemsQuery';
-  import { useItemFilters } from '$lib/utils/useItemFilters';
-  import FilterBar from '$lib/components/layout/FilterBar.svelte';
-  import ItemItem from '$lib/components/items/ItemItem.svelte';
-  import ItemForm from '$lib/components/items/ItemForm.svelte';
-  import { uiStore } from '$lib/stores/uiStore.svelte';
-  import { Button } from '$lib/components/ui/button';
-  import { Plus } from '@lucide/svelte';
-
-  const itemTreeQuery = useItemTree();
-
-  let filters = $state({
-    searchQuery: '',
-    selectedPriority: 'all' as const,
-    showCompleted: true,
-    selectedTags: [] as string[],
-  });
-
-  // Reactive derived state
-  let filterResults = $derived(useItemFilters(itemTreeQuery.data || {}, filters));
-  let filteredItemTree = $derived(filterResults.filteredItemTree);
-  let allTags = $derived(filterResults.allTags);
-  let hasActiveFilters = $derived(filterResults.hasActiveFilters);
-
-  function clearFilters() {
-    filters = {
-      searchQuery: '',
-      selectedPriority: 'all',
-      showCompleted: true,
-      selectedTags: [],
-    };
-  }
+  import ItemPage from 'lib/pages/ItemPage.svelte';
 </script>
 
-<header class="mb-6">
-  <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
-</header>
-
-<FilterBar
-  bind:search={filters.searchQuery}
-  bind:priority={filters.selectedPriority}
-  bind:showCompleted={filters.showCompleted}
-  bind:selectedTags={filters.selectedTags}
-  {allTags}
-  {hasActiveFilters}
-  on:clear={clearFilters}
- />
-
-{#if itemTreeQuery.isLoading}
-  <div class="py-10">Loading...</div>
-{:else if itemTreeQuery.error}
-  <div class="text-destructive">Error: {itemTreeQuery.error.message}</div>
-{:else}
-  <div class="mt-6 space-y-8">
-    {#each Object.entries(filteredItemTree) as [category, items]}
-      <section>
-        <div class="flex items-center gap-2 mb-4">
-          <h2 class="font-semibold capitalize text-size-xl">{category}</h2>
-          <span class="text-sm text-text-muted">({items.length})</span>
-          <Button 
-            variant="ghost" 
-            size="icon-sm" 
-            onclick={() => uiStore.openForm(undefined, category)}
-          >
-            <Plus class="w-4 h-4" />
-          </Button>
-        </div>
-        <div class="grid gap-4">
-          {#each items as item (item.id)}
-            <ItemItem {item} />
-          {/each}
-        </div>
-      </section>
-    {/each}
-    {#if Object.keys(filteredItemTree).length === 0 && !itemTreeQuery.isLoading}
-      <div class="py-10 text-center text-text-muted">
-        <p>No items found.</p>
-        {#if hasActiveFilters}
-          <p>Try adjusting your filters.</p>
-        {/if}
-      </div>
-    {/if}
-  </div>
-{/if}
-
-{#if uiStore.isFormOpen}
-  <ItemForm onClose={() => uiStore.closeForm()} />
-{/if}
+<ItemPage />
 ```
 
 ## `components.json`
