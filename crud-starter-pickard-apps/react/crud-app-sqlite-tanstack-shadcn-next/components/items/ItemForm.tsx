@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Item, Priority } from '@/types';
-import { itemSchema } from '@/schemas/itemSchema';
 import { useItemsApi } from '@/hooks/useItemsApi';
 import { slugify } from '@/utils/slugify';
 
@@ -48,9 +47,6 @@ export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
         console.error('Failed to save item:', error);
       }
     },
-    // validators: {
-    //   onChange: itemSchema,
-    // },
   });
 
   const isPending = createItemMutation.isPending || updateItemMutation.isPending;
@@ -80,9 +76,9 @@ export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Enter item title"
                 />
-                {field.state.meta.errors.length > 0 && (
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                   <p className="text-sm text-destructive">
-                    {field.state.meta.errors[0]?.message}
+                    Error in this field
                   </p>
                 )}
               </div>
@@ -101,9 +97,9 @@ export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
                   placeholder="Enter item description"
                   rows={3}
                 />
-                {field.state.meta.errors.length > 0 && (
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                   <p className="text-sm text-destructive">
-                    {field.state.meta.errors[0]?.message}
+                    Error in this field
                   </p>
                 )}
               </div>
@@ -121,9 +117,9 @@ export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Enter category"
                 />
-                {field.state.meta.errors.length > 0 && (
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                   <p className="text-sm text-destructive">
-                    {field.state.meta.errors[0]?.message}
+                    Error in this field
                   </p>
                 )}
               </div>
@@ -148,9 +144,9 @@ export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
                     <SelectItem value="high">High</SelectItem>
                   </SelectContent>
                 </Select>
-                {field.state.meta.errors.length > 0 && (
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                   <p className="text-sm text-destructive">
-                    {field.state.meta.errors[0]?.message}
+                    Error in this field
                   </p>
                 )}
               </div>
