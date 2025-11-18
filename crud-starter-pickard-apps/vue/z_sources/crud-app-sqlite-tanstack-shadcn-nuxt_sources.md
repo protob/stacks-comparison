@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 04:38:12 CET
+**Generated on:** wto, 18 lis 2025, 04:55:11 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -1738,8 +1738,10 @@ import TopBar from "~/components/layout/TopBar.vue";
 ```
 <script setup lang="ts">
 import { Toaster } from "@/components/ui/sonner";
+import { useColorMode } from "@vueuse/core";
 
-// Color mode is now handled automatically by @nuxtjs/color-mode
+// Initialize color mode early
+const colorMode = useColorMode();
 </script>
 
 <template>
@@ -1850,7 +1852,7 @@ export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Com
 import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query";
 import { getItemTree, getItemBySlug, createItem, updateItem, deleteItem } from "~/api/itemApi";
 import { useUiStore } from "~/stores/uiStore";
-import type { CreateItemPayload, UpdateItemPayload } from "~/types";
+import type { CreateItemPayload, UpdateItemPayload, Item } from "~/types";
 
 export const itemKeys = {
   all: ["items"] as const,
@@ -1891,12 +1893,36 @@ export function useUpdateItem() {
   return useMutation({
     mutationFn: ({ categorySlug, itemSlug, payload }: { categorySlug: string; itemSlug: string; payload: UpdateItemPayload }) =>
       updateItem(categorySlug, itemSlug, payload),
+    onMutate: async ({ categorySlug, itemSlug, payload }) => {
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: itemKeys.tree });
+
+      // Get previous data
+      const previousData = queryClient.getQueryData(itemKeys.tree);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(itemKeys.tree, (old: any) => {
+        if (!old) return old;
+
+        const newData = { ...old };
+        if (newData[categorySlug]) {
+          newData[categorySlug] = newData[categorySlug].map((item: Item) => (item.slug === itemSlug ? { ...item, ...payload } : item));
+        }
+        return newData;
+      });
+
+      return { previousData };
+    },
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(itemKeys.tree, context.previousData);
+      }
+      uiStore.showNotification("error", error.message || "Failed to update item");
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item updated successfully");
-    },
-    onError: (error: any) => {
-      uiStore.showNotification("error", error.message || "Failed to update item");
     },
   });
 }
@@ -3128,41 +3154,25 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 ```
 
-## `app/plugins/color-mode-script.client.ts`
-```
-export default defineNuxtPlugin(() => {
-  // This runs early on client-side to prevent flash
-  const colorMode = useColorMode();
-
-  // Force immediate class application
-  if (process.client) {
-    const root = document.documentElement;
-    if (colorMode.value === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }
-});
-
-```
-
 ## `nuxt.config.ts`
 ```
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: ["@nuxt/icon", "shadcn-nuxt", "@vueuse/nuxt", "@pinia/nuxt", "@peterbud/nuxt-query", "@nuxtjs/color-mode"],
   css: ["~/assets/css/tailwind.css", "~/assets/css/main.css"],
-  // css: ["~/assets/css/tailwind.css"],
+
   colorMode: {
     classSuffix: "",
     preference: "system",
     fallback: "light",
     storageKey: "theme",
+    hid: "nuxt-color-mode-script", // Important for SSR
   },
+
   nuxtQuery: {
     autoImports: ["useQuery", "useMutation", "useQueryClient"],
     queryClientOptions: {
@@ -3174,18 +3184,9 @@ export default defineNuxtConfig({
       },
     },
   },
+
   shadcn: {
-    /**
-     * Prefix for all the imported component.
-     * @default "Ui"
-     */
     prefix: "",
-    /**
-     * Directory that the component lives in.
-     * Will respect the Nuxt aliases.
-     * @link https://nuxt.com/docs/api/nuxt-config#alias
-     * @default "@/components/ui"
-     */
     componentDir: "@/components/ui",
   },
 
