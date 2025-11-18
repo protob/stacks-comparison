@@ -14,12 +14,12 @@ const { mutate: updateItem } = useUpdateItem();
 const { mutate: deleteItem } = useDeleteItem();
 const uiStore = useUiStore();
 
-const toggleComplete = () => {
+const toggleComplete = (value: boolean) => {
     if (!props.item?.id) return;
 
     updateItem({
         id: props.item.id,
-        payload: { isCompleted: !props.item.isCompleted },
+        payload: { isCompleted: value },
     });
 };
 
@@ -35,7 +35,7 @@ const handleDelete = () => {
 <template>
     <Card v-if="item" :class="{ 'opacity-60': item.isCompleted }">
         <CardContent class="flex items-start gap-4 p-4">
-            <Checkbox :checked="item.isCompleted" @update:checked="toggleComplete" class="mt-1" />
+            <Checkbox :checked="item.isCompleted" @update:modelValue="toggleComplete" class="mt-1" />
 
             <div class="flex-1">
                 <div class="flex items-center justify-between">

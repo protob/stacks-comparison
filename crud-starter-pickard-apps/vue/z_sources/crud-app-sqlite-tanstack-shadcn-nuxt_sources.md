@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 03:28:21 CET
+**Generated on:** wto, 18 lis 2025, 04:34:58 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -318,12 +318,12 @@ const { mutate: updateItem } = useUpdateItem();
 const { mutate: deleteItem } = useDeleteItem();
 const uiStore = useUiStore();
 
-const toggleComplete = () => {
+const toggleComplete = (value: boolean) => {
     if (!props.item?.id) return;
 
     updateItem({
         id: props.item.id,
-        payload: { isCompleted: !props.item.isCompleted },
+        payload: { isCompleted: value },
     });
 };
 
@@ -339,7 +339,7 @@ const handleDelete = () => {
 <template>
     <Card v-if="item" :class="{ 'opacity-60': item.isCompleted }">
         <CardContent class="flex items-start gap-4 p-4">
-            <Checkbox :checked="item.isCompleted" @update:checked="toggleComplete" class="mt-1" />
+            <Checkbox :checked="item.isCompleted" @update:modelValue="toggleComplete" class="mt-1" />
 
             <div class="flex-1">
                 <div class="flex items-center justify-between">
@@ -515,8 +515,17 @@ const filterStore = useFilterStore();
             <div>
                 <Label class="block mb-2">Status</Label>
                 <div class="flex items-center gap-2">
-                    <Checkbox id="show-completed" :checked="filterStore.showCompleted" @update:checked="(value) => (filterStore.showCompleted = !!value)" />
-                    <Label for="show-completed" class="cursor-pointer"> Show Completed Items </Label>
+                    <Checkbox
+                        id="show-completed"
+                        :checked="filterStore.showCompleted"
+                        @update:modelValue="(val) => (filterStore.showCompleted = val as boolean)"
+                    />
+                    <Label
+                        for="show-completed"
+                        class="text-sm font-medium leading-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                    >
+                        Show Completed Items
+                    </Label>
                 </div>
             </div>
         </div>
@@ -607,39 +616,39 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
 ## `app/components/ui/checkbox/Checkbox.vue`
 ```
 <script setup lang="ts">
-import type { CheckboxRootEmits, CheckboxRootProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import { reactiveOmit } from "@vueuse/core"
-import { Check } from "lucide-vue-next"
-import { CheckboxIndicator, CheckboxRoot, useForwardPropsEmits } from "reka-ui"
-import { cn } from "@/lib/utils"
+import type { CheckboxRootEmits, CheckboxRootProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import { reactiveOmit } from "@vueuse/core";
+import { Check } from "lucide-vue-next";
+import { CheckboxIndicator, CheckboxRoot, useForwardPropsEmits } from "reka-ui";
+import { cn } from "@/lib/utils";
 
-const props = defineProps<CheckboxRootProps & { class?: HTMLAttributes["class"] }>()
-const emits = defineEmits<CheckboxRootEmits>()
+const props = defineProps<CheckboxRootProps & { class?: HTMLAttributes["class"] }>();
+const emits = defineEmits<CheckboxRootEmits>();
 
-const delegatedProps = reactiveOmit(props, "class")
+const delegatedProps = reactiveOmit(props, "class");
 
-const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
-  <CheckboxRoot
-    v-slot="slotProps"
-    data-slot="checkbox"
-    v-bind="forwarded"
-    :class="
-      cn('peer border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
-         props.class)"
-  >
-    <CheckboxIndicator
-      data-slot="checkbox-indicator"
-      class="grid place-content-center text-current transition-none"
+    <CheckboxRoot
+        v-slot="slotProps"
+        data-slot="checkbox"
+        v-bind="forwarded"
+        :class="
+            cn(
+                'peer border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+                props.class,
+            )
+        "
     >
-      <slot v-bind="slotProps">
-        <Check class="size-3.5" />
-      </slot>
-    </CheckboxIndicator>
-  </CheckboxRoot>
+        <CheckboxIndicator data-slot="checkbox-indicator" class="grid place-content-center text-current transition-none">
+            <slot v-bind="slotProps">
+                <Check class="size-3.5" />
+            </slot>
+        </CheckboxIndicator>
+    </CheckboxRoot>
 </template>
 
 ```
@@ -684,6 +693,41 @@ const delegatedProps = reactiveOmit(props, "class")
 ## `app/components/ui/label/index.ts`
 ```
 export { default as Label } from "./Label.vue"
+
+```
+
+## `app/components/ui/checkbox-fix/Checkbox.vue`
+```
+<script setup lang="ts">
+import { ref, watch, defineEmits, defineProps } from "vue";
+import { Checkbox as ShadcnCheckbox } from "@/components/ui/checkbox";
+
+const props = defineProps<{ modelValue: boolean }>();
+const emit = defineEmits(["update:modelValue"]);
+
+const internalChecked = ref(props.modelValue);
+
+watch(
+    () => props.modelValue,
+    (val) => {
+        internalChecked.value = val;
+    },
+);
+
+function onCheckedChange(val: boolean) {
+    emit("update:modelValue", val);
+}
+</script>
+
+<template>
+    <ShadcnCheckbox :checked="internalChecked" @update:checked="onCheckedChange" />
+</template>
+
+```
+
+## `app/components/ui/checkbox-fix/index.ts`
+```
+export { default as CheckboxWrapper } from "./Checkbox.vue";
 
 ```
 
@@ -1188,6 +1232,55 @@ const forwardedProps = useForwardProps(delegatedProps)
 ```
 export { default as RadioGroup } from "./RadioGroup.vue"
 export { default as RadioGroupItem } from "./RadioGroupItem.vue"
+
+```
+
+## `app/components/ui/switch/Switch.vue`
+```
+<script setup lang="ts">
+import type { SwitchRootEmits, SwitchRootProps } from "reka-ui"
+import type { HTMLAttributes } from "vue"
+import { reactiveOmit } from "@vueuse/core"
+import {
+  SwitchRoot,
+  SwitchThumb,
+  useForwardPropsEmits,
+} from "reka-ui"
+import { cn } from "@/lib/utils"
+
+const props = defineProps<SwitchRootProps & { class?: HTMLAttributes["class"] }>()
+
+const emits = defineEmits<SwitchRootEmits>()
+
+const delegatedProps = reactiveOmit(props, "class")
+
+const forwarded = useForwardPropsEmits(delegatedProps, emits)
+</script>
+
+<template>
+  <SwitchRoot
+    v-slot="slotProps"
+    data-slot="switch"
+    v-bind="forwarded"
+    :class="cn(
+      'peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+      props.class,
+    )"
+  >
+    <SwitchThumb
+      data-slot="switch-thumb"
+      :class="cn('bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0')"
+    >
+      <slot name="thumb" v-bind="slotProps" />
+    </SwitchThumb>
+  </SwitchRoot>
+</template>
+
+```
+
+## `app/components/ui/switch/index.ts`
+```
+export { default as Switch } from "./Switch.vue"
 
 ```
 
