@@ -7,8 +7,10 @@
   import ItemForm from '$lib/components/items/ItemForm.svelte';
   import { uiStore } from '$lib/stores/uiStore';
   import { Button } from '$lib/components/ui/button';
+  import { createEventDispatcher } from 'svelte';
 
   const itemTreeQuery = useItemTree();
+  const dispatch = createEventDispatcher();
 
   let filters = {
     searchQuery: '',
@@ -17,7 +19,7 @@
     selectedTags: [] as string[],
   };
 
-  $: filterResults = useItemFilters($itemTreeQuery.data || {}, filters);
+  $: filterResults = useItemFilters(itemTreeQuery.data || {}, filters);
   $: filteredItemTree = filterResults.filteredItemTree;
   $: allTags = filterResults.allTags;
   $: hasActiveFilters = filterResults.hasActiveFilters;
@@ -30,9 +32,13 @@
       selectedTags: [],
     };
   }
+
+  function handleNavigate(path: string) {
+    dispatch('navigate', { path });
+  }
 </script>
 
-<MainLayout on:navigate>
+<MainLayout on:navigate={handleNavigate}>
   <header class="mb-6">
     <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
     <!-- The main "Add New Item" button remains in the sidebar -->
@@ -48,10 +54,10 @@
     on:clear={clearFilters}
   />
 
-  {#if $itemTreeQuery.isLoading}
+  {#if itemTreeQuery.isLoading}
     <div>Loading...</div>
-  {:else if $itemTreeQuery.error}
-    <div>Error: {$itemTreeQuery.error.message}</div>
+  {:else if itemTreeQuery.error}
+    <div>Error: {itemTreeQuery.error.message}</div>
   {:else}
     <div class="mt-6 space-y-8">
       {#each Object.entries(filteredItemTree) as [category, items]}
@@ -75,7 +81,7 @@
           </div>
         </section>
       {/each}
-      {#if Object.keys(filteredItemTree).length === 0 && !$itemTreeQuery.isLoading}
+      {#if Object.keys(filteredItemTree).length === 0 && !itemTreeQuery.isLoading}
         <div class="py-10 text-center text-text-muted">
           <p>No items found.</p>
           {#if hasActiveFilters}
@@ -87,7 +93,7 @@
   {/if}
 
   <!-- The ItemForm is now aware of pre-selected category -->
-  {#if $uiStore.isFormOpen}
-    <ItemForm on:close={() => uiStore.closeForm()} />
+  {#if uiStore.isFormOpen}
+    <ItemForm onClose={() => uiStore.closeForm()} />
   {/if}
 </MainLayout>
