@@ -138,3 +138,26 @@ As the matrix of choices grows (e.g., HTMX stacks vs. SPA stacks), a simple CLI 
     - **Architecture:** The Web App calls the existing CLI via REST/IPC.
     - **Presets:** Introduce "Presets" to handle valid combinations (e.g., restricting HTMX frontends to compatible backends).
     - **Goal:** The CLI remains the core engine, but the GUI handles the complexity of choice.
+
+========== OTHER TODOS =====================
+
+Here are the additional sections for your Roadmap/To-Do list, focusing on quality assurance, styling engines, and your custom UI library.
+
+### 4. Maintenance & Quality Assurance
+*Crucial for boilerplates: If the seed code is bad, the user's project starts bad.*
+
+- [ ] **Dependency Audit:** Update all dependencies across all existing and new applications to their latest stable versions.
+- [ ] **Idiomatic Code Reviews:**
+    - Conduct code reviews for each framework.
+- [ ] **Visual Coherence:**
+    - Enforce a strict "Theme Standardization."
+    - The React app, Svelte app, and Vue app must look **visually identical** (same layout, typography, spacing, and "feel"), regardless of the underlying tech.
+
+### 5. Styling & UI Ecosystem
+- [ ] **UnoCSS Variants:**
+    - While Tailwind CSS v4 is the current default, introduce **UnoCSS** starters.
+    - **Targets:** React, Vue, Svelte (Optional: Solid).
+- [ ] **Protobiont UI Integration:**
+    - Create a dedicated starter for your custom UI kit, **Protobiont UI**.
+    - *Current Status:* Vue/Nuxt + UnoCSS based.
+    - *Goal:* Make this a first-class selectable option in the scaffolder.
