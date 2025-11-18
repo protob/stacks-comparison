@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 02:44:21 CET
+**Generated on:** wto, 18 lis 2025, 03:19:21 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@nuxt/icon": "2.1.0",
+    "@nuxtjs/color-mode": "^4.0.0",
     "@pinia/nuxt": "0.11.3",
     "@tanstack/vue-form": "^1.25.0",
     "@tanstack/vue-query": "^5.91.2",
@@ -318,6 +319,8 @@ const { mutate: deleteItem } = useDeleteItem();
 const uiStore = useUiStore();
 
 const toggleComplete = () => {
+    if (!props.item?.id) return;
+
     updateItem({
         id: props.item.id,
         payload: { isCompleted: !props.item.isCompleted },
@@ -325,6 +328,8 @@ const toggleComplete = () => {
 };
 
 const handleDelete = () => {
+    if (!props.item?.id) return;
+
     if (confirm("Are you sure you want to delete this item?")) {
         deleteItem(props.item.id);
     }
@@ -332,9 +337,10 @@ const handleDelete = () => {
 </script>
 
 <template>
-    <Card :class="{ 'opacity-60': item.isCompleted }">
+    <Card v-if="item" :class="{ 'opacity-60': item.isCompleted }">
         <CardContent class="flex items-start gap-4 p-4">
             <Checkbox :checked="item.isCompleted" @update:checked="toggleComplete" class="mt-1" />
+
             <div class="flex-1">
                 <div class="flex items-center justify-between">
                     <h3 class="font-semibold text-size-lg" :class="{ 'line-through text-text-muted': item.isCompleted }">
@@ -344,10 +350,13 @@ const handleDelete = () => {
                         {{ item.priority }}
                     </Badge>
                 </div>
+
                 <p class="mb-3 text-text-secondary">{{ item.text }}</p>
 
                 <div class="flex items-center justify-between">
-                    <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
+                    <p class="text-xs text-text-muted">
+                        {{ formatDate(item.createdAt) }}
+                    </p>
                     <div class="flex gap-2">
                         <Button size="sm" variant="ghost" @click="uiStore.openForm(item)">
                             <Icon name="lucide:pencil" class="w-4 h-4" />
@@ -358,8 +367,10 @@ const handleDelete = () => {
                     </div>
                 </div>
 
-                <div class="flex gap-2 mt-3">
-                    <Badge v-for="tag in item.tags" :key="tag" variant="secondary">{{ tag }}</Badge>
+                <div v-if="item.tags?.length" class="flex gap-2 mt-3">
+                    <Badge v-for="tag in item.tags" :key="tag" variant="secondary">
+                        {{ tag }}
+                    </Badge>
                 </div>
             </div>
         </CardContent>
@@ -454,8 +465,9 @@ const toggleTag = (tag: string) => {
 
         <div class="mt-auto">
             <Button variant="ghost" @click="uiStore.toggleTheme()" class="justify-start w-full">
-                <Icon v-if="!uiStore.isDark" name="lucide:sun" class="w-4 h-4" />
-                <Icon v-else name="lucide:moon" class="w-4 h-4" />
+                <Icon v-if="uiStore.isDark" name="lucide:moon" class="w-4 h-4" />
+                <Icon v-else name="lucide:sun" class="w-4 h-4" />
+                <!-- <span class="ml-2">{{ uiStore.isDark ? "Dark" : "Light" }}</span> -->
             </Button>
         </div>
     </aside>
@@ -466,77 +478,62 @@ const toggleTag = (tag: string) => {
 ## `app/components/layout/FilterBar.vue`
 ```
 <script setup lang="ts">
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/components/ui/button'
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
 defineProps<{
-  priority: string;
-  showCompleted: boolean;
-  hasActiveFilters: boolean;
+    priority: string;
+    showCompleted: boolean;
+    hasActiveFilters: boolean;
 }>();
 
 const emit = defineEmits<{
-  'update:priority': [value: string];
-  'update:showCompleted': [value: boolean];
-  'clear': [];
+    "update:priority": [value: string];
+    "update:showCompleted": [value: boolean];
+    clear: [];
 }>();
 </script>
 
 <template>
-  <div class="p-4 space-y-4 border rounded-lg bg-surface border-border">
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-      <div>
-        <Label class="block mb-2">Priority</Label>
-        <RadioGroup
-          :model-value="priority"
-          @update:model-value="emit('update:priority', $event as string)"
-          class="flex items-center gap-4"
-        >
-          <div class="flex items-center space-x-2">
-            <RadioGroupItem id="r-all" value="all" />
-            <Label for="r-all">All</Label>
-          </div>
-          <div class="flex items-center space-x-2">
-            <RadioGroupItem id="r-low" value="low" />
-            <Label for="r-low">Low</Label>
-          </div>
-          <div class="flex items-center space-x-2">
-            <RadioGroupItem id="r-mid" value="mid" />
-            <Label for="r-mid">Mid</Label>
-          </div>
-          <div class="flex items-center space-x-2">
-            <RadioGroupItem id="r-high" value="high" />
-            <Label for="r-high">High</Label>
-          </div>
-        </RadioGroup>
-      </div>
+    <div class="p-4 space-y-4 border rounded-lg bg-surface border-border">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+                <Label class="block mb-2">Priority</Label>
+                <RadioGroup :model-value="priority" @update:model-value="emit('update:priority', $event as string)" class="flex items-center gap-4">
+                    <div class="flex items-center space-x-2">
+                        <RadioGroupItem id="r-all" value="all" />
+                        <Label for="r-all">All</Label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <RadioGroupItem id="r-low" value="low" />
+                        <Label for="r-low">Low</Label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <RadioGroupItem id="r-mid" value="mid" />
+                        <Label for="r-mid">Mid</Label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <RadioGroupItem id="r-high" value="high" />
+                        <Label for="r-high">High</Label>
+                    </div>
+                </RadioGroup>
+            </div>
 
-      <div>
-        <Label class="block mb-2">Status</Label>
-        <div class="flex items-center gap-2">
-          <Checkbox
-            id="show-completed"
-            :checked="showCompleted"
-            @update:checked="emit('update:showCompleted', $event as boolean)"
-          />
-          <Label for="show-completed">Show Completed</Label>
+            <div>
+                <Label class="block mb-2">Status</Label>
+                <div class="flex items-center gap-2">
+                    <Checkbox id="show-completed" :checked="showCompleted" @update:checked="(val) => emit('update:showCompleted', !!val)" />
+                    <Label for="show-completed" class="cursor-pointer"> Show Completed Items </Label>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <Button
-      v-if="hasActiveFilters"
-      variant="ghost"
-      size="sm"
-      @click="emit('clear')"
-      class="mt-4"
-    >
-      Clear Filters
-    </Button>
-  </div>
+        <Button v-if="hasActiveFilters" variant="ghost" size="sm" @click="emit('clear')" class="mt-4"> Clear Filters </Button>
+    </div>
 </template>
+
 ```
 
 ## `app/components/ui/button/Button.vue`
@@ -1513,39 +1510,46 @@ export const formatDate = (dateString: string): string => {
 
 ## `app/stores/uiStore.ts`
 ```
-import { defineStore } from 'pinia';
-import { toast } from 'vue-sonner';
-import type { NotificationType, Item } from '@/types';
-import { useStorage } from '@vueuse/core'; // ← ADD THIS
-type Theme = 'light' | 'dark' | 'system';
+import { defineStore } from "pinia";
+import { toast } from "vue-sonner";
+import type { NotificationType, Item } from "@/types";
 
-export const useUiStore = defineStore('ui', () => {
-  const theme = useStorage<Theme>('theme', 'system');
-  
+export const useUiStore = defineStore("ui", () => {
+  const colorMode = useColorMode();
+
   const isFormOpen = ref(false);
   const editingItem = ref<Item | null>(null);
   const preselectedCategory = ref<string | null>(null);
 
-  const isDark = computed(() => theme.value === 'dark');
+  const isDark = computed(() => colorMode.value === "dark");
 
   const showNotification = (type: NotificationType, message: string) => {
     switch (type) {
-      case 'success': toast.success(message); break;
-      case 'error': toast.error(message); break;
-      case 'warning': toast.warning(message); break;
-      case 'info': toast.info(message); break;
-      default: toast(message);
+      case "success":
+        toast.success(message);
+        break;
+      case "error":
+        toast.error(message);
+        break;
+      case "warning":
+        toast.warning(message);
+        break;
+      case "info":
+        toast.info(message);
+        break;
+      default:
+        toast(message);
     }
   };
 
   const toggleTheme = () => {
-    theme.value = theme.value === 'dark' ? 'light' : 'dark';
+    colorMode.preference = colorMode.value === "dark" ? "light" : "dark";
   };
 
   const openForm = (item?: Item, category?: string) => {
     isFormOpen.value = true;
     editingItem.value = item || null;
-    preselectedCategory.value = category || (item ? item.categorySlug : null);
+    preselectedCategory.value = category || (item ? item.categories[0] : null);
   };
 
   const closeForm = () => {
@@ -1555,17 +1559,17 @@ export const useUiStore = defineStore('ui', () => {
   };
 
   return {
-    theme,
+    isDark,
     isFormOpen,
     editingItem,
     preselectedCategory,
-    isDark,
     showNotification,
     toggleTheme,
     openForm,
     closeForm,
   };
 });
+
 ```
 
 ## `app/stores/itemStore.ts`
@@ -1611,97 +1615,100 @@ import TopBar from "~/components/layout/TopBar.vue";
 ## `app/app.vue`
 ```
 <script setup lang="ts">
-import { Toaster } from '@/components/ui/sonner';
-import { useThemeUpdater } from '@/composables/useThemeUpdater';
+import { Toaster } from "@/components/ui/sonner";
 
-useThemeUpdater();
+// Color mode is now handled automatically by @nuxtjs/color-mode
 </script>
 
 <template>
-  <div class="min-h-screen bg-background text-foreground">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-    <Toaster position="top-right" rich-colors />
-  </div>
+    <div class="min-h-screen bg-background text-foreground">
+        <NuxtLayout>
+            <NuxtPage />
+        </NuxtLayout>
+        <Toaster position="top-right" rich-colors />
+    </div>
 </template>
 
 ```
 
 ## `app/schemas/itemSchema.ts`
 ```
-import { z } from 'zod';
-import type { SingleCategory } from '@/types';
+import { z } from "zod";
+import type { SingleCategory } from "@/types";
 
 export const itemFormSchema = z.object({
-  name: z.string()
-    .min(1, 'Name is required')
-    .min(3, 'Name must be at least 3 characters'),
-  text: z.string()
-    .min(1, 'Description is required'),
-  priority: z.enum(['low', 'mid', 'high']),
+  name: z.string().min(1, "Name is required").min(3, "Name must be at least 3 characters"),
+  text: z.string().min(1, "Description is required"),
+  priority: z.enum(["low", "mid", "high"]),
   tags: z.array(z.string()).optional(),
-  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
+  categories: z.tuple([z.string().min(1, "Category is required")]) as z.ZodType<SingleCategory<string>>,
 });
 
 export type ItemFormData = z.infer<typeof itemFormSchema>;
+
 ```
 
 ## `app/composables/useItemFilters.ts`
 ```
-import type { ItemTree, Item, Priority } from '@/types';
+import type { ItemTree, Item, Priority } from "@/types";
 
 export interface FilterOptions {
   searchQuery: string;
-  selectedPriority: 'all' | Priority;
+  selectedPriority: "all" | Priority;
   showCompleted: boolean;
   selectedTags: string[];
 }
 
-export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptions>) {
+export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref<FilterOptions>) {
   const allTags = computed(() => {
+    if (!itemTree.value) return [];
+
     const tags = new Set<string>();
-    Object.values(itemTree.value).forEach(items => {
-      items.forEach(item => {
-        item.tags?.forEach(tag => tags.add(tag));
+    Object.values(itemTree.value).forEach((items) => {
+      items.forEach((item) => {
+        item.tags?.forEach((tag) => tags.add(tag));
       });
     });
     return Array.from(tags).sort();
   });
 
   const hasActiveFilters = computed(() => {
-    return filters.value.searchQuery.trim() !== '' ||
-           filters.value.selectedPriority !== 'all' ||
-           !filters.value.showCompleted ||
-           filters.value.selectedTags.length > 0;
+    return (
+      filters.value.searchQuery.trim() !== "" || filters.value.selectedPriority !== "all" || filters.value.selectedTags.length > 0
+      // Removed showCompleted from here - it's a view toggle, not a filter
+    );
   });
 
   const filteredItemTree = computed(() => {
+    if (!itemTree.value) return {};
+
     const filtered: Record<string, Item[]> = {};
-    
+
     Object.entries(itemTree.value).forEach(([categoryName, items]) => {
-      const filteredItems = items.filter(item => {
+      const filteredItems = items.filter((item) => {
+        // Search filter
         if (filters.value.searchQuery.trim()) {
           const query = filters.value.searchQuery.toLowerCase();
-          const matchesSearch = 
-            item.name.toLowerCase().includes(query) ||
-            item.text.toLowerCase().includes(query) ||
-            item.tags?.some(tag => tag.toLowerCase().includes(query));
+          const matchesSearch =
+            item.name.toLowerCase().includes(query) || item.text.toLowerCase().includes(query) || item.tags?.some((tag) => tag.toLowerCase().includes(query));
           if (!matchesSearch) return false;
         }
 
-        if (filters.value.selectedPriority !== 'all' && item.priority !== filters.value.selectedPriority) {
+        // Priority filter
+        if (filters.value.selectedPriority !== "all" && item.priority !== filters.value.selectedPriority) {
           return false;
         }
 
+        // Show/hide completed items
+        // If showCompleted is FALSE, hide completed items
+        // If showCompleted is TRUE, show all items (including completed)
         if (!filters.value.showCompleted && item.isCompleted) {
           return false;
         }
 
+        // Tags filter
         if (filters.value.selectedTags.length > 0) {
-          const hasMatchingTag = filters.value.selectedTags.some(selectedTag =>
-            item.tags?.includes(selectedTag)
-          );
+          const hasMatchingTag = filters.value.selectedTags.some((selectedTag) => item.tags?.includes(selectedTag));
           if (!hasMatchingTag) return false;
         }
 
@@ -1718,9 +1725,9 @@ export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptio
 
   const clearFilters = () => {
     filters.value = {
-      searchQuery: '',
-      selectedPriority: 'all',
-      showCompleted: true,
+      searchQuery: "",
+      selectedPriority: "all",
+      showCompleted: false, // Reset to default: hide completed
       selectedTags: [],
     };
   };
@@ -1732,24 +1739,7 @@ export function useItemFilters(itemTree: Ref<ItemTree>, filters: Ref<FilterOptio
     clearFilters,
   };
 }
-```
 
-## `app/composables/useThemeUpdater.ts`
-```
-import { useUiStore } from '@/stores/uiStore';
-
-export function useThemeUpdater() {
-  const uiStore = useUiStore();
-  const colorMode = useColorMode();
-
-  watch(
-    () => uiStore.theme,
-    (newTheme) => {
-      colorMode.preference = newTheme;
-    },
-    { immediate: true }
-  );
-}
 ```
 
 ## `app/composables/useItemsApi.ts`
@@ -1796,7 +1786,7 @@ export function useUpdateItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateItemPayload }) => updateItem(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateItemPayload }) => updateItem(id, payload), // Changed from number to string
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item updated successfully");
@@ -1824,23 +1814,40 @@ export function useDeleteItem() {
 
 ```
 
+## `app/composables/zz2del-useThemeUpdater.ts`
+```
+import { useUiStore } from '@/stores/uiStore';
+
+export function useThemeUpdater() {
+  const uiStore = useUiStore();
+  const colorMode = useColorMode();
+
+  watch(
+    () => uiStore.theme,
+    (newTheme) => {
+      colorMode.preference = newTheme;
+    },
+    { immediate: true }
+  );
+}
+```
+
 ## `app/types/index.ts`
 ```
-export type Priority = 'low' | 'mid' | 'high';
-export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+export type Priority = "low" | "mid" | "high";
+export type NotificationType = "success" | "error" | "warning" | "info";
 
-export type SingleCategory<T = number> = [T];
+export type SingleCategory<T = string> = [T]; // Changed from number to string
 
 export interface Item {
-  id: number;
+  id: string; // Changed from number to string (UUID)
   name: string;
   text: string;
   priority: Priority;
   isCompleted: boolean;
   slug: string;
   tags?: string[];
-  categories: SingleCategory<number>;
-  categorySlug: string;
+  categories: string[]; // Changed from SingleCategory<number> to string[]
   createdAt: string;
   updatedAt: string;
 }
@@ -1861,15 +1868,20 @@ export interface UpdateItemPayload extends Partial<CreateItemPayload> {
   isCompleted?: boolean;
 }
 
+// Add API response wrapper types
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
+
 export interface ApiErrorData {
   message: string;
   statusCode: number;
   details?: any;
 }
 
-export type Result<T, E> =
-  | { success: true; data: T }
-  | { success: false; error: E };
+export type Result<T, E> = { success: true; data: T } | { success: false; error: E };
+
 ```
 
 ## `app/assets/css/main.css`
@@ -2871,78 +2883,73 @@ const { data: item, isLoading, error } = useItemDetail(categorySlug, itemSlug);
 ## `app/pages/index.vue`
 ```
 <script setup lang="ts">
-import { useItemTree, itemKeys } from '@/composables/useItemsApi';
-import { useItemFilters } from '@/composables/useItemFilters';
-import FilterBar from '@/components/layout/FilterBar.vue';
-import ItemItem from '@/components/items/ItemItem.vue';
-import ItemForm from '@/components/items/ItemForm.vue';
-import { useUiStore } from '@/stores/uiStore';
-import { Button } from '@/components/ui/button';
-import { getItemTree } from '@/api/itemApi';
+import { useItemTree } from "@/composables/useItemsApi";
+import { useItemFilters } from "@/composables/useItemFilters";
+import FilterBar from "@/components/layout/FilterBar.vue";
+import ItemItem from "@/components/items/ItemItem.vue";
+import ItemForm from "@/components/items/ItemForm.vue";
+import { useUiStore } from "@/stores/uiStore";
+import { Button } from "@/components/ui/button";
 
-// Data fetching for the page
-const { data: itemTree, isLoading, error } = await useAsyncData('itemTree', getItemTree, {
-  default: () => ({}),
-});
+const { data: itemTree, isLoading, error } = useItemTree();
+
 const uiStore = useUiStore();
 
 const filters = ref({
-  searchQuery: '',
-  selectedPriority: 'all' as const,
-  showCompleted: true,
-  selectedTags: [],
+    searchQuery: "",
+    selectedPriority: "all" as const,
+    showCompleted: false, // Changed from true to false
+    selectedTags: [],
 });
 
-const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFilters(
-  computed(() => itemTree.value || {}),
-  filters
+const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
+    computed(() => itemTree.value || {}),
+    filters,
 );
 </script>
 
 <template>
-  <div>
-    <header class="mb-6">
-      <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
-    </header>
+    <div>
+        <header class="mb-6">
+            <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
+        </header>
 
-    <FilterBar
-      v-model:priority="filters.selectedPriority"
-      v-model:showCompleted="filters.showCompleted"
-      :has-active-filters="hasActiveFilters"
-      @clear="clearFilters"
-    />
+        <FilterBar
+            v-model:priority="filters.selectedPriority"
+            v-model:showCompleted="filters.showCompleted"
+            :has-active-filters="hasActiveFilters"
+            @clear="clearFilters"
+        />
 
-    <div v-if="isLoading">Loading...</div>
-    <div v-else-if="error">Error: {{ error.message }}</div>
-    <div v-else class="mt-6 space-y-8">
-      <section v-for="(items, category) in filteredItemTree" :key="category">
-        <div class="flex items-center gap-2 mb-4">
-          <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
-          <span class="text-sm text-text-muted">({{ items.length }})</span>
-          <Button variant="ghost" size="icon-sm" @click="uiStore.openForm(undefined, category)">
-            <Icon name="lucide:plus" class="w-4 h-4" />
-          </Button>
+        <div v-if="isLoading" class="py-10 text-center text-text-muted">Loading...</div>
+
+        <div v-else-if="error" class="py-10 text-center text-destructive">Error: {{ error.message }}</div>
+
+        <div v-else-if="itemTree" class="mt-6 space-y-8">
+            <section v-for="(items, category) in filteredItemTree" :key="category">
+                <div class="flex items-center gap-2 mb-4">
+                    <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
+                    <span class="text-sm text-text-muted">({{ items.length }})</span>
+                    <Button variant="ghost" size="icon-sm" @click="uiStore.openForm(undefined, category)">
+                        <Icon name="lucide:plus" class="w-4 h-4" />
+                    </Button>
+                </div>
+
+                <div class="grid gap-4">
+                    <ItemItem v-for="item in items" :key="item.id" :item="item" />
+                </div>
+            </section>
+
+            <div v-if="Object.keys(filteredItemTree).length === 0" class="py-10 text-center text-text-muted">
+                <p>No items found.</p>
+                <p v-if="hasActiveFilters">Try adjusting your filters.</p>
+            </div>
         </div>
-        <div class="grid gap-4">
-          <ItemItem
-            v-for="item in items"
-            :key="item.id"
-            :item="item"
-          />
-        </div>
-      </section>
-      <div v-if="Object.keys(filteredItemTree).length === 0 && !isLoading" class="py-10 text-center text-text-muted">
-        <p>No items found.</p>
-        <p v-if="hasActiveFilters">Try adjusting your filters.</p>
-      </div>
+
+        <ItemForm v-if="uiStore.isFormOpen" @close="uiStore.closeForm" />
     </div>
-
-    <ItemForm
-      v-if="uiStore.isFormOpen"
-      @close="uiStore.closeForm"
-    />
-  </div>
 </template>
+
 ```
 
 ## `app/api/itemApi.ts`
@@ -2953,42 +2960,55 @@ import type { Item, ItemTree, CreateItemPayload, UpdateItemPayload } from "~/typ
 export const getItemTree = () => get<ItemTree>("items/tree");
 export const getItemBySlug = (categorySlug: string, itemSlug: string) => get<Item>(`items/${categorySlug}/${itemSlug}`);
 export const createItem = (payload: CreateItemPayload) => post<Item, CreateItemPayload>("items", payload);
-export const updateItem = (id: number, payload: UpdateItemPayload) => patch<Item, UpdateItemPayload>(`items/${id}`, payload);
-export const deleteItem = (id: number) => del(`items/${id}`);
+export const updateItem = (id: string, payload: UpdateItemPayload) => patch<Item, UpdateItemPayload>(`items/${id}`, payload); // Changed from number to string
+export const deleteItem = (id: string) => del(`items/${id}`); // Changed from number to string
 
 ```
 
 ## `app/api/apiClient.ts`
 ```
-import { createFetch } from "ofetch";
+import { ofetch } from "ofetch";
+import type { ApiResponse } from "~/types";
 
 const API_URL_BASE = "http://localhost:3000/api";
 
-export const apiClient = createFetch({
+export const apiClient = ofetch.create({
   baseURL: API_URL_BASE,
   headers: {
     "Content-Type": "application/json",
   },
-  async onResponseError(response) {
-    console.error("API Error:", response.status, response.statusText);
+  async onResponseError(context) {
+    console.error("API Error:", context.response?.status, context.response?.statusText);
   },
 });
 
-// Wrapper functions exported explicitly for consistency
-export function get<T>(endpoint: string) {
-  return apiClient<T>(endpoint); // Calls GET by default
+// Unwrap the API response to extract data
+export async function get<T>(endpoint: string): Promise<T> {
+  const response = await apiClient<ApiResponse<T>>(endpoint);
+  return response.data;
 }
 
-export function post<T, V>(endpoint: string, data: V) {
-  return apiClient<T>(endpoint, { method: "POST", body: data });
+export async function post<T, V>(endpoint: string, data: V): Promise<T> {
+  const response = await apiClient<ApiResponse<T>>(endpoint, {
+    method: "POST",
+    body: data,
+  });
+  return response.data;
 }
 
-export function patch<T, V>(endpoint: string, data: V) {
-  return apiClient<T>(endpoint, { method: "PATCH", body: data });
+export async function patch<T, V>(endpoint: string, data: V): Promise<T> {
+  const response = await apiClient<ApiResponse<T>>(endpoint, {
+    method: "PATCH",
+    body: data,
+  });
+  return response.data;
 }
 
-export function del<T>(endpoint: string) {
-  return apiClient<T>(endpoint, { method: "DELETE" });
+export async function del<T>(endpoint: string): Promise<T> {
+  const response = await apiClient<ApiResponse<T>>(endpoint, {
+    method: "DELETE",
+  });
+  return response.data;
 }
 
 ```
@@ -3014,6 +3034,25 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 ```
 
+## `app/plugins/color-mode-script.client.ts`
+```
+export default defineNuxtPlugin(() => {
+  // This runs early on client-side to prevent flash
+  const colorMode = useColorMode();
+
+  // Force immediate class application
+  if (process.client) {
+    const root = document.documentElement;
+    if (colorMode.value === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }
+});
+
+```
+
 ## `nuxt.config.ts`
 ```
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -3021,10 +3060,15 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/icon", "shadcn-nuxt", "@vueuse/nuxt", "@pinia/nuxt", "@peterbud/nuxt-query"],
+  modules: ["@nuxt/icon", "shadcn-nuxt", "@vueuse/nuxt", "@pinia/nuxt", "@peterbud/nuxt-query", "@nuxtjs/color-mode"],
   css: ["~/assets/css/tailwind.css", "~/assets/css/main.css"],
   // css: ["~/assets/css/tailwind.css"],
-
+  colorMode: {
+    classSuffix: "",
+    preference: "system",
+    fallback: "light",
+    storageKey: "theme",
+  },
   nuxtQuery: {
     autoImports: ["useQuery", "useMutation", "useQueryClient"],
     queryClientOptions: {

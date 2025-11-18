@@ -7,7 +7,10 @@ export interface FilterOptions {
   selectedTags: string[];
 }
 
-export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref<FilterOptions>) {
+export function useItemFilters(
+  itemTree: Ref<ItemTree | undefined>,
+  filters: ComputedRef<FilterOptions>, // Changed from Ref to ComputedRef
+) {
   const allTags = computed(() => {
     if (!itemTree.value) return [];
 
@@ -18,15 +21,6 @@ export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref
       });
     });
     return Array.from(tags).sort();
-  });
-
-  const hasActiveFilters = computed(() => {
-    return (
-      filters.value.searchQuery.trim() !== "" ||
-      filters.value.selectedPriority !== "all" ||
-      !filters.value.showCompleted ||
-      filters.value.selectedTags.length > 0
-    );
   });
 
   const filteredItemTree = computed(() => {
@@ -67,19 +61,8 @@ export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: Ref
     return filtered;
   });
 
-  const clearFilters = () => {
-    filters.value = {
-      searchQuery: "",
-      selectedPriority: "all",
-      showCompleted: true,
-      selectedTags: [],
-    };
-  };
-
   return {
     allTags,
-    hasActiveFilters,
     filteredItemTree,
-    clearFilters,
   };
 }

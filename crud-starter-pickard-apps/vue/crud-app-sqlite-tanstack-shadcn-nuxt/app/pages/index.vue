@@ -5,20 +5,22 @@ import FilterBar from "@/components/layout/FilterBar.vue";
 import ItemItem from "@/components/items/ItemItem.vue";
 import ItemForm from "@/components/items/ItemForm.vue";
 import { useUiStore } from "@/stores/uiStore";
+import { useFilterStore } from "@/stores/filterStore";
 import { Button } from "@/components/ui/button";
 
 const { data: itemTree, isLoading, error } = useItemTree();
-
 const uiStore = useUiStore();
+const filterStore = useFilterStore();
 
-const filters = ref({
-    searchQuery: "",
-    selectedPriority: "all" as const,
-    showCompleted: true,
-    selectedTags: [],
-});
+// Convert store state to computed ref for the composable
+const filters = computed(() => ({
+    searchQuery: filterStore.searchQuery,
+    selectedPriority: filterStore.selectedPriority,
+    showCompleted: filterStore.showCompleted,
+    selectedTags: filterStore.selectedTags,
+}));
 
-const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
+const { filteredItemTree } = useItemFilters(
     computed(() => itemTree.value || {}),
     filters,
 );
@@ -30,12 +32,7 @@ const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
             <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
         </header>
 
-        <FilterBar
-            v-model:priority="filters.selectedPriority"
-            v-model:showCompleted="filters.showCompleted"
-            :has-active-filters="hasActiveFilters"
-            @clear="clearFilters"
-        />
+        <FilterBar />
 
         <div v-if="isLoading" class="py-10 text-center text-text-muted">Loading...</div>
 
@@ -44,7 +41,9 @@ const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
         <div v-else-if="itemTree" class="mt-6 space-y-8">
             <section v-for="(items, category) in filteredItemTree" :key="category">
                 <div class="flex items-center gap-2 mb-4">
-                    <h2 class="font-semibold capitalize text-size-xl">{{ category }}</h2>
+                    <h2 class="font-semibold capitalize text-size-xl">
+                        {{ category }}
+                    </h2>
                     <span class="text-sm text-text-muted">({{ items.length }})</span>
                     <Button variant="ghost" size="icon-sm" @click="uiStore.openForm(undefined, category)">
                         <Icon name="lucide:plus" class="w-4 h-4" />
@@ -58,7 +57,11 @@ const { filteredItemTree, hasActiveFilters, clearFilters } = useItemFilters(
 
             <div v-if="Object.keys(filteredItemTree).length === 0" class="py-10 text-center text-text-muted">
                 <p>No items found.</p>
-                <p v-if="hasActiveFilters">Try adjusting your filters.</p>
+                <p v-if="filterStore.hasActiveFilters">Try adjusting your filters.</p>
+                <p v-if="!filterStore.showCompleted" class="mt-2">
+                    <span class="text-sm"> 💡 Completed items are hidden. </span>
+                    <button @click="filterStore.showCompleted = true" class="text-sm text-primary underline hover:no-underline">Show them?</button>
+                </p>
             </div>
         </div>
 
