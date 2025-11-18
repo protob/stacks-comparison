@@ -29,12 +29,7 @@ The SvelteKit `package.json` currently only has Svelte, SvelteKit, Tailwind v4, 
    ```bash
    cd /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-kit
 
-   bun add @tanstack/svelte-query@latest \
-           @tanstack/svelte-form@latest \
-           @tanstack/zod-form-adapter@latest \
-           zod@latest \
-           ofetch@latest \
-           svelte-sonner@latest
+   bun add @tanstack/svelte-query@latest   @tanstack/svelte-form@latest  @tanstack/zod-form-adapter@latest   zod@latest  ofetch@latest svelte-sonner@latest
    ```
 
    This aligns SvelteKit with the SPA’s stack (TanStack Query v6 runes adapter, zod, ofetch, svelte-sonner).[9][3][5]
