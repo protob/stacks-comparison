@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 18:05:23 CET
+**Generated on:** wto, 18 lis 2025, 18:11:24 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-vite
 
 ---
@@ -276,7 +276,7 @@ export default defineConfig({
    import { Checkbox } from '$lib/components/ui/checkbox';
    import { useUpdateItem, useDeleteItem } from '$lib/api/itemsQuery';
    import { formatDate } from '$lib/utils/helpers';
-   import { uiStore } from '$lib/stores/uiStore';
+   import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
    import type { Item } from '$lib/types';
    import { Pencil, Trash2 } from '@lucide/svelte';
  
@@ -353,7 +353,7 @@ export default defineConfig({
   import { Badge } from '$lib/components/ui/badge';
   import { useAddItem, useUpdateItem } from '$lib/api/itemsQuery'; // Import update hook
   import { itemFormSchema } from '$lib/schemas/itemSchema';
-  import { uiStore } from '$lib/stores/uiStore';
+  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
 
   let { onClose } = $props<{ onClose: () => void }>();
 
@@ -629,7 +629,7 @@ export default defineConfig({
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Separator } from '$lib/components/ui/separator';
-  import { uiStore } from '$lib/stores/uiStore';
+  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
   import { Sun, Moon } from '@lucide/svelte';
 
   let searchQuery = $state('');
@@ -2340,7 +2340,7 @@ export function useItemFilters(itemTree: ItemTree, filters: FilterOptions) {
 ```
 // src/lib/utils/themeUpdater.ts
 import { onMount } from 'svelte';
-import { uiStore, type Theme } from '$lib/stores/uiStore';
+import { uiStore, type Theme } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
 
 export function useThemeUpdater() {
   onMount(() => {
@@ -2393,7 +2393,7 @@ export const formatDate = (dateString: string): string => {
 };
 ```
 
-## `src/lib/stores/uiStore.ts`
+## `src/lib/stores/uiStore.svelte.ts`
 ```
 // src/lib/stores/uiStore.ts
 import { toast } from 'svelte-sonner';
@@ -2711,7 +2711,7 @@ export type Result<T, E> =
   import FilterBar from '$lib/components/layout/FilterBar.svelte';
   import ItemItem from '$lib/components/items/ItemItem.svelte';
   import ItemForm from '$lib/components/items/ItemForm.svelte';
-  import { uiStore } from '$lib/stores/uiStore'; // <-- Only import the singleton
+  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
   import { Button } from '$lib/components/ui/button';
   import { createEventDispatcher } from 'svelte';
   import { Plus } from '@lucide/svelte'; // Import icon directly
@@ -2975,7 +2975,7 @@ import {
   deleteItem,
 } from '$lib/api/itemApi';
 import type { CreateItemPayload, UpdateItemPayload } from '$lib/types';
-import { uiStore } from '$lib/stores/uiStore';
+import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
 
 // shared query keys (same structure as Vue)
 export const itemKeys = {
