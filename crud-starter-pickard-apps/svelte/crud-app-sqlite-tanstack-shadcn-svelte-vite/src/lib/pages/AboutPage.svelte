@@ -10,7 +10,7 @@
   }
 </script>
 
-<MainLayout onNavigate={handleNavigate}>
+<MainLayout currentPath={window.location.pathname} onNavigate={handleNavigate}>
   <div class="space-y-6">
     <header>
       <h1 class="font-bold text-size-3xl">About This Application</h1>

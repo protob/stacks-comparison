@@ -1,13 +1,14 @@
 <script lang="ts">
-  export let currentPath = '';
+  import { createEventDispatcher } from 'svelte';
+
+  export let currentPath: string;
+
+  const dispatch = createEventDispatcher<{ navigate: string }>();
 
   function navigate(path: string) {
     // Dispatch navigate event to parent
-    dispatch('navigate', { path });
+    dispatch('navigate', path);
   }
-
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
 </script>
 
 <header class="flex justify-end items-center pb-4 mb-4 border-b border-border">

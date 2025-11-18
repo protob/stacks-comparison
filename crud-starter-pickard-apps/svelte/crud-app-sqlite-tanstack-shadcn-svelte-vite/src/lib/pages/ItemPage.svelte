@@ -40,7 +40,7 @@
   }
 </script>
 
-<MainLayout onNavigate={handleNavigate}>
+<MainLayout currentPath={window.location.pathname} onNavigate={handleNavigate}>
   <header class="mb-6">
     <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
   </header>
