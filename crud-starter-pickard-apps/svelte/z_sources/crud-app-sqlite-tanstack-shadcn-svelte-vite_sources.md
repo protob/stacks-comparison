@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 14:53:36 CET
+**Generated on:** wto, 18 lis 2025, 17:51:44 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-vite
 
 ---
@@ -56,14 +56,17 @@
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
   "devDependencies": {
-    "@lucide/svelte": "^0.553.0",
+    "@internationalized/date": "^3.8.1",
+    "@lucide/svelte": "^0.544.0",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.14",
     "@tsconfig/svelte": "^5.0.5",
     "@types/node": "^24.10.0",
+    "bits-ui": "^2.11.0",
     "clsx": "^2.1.1",
+    "mode-watcher": "^1.1.0",
     "svelte": "^5.43.5",
     "svelte-check": "^4.3.3",
     "tailwind-merge": "^3.3.1",
@@ -75,6 +78,14 @@
   },
   "overrides": {
     "vite": "npm:rolldown-vite@7.2.2"
+  },
+  "dependencies": {
+    "@tanstack/svelte-form": "^1.25.0",
+    "@tanstack/svelte-query": "^6.0.8",
+    "@tanstack/zod-form-adapter": "^0.42.1",
+    "ofetch": "^1.5.1",
+    "svelte-sonner": "^1.0.6",
+    "zod": "^4.1.12"
   }
 }
 
@@ -235,26 +246,491 @@ export default defineConfig({
 
 ## `src/App.svelte`
 ```
+<!-- src/App.svelte -->
 <script lang="ts">
   import './app.css';
-  import svelteLogo from './assets/svelte.svg';
-  import viteLogo from '/vite.svg';
-  import Counter from './lib/Counter.svelte';
-    import { Button } from "$lib/components/ui/button/index.js";
+  import { QueryClientProvider } from '@tanstack/svelte-query';
+  import { Toaster } from 'svelte-sonner';
+  import { createAppQueryClient } from '$lib/api/itemsQuery';
+  import Router from '$lib/router/Router.svelte';
+  import { useThemeUpdater } from '$lib/utils/themeUpdater';
+
+  const queryClient = createAppQueryClient();
+
+  useThemeUpdater();
 </script>
 
-<main>
-  <div>
-
-  <Button>ShadCN Button</Button>
- 
-
+<main class="min-h-screen bg-background text-foreground">
+  <QueryClientProvider client={queryClient}>
+    <Toaster position="top-right" richColors />
+    <Router />
+  </QueryClientProvider>
 </main>
+```
 
-<style>
+## `src/lib/components/items/ItemItem.svelte`
+```
+<script lang="ts">
+   import { Badge } from '$lib/components/ui/badge';
+   import { Button } from '$lib/components/ui/button';
+   import { Checkbox } from '$lib/components/ui/checkbox';
+   import { useUpdateItem, useDeleteItem } from '$lib/api/itemsQuery';
+   import { formatDate } from '$lib/utils/helpers';
+   import { uiStore } from '$lib/stores/uiStore';
+   import type { Item } from '$lib/types';
+ 
+   export let item: Item;
+ 
+   const { mutate: updateItem } = useUpdateItem();
+   const { mutate: deleteItem } = useDeleteItem();
+ 
+   function toggleComplete() {
+     updateItem({
+       id: item.id,
+       payload: { isCompleted: !item.isCompleted },
+     });
+   }
+ 
+   function handleDelete() {
+     if (confirm('Are you sure you want to delete this item?')) {
+       deleteItem(item.id);
+     }
+   }
+ </script>
+ 
+<div class="border rounded-lg bg-card p-4 flex items-start gap-4 opacity-60" class:opacity-100={!item.isCompleted}>
+    <div class="mt-1">
+      <Checkbox
+        checked={item.isCompleted}
+        onchange={toggleComplete}
+      />
+    </div>
+    <div class="flex-1">
+      <div class="flex items-center justify-between">
+          <h3 
+            class="font-semibold text-lg"
+            class:line-through={item.isCompleted}
+            class:text-muted-foreground={item.isCompleted}
+          >
+            {item.name}
+          </h3>
+           <Badge class="tag-priority-{item.priority}" variant="outline">
+             {item.priority}
+           </Badge>
+      </div>
+      <p class="mb-3 text-muted-foreground">{item.text}</p>
 
-</style>
+      <div class="flex items-center justify-between">
+          <p class="text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
+          <div class="flex gap-2">
+              <Button size="sm" variant="ghost" onclick={() => uiStore.openForm(item)}>
+                  <icon-lucide-pencil class="w-4 h-4"></icon-lucide-pencil>
+              </Button>
+              <Button size="sm" variant="destructive" onclick={handleDelete}>
+                  <icon-lucide-trash-2 class="w-4 h-4"></icon-lucide-trash-2>
+              </Button>
+          </div>
+      </div>
 
+      <div class="flex gap-2 mt-3">
+        {#each item.tags as tag (tag)}
+          <Badge variant="secondary">{tag}</Badge>
+        {/each}
+      </div>
+    </div>
+</div>
+```
+
+## `src/lib/components/items/ItemForm.svelte`
+```
+<script lang="ts">
+  import { Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
+  import { Label } from '$lib/components/ui/label';
+  import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group';
+  import { Badge } from '$lib/components/ui/badge';
+  import { useAddItem } from '$lib/api/itemsQuery';
+  import { itemFormSchema } from '$lib/schemas/itemSchema';
+  import { uiStore } from '$lib/stores/uiStore';
+  import { createEventDispatcher } from 'svelte';
+
+  export let onClose: () => void;
+
+  const dispatch = createEventDispatcher();
+  const { mutate: addItem } = useAddItem();
+
+  let currentTag = '';
+  let formData = {
+    name: '',
+    text: '',
+    priority: 'mid' as const,
+    tags: [] as string[],
+    categories: [$uiStore.preselectedCategory || 'general'] as [string],
+  };
+
+  let errors: Record<string, string> = {};
+
+  function validateForm() {
+    errors = {};
+    
+    try {
+      itemFormSchema.parse(formData);
+    } catch (e: any) {
+      if (e.errors) {
+        e.errors.forEach((error: any) => {
+          errors[error.path[0]] = error.message;
+        });
+      }
+    }
+    
+    return Object.keys(errors).length === 0;
+  }
+
+  function handleSubmit() {
+    if (!validateForm()) return;
+
+    addItem(formData, {
+      onSuccess: () => {
+        dispatch('close');
+        if (onClose) onClose();
+      },
+    });
+  }
+
+  function addTag() {
+    const newTag = currentTag.trim();
+    if (newTag && !formData.tags.includes(newTag)) {
+      formData = {
+        ...formData,
+        tags: [...formData.tags, newTag]
+      };
+    }
+    currentTag = '';
+  }
+
+  function removeTag(tagToRemove: string) {
+    formData = {
+      ...formData,
+      tags: formData.tags.filter(tag => tag !== tagToRemove)
+    };
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      addTag();
+    }
+  }
+</script>
+
+<Dialog open={true} on:openChange={() => dispatch('close')}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Add New Task</DialogTitle>
+    </DialogHeader>
+    
+    <form on:submit|preventDefault={handleSubmit} class="space-y-4">
+      <!-- Name Field -->
+      <div>
+        <Label for="name">Task Name</Label>
+        <Input
+          id="name"
+          bind:value={formData.name}
+          placeholder="e.g., Finalize project report"
+        />
+        {#if errors.name}
+          <p class="mt-1 text-sm text-destructive">{errors.name}</p>
+        {/if}
+      </div>
+
+      <!-- Description Field -->
+      <div>
+        <Label for="text">Description</Label>
+        <Input
+          id="text"
+          bind:value={formData.text}
+          placeholder="Add more details about task..."
+        />
+        {#if errors.text}
+          <p class="mt-1 text-sm text-destructive">{errors.text}</p>
+        {/if}
+      </div>
+
+      <!-- Category Field -->
+      <div>
+        <Label for="category">Category</Label>
+        <Input
+          id="category"
+          bind:value={formData.categories[0]}
+          placeholder="e.g., Work"
+        />
+        {#if errors.categories}
+          <p class="mt-1 text-sm text-destructive">{errors.categories}</p>
+        {/if}
+      </div>
+
+      <!-- Priority Field -->
+      <div>
+        <Label>Priority</Label>
+        <RadioGroup
+          bind:value={formData.priority}
+          class="flex items-center gap-4 mt-2"
+        >
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="p-low" value="low" />
+            <Label for="p-low">Low</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="p-mid" value="mid" />
+            <Label for="p-mid">Mid</Label>
+          </div>
+          <div class="flex items-center space-x-2">
+            <RadioGroupItem id="p-high" value="high" />
+            <Label for="p-high">High</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <!-- Tags Field -->
+      <div>
+        <Label>Tags</Label>
+        <div class="flex items-center gap-2 mt-2">
+          <Input
+            bind:value={currentTag}
+            on:keydown={handleKeydown}
+            placeholder="Add a tag..."
+          />
+          <Button type="button" variant="outline" onclick={addTag}>Add</Button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-2">
+          {#each formData.tags as tag (tag)}
+            <Badge
+              variant="secondary"
+              class="cursor-pointer"
+              onclick={() => removeTag(tag)}
+            >
+              {tag} ×
+            </Badge>
+          {/each}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-2 pt-4">
+        <Button type="button" variant="outline" onclick={() => dispatch('close')}>Cancel</Button>
+        <Button type="submit">Create Task</Button>
+      </div>
+    </form>
+  </DialogContent>
+</Dialog>
+```
+
+## `src/lib/components/layout/FilterBar.svelte`
+```
+<script lang="ts">
+  import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group';
+  import { Label } from '$lib/components/ui/label';
+  import { Checkbox } from '$lib/components/ui/checkbox';
+  import { Button } from '$lib/components/ui/button';
+  import { createEventDispatcher } from 'svelte';
+
+  export let priority: string = 'all';
+  export let showCompleted: boolean = true;
+  export let hasActiveFilters: boolean = false;
+  export let allTags: string[] = [];
+  export let selectedTags: string[] = [];
+  export let search: string = '';
+
+  const dispatch = createEventDispatcher();
+
+  function handlePriorityChange(value: string) {
+    priority = value;
+    dispatch('update:priority', value);
+  }
+
+  function handleShowCompletedChange(checked: boolean) {
+    showCompleted = checked;
+    dispatch('update:showCompleted', checked);
+  }
+
+  function handleClear() {
+    dispatch('clear');
+  }
+</script>
+
+<div class="p-4 space-y-4 border rounded-lg bg-surface border-border">
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div>
+      <Label class="block mb-2">Priority</Label>
+      <RadioGroup bind:value={priority} class="flex items-center gap-4">
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-all" value="all" />
+          <Label for="r-all">All</Label>
+        </div>
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-low" value="low" />
+          <Label for="r-low">Low</Label>
+        </div>
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-mid" value="mid" />
+          <Label for="r-mid">Mid</Label>
+        </div>
+        <div class="flex items-center space-x-2">
+          <RadioGroupItem id="r-high" value="high" />
+          <Label for="r-high">High</Label>
+        </div>
+      </RadioGroup>
+    </div>
+
+    <div>
+      <Label class="block mb-2">Status</Label>
+      <div class="flex items-center gap-2">
+        <Checkbox
+          id="show-completed"
+          bind:checked={showCompleted}
+        />
+        <Label for="show-completed">Show Completed</Label>
+      </div>
+    </div>
+  </div>
+
+  {#if hasActiveFilters}
+    <Button
+      variant="ghost"
+      size="sm"
+      onclick={handleClear}
+      class="mt-4"
+    >
+      Clear Filters
+    </Button>
+  {/if}
+</div>
+```
+
+## `src/lib/components/layout/MainLayout.svelte`
+```
+<!-- src/lib/components/layout/MainLayout.svelte -->
+<script lang="ts">
+  import AppSidebar from '$lib/components/layout/AppSidebar.svelte';
+  import TopBar from '$lib/components/layout/TopBar.svelte';
+
+  export let onNavigate: (path: string) => void;
+</script>
+
+<div class="flex min-h-screen bg-background text-foreground">
+  <AppSidebar on:navigate={(e) => onNavigate(e.detail)} />
+  <div class="flex-1 max-w-5xl mx-auto p-fluid-6">
+    <TopBar on:navigate={(e) => onNavigate(e.detail)} />
+    <slot />
+  </div>
+</div>
+```
+
+## `src/lib/components/layout/AppSidebar.svelte`
+```
+<script lang="ts">
+  import { Button } from '$lib/components/ui/button';
+  import { Input } from '$lib/components/ui/input';
+  import { Separator } from '$lib/components/ui/separator';
+  import { uiStore } from '$lib/stores/uiStore';
+
+  // These would eventually be props or come from a store
+  let searchQuery = '';
+  let allTags = ['project', 'personal', 'work']; // Example tags
+  let selectedTags: string[] = [];
+
+  function toggleTag(tag: string) {
+    const index = selectedTags.indexOf(tag);
+    if (index > -1) {
+      selectedTags.splice(index, 1);
+    } else {
+      selectedTags.push(tag);
+    }
+  }
+</script>
+
+<aside class="flex flex-col p-4 border-r bg-surface border-border">
+  <div class="p-2 mb-4">
+    <h2 class="text-xl font-bold">TodoApp</h2>
+  </div>
+
+  <div class="flex-1 space-y-4">
+    <!-- Search -->
+    <div class="px-2">
+      <Input bind:value={searchQuery} placeholder="Search tasks..." />
+    </div>
+
+    <Separator />
+
+    <!-- Tags Section -->
+    <div class="px-2">
+      <h3 class="mb-2 text-sm font-semibold text-text-muted">Tags</h3>
+      <div class="flex flex-wrap gap-2">
+        {#each allTags as tag (tag)}
+          <Button
+            onclick={() => toggleTag(tag)}
+            variant={selectedTags.includes(tag) ? 'default' : 'outline'}
+            size="sm"
+            class="rounded-full"
+          >
+            {tag}
+          </Button>
+        {/each}
+      </div>
+    </div>
+
+    <!-- Add New Item Button -->
+    <div class="px-2 mt-4">
+      <Button class="w-full" onclick={() => uiStore.openForm()}>
+        + Add Item
+      </Button>
+    </div>
+  </div>
+
+  <!-- Footer / Theme Toggle -->
+  <div class="mt-auto">
+    <Button variant="ghost" onclick={() => uiStore.toggleTheme()} class="justify-start w-full">
+      {#if !$uiStore.isDark}
+        <icon-lucide-sun class="w-4 h-4" />
+      {:else}
+        <icon-lucide-moon class="w-4 h-4" />
+      {/if}
+    </Button>
+  </div>
+</aside>
+```
+
+## `src/lib/components/layout/TopBar.svelte`
+```
+<script lang="ts">
+  export let currentPath = '';
+
+  function navigate(path: string) {
+    // Dispatch navigate event to parent
+    dispatch('navigate', { path });
+  }
+
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+</script>
+
+<header class="flex justify-end items-center pb-4 mb-4 border-b border-border">
+  <nav class="flex items-center gap-4">
+    <button 
+      onclick={() => navigate('/')}
+      class={currentPath === '/' ? 'text-primary font-bold' : 'text-text-secondary hover:text-text-primary'}
+    >
+      Home
+    </button>
+    <button 
+      onclick={() => navigate('/about')}
+      class={currentPath === '/about' ? 'text-primary font-bold' : 'text-text-secondary hover:text-text-primary'}
+    >
+      About
+    </button>
+  </nav>
+</header>
 ```
 
 ## `src/lib/components/ui/button/button.svelte`
@@ -344,6 +820,71 @@ export default defineConfig({
 
 ```
 
+## `src/lib/components/ui/button/Button.svelte`
+```
+<script lang="ts">
+  import { cn } from "$lib/utils.js";
+  import type { ButtonHTMLAttributes } from "svelte/elements";
+  import { cva, type VariantProps } from "class-variance-authority";
+
+  const buttonVariants = cva(
+    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    {
+      variants: {
+        variant: {
+          default: "bg-primary text-primary-foreground hover:bg-primary/90",
+          destructive:
+            "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          outline:
+            "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          secondary:
+            "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          ghost: "hover:bg-accent hover:text-accent-foreground",
+          link: "text-primary underline-offset-4 hover:underline",
+        },
+        size: {
+          default: "h-10 px-4 py-2",
+          sm: "h-9 rounded-md px-3",
+          lg: "h-11 rounded-md px-8",
+          icon: "h-10 w-10",
+        },
+      },
+      defaultVariants: {
+        variant: "default",
+        size: "default",
+      },
+    }
+  );
+
+  type Props = ButtonHTMLAttributes & {
+    variant?: VariantProps<typeof buttonVariants>["variant"];
+    size?: VariantProps<typeof buttonVariants>["size"];
+  };
+
+  export let variant: Props["variant"] = "default";
+  export let size: Props["size"] = "default";
+  let className: Props["class"] = undefined;
+  let restProps: $restProps;
+
+  $: buttonClass = cn(buttonVariants({ variant, size, className }));
+</script>
+
+<button
+  class={buttonClass}
+  {...restProps}
+  on:click
+  on:keydown
+  on:keyup
+  on:focus
+  on:blur
+  on:mouseenter
+  on:mouseleave
+  on:paste
+>
+  <slot />
+</button>
+```
+
 ## `src/lib/components/ui/button/index.ts`
 ```
 import Root, {
@@ -364,6 +905,1569 @@ export {
 	type ButtonVariant,
 };
 
+```
+
+## `src/lib/components/ui/checkbox/index.ts`
+```
+import Root from "./checkbox.svelte";
+export {
+	Root,
+	//
+	Root as Checkbox,
+};
+
+```
+
+## `src/lib/components/ui/checkbox/checkbox.svelte`
+```
+<script lang="ts">
+	import { Checkbox as CheckboxPrimitive } from "bits-ui";
+	import CheckIcon from "@lucide/svelte/icons/check";
+	import MinusIcon from "@lucide/svelte/icons/minus";
+	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		checked = $bindable(false),
+		indeterminate = $bindable(false),
+		class: className,
+		...restProps
+	}: WithoutChildrenOrChild<CheckboxPrimitive.RootProps> = $props();
+</script>
+
+<CheckboxPrimitive.Root
+	bind:ref
+	data-slot="checkbox"
+	class={cn(
+		"border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shadow-xs peer flex size-4 shrink-0 items-center justify-center rounded-[4px] border outline-none transition-shadow focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+		className
+	)}
+	bind:checked
+	bind:indeterminate
+	{...restProps}
+>
+	{#snippet children({ checked, indeterminate })}
+		<div data-slot="checkbox-indicator" class="text-current transition-none">
+			{#if checked}
+				<CheckIcon class="size-3.5" />
+			{:else if indeterminate}
+				<MinusIcon class="size-3.5" />
+			{/if}
+		</div>
+	{/snippet}
+</CheckboxPrimitive.Root>
+
+```
+
+## `src/lib/components/ui/label/label.svelte`
+```
+<script lang="ts">
+	import { Label as LabelPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: LabelPrimitive.RootProps = $props();
+</script>
+
+<LabelPrimitive.Root
+	bind:ref
+	data-slot="label"
+	class={cn(
+		"flex select-none items-center gap-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50 group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/label/index.ts`
+```
+import Root from "./label.svelte";
+
+export {
+	Root,
+	//
+	Root as Label,
+};
+
+```
+
+## `src/lib/components/ui/input/input.svelte`
+```
+<script lang="ts">
+	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	type InputType = Exclude<HTMLInputTypeAttribute, "file">;
+
+	type Props = WithElementRef<
+		Omit<HTMLInputAttributes, "type"> &
+			({ type: "file"; files?: FileList } | { type?: InputType; files?: undefined })
+	>;
+
+	let {
+		ref = $bindable(null),
+		value = $bindable(),
+		type,
+		files = $bindable(),
+		class: className,
+		"data-slot": dataSlot = "input",
+		...restProps
+	}: Props = $props();
+</script>
+
+{#if type === "file"}
+	<input
+		bind:this={ref}
+		data-slot={dataSlot}
+		class={cn(
+			"selection:bg-primary dark:bg-input/30 selection:text-primary-foreground border-input ring-offset-background placeholder:text-muted-foreground shadow-xs flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 pt-1.5 text-sm font-medium outline-none transition-[color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50",
+			"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+			"aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+			className
+		)}
+		type="file"
+		bind:files
+		bind:value
+		{...restProps}
+	/>
+{:else}
+	<input
+		bind:this={ref}
+		data-slot={dataSlot}
+		class={cn(
+			"border-input bg-background selection:bg-primary dark:bg-input/30 selection:text-primary-foreground ring-offset-background placeholder:text-muted-foreground shadow-xs flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base outline-none transition-[color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+			"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+			"aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+			className
+		)}
+		{type}
+		bind:value
+		{...restProps}
+	/>
+{/if}
+
+```
+
+## `src/lib/components/ui/input/index.ts`
+```
+import Root from "./input.svelte";
+
+export {
+	Root,
+	//
+	Root as Input,
+};
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-footer.svelte`
+```
+<script lang="ts">
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="alert-dialog-footer"
+	class={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-title.svelte`
+```
+<script lang="ts">
+	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: AlertDialogPrimitive.TitleProps = $props();
+</script>
+
+<AlertDialogPrimitive.Title
+	bind:ref
+	data-slot="alert-dialog-title"
+	class={cn("text-lg font-semibold", className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-action.svelte`
+```
+<script lang="ts">
+	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+	import { buttonVariants } from "$lib/components/ui/button/index.js";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: AlertDialogPrimitive.ActionProps = $props();
+</script>
+
+<AlertDialogPrimitive.Action
+	bind:ref
+	data-slot="alert-dialog-action"
+	class={cn(buttonVariants(), className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-description.svelte`
+```
+<script lang="ts">
+	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: AlertDialogPrimitive.DescriptionProps = $props();
+</script>
+
+<AlertDialogPrimitive.Description
+	bind:ref
+	data-slot="alert-dialog-description"
+	class={cn("text-muted-foreground text-sm", className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-overlay.svelte`
+```
+<script lang="ts">
+	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: AlertDialogPrimitive.OverlayProps = $props();
+</script>
+
+<AlertDialogPrimitive.Overlay
+	bind:ref
+	data-slot="alert-dialog-overlay"
+	class={cn(
+		"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-header.svelte`
+```
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="alert-dialog-header"
+	class={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-trigger.svelte`
+```
+<script lang="ts">
+	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+
+	let { ref = $bindable(null), ...restProps }: AlertDialogPrimitive.TriggerProps = $props();
+</script>
+
+<AlertDialogPrimitive.Trigger bind:ref data-slot="alert-dialog-trigger" {...restProps} />
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-content.svelte`
+```
+<script lang="ts">
+	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+	import AlertDialogOverlay from "./alert-dialog-overlay.svelte";
+	import { cn, type WithoutChild, type WithoutChildrenOrChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		portalProps,
+		...restProps
+	}: WithoutChild<AlertDialogPrimitive.ContentProps> & {
+		portalProps?: WithoutChildrenOrChild<AlertDialogPrimitive.PortalProps>;
+	} = $props();
+</script>
+
+<AlertDialogPrimitive.Portal {...portalProps}>
+	<AlertDialogOverlay />
+	<AlertDialogPrimitive.Content
+		bind:ref
+		data-slot="alert-dialog-content"
+		class={cn(
+			"bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed left-[50%] top-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+			className
+		)}
+		{...restProps}
+	/>
+</AlertDialogPrimitive.Portal>
+
+```
+
+## `src/lib/components/ui/alert-dialog/index.ts`
+```
+import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+import Trigger from "./alert-dialog-trigger.svelte";
+import Title from "./alert-dialog-title.svelte";
+import Action from "./alert-dialog-action.svelte";
+import Cancel from "./alert-dialog-cancel.svelte";
+import Footer from "./alert-dialog-footer.svelte";
+import Header from "./alert-dialog-header.svelte";
+import Overlay from "./alert-dialog-overlay.svelte";
+import Content from "./alert-dialog-content.svelte";
+import Description from "./alert-dialog-description.svelte";
+
+const Root = AlertDialogPrimitive.Root;
+const Portal = AlertDialogPrimitive.Portal;
+
+export {
+	Root,
+	Title,
+	Action,
+	Cancel,
+	Portal,
+	Footer,
+	Header,
+	Trigger,
+	Overlay,
+	Content,
+	Description,
+	//
+	Root as AlertDialog,
+	Title as AlertDialogTitle,
+	Action as AlertDialogAction,
+	Cancel as AlertDialogCancel,
+	Portal as AlertDialogPortal,
+	Footer as AlertDialogFooter,
+	Header as AlertDialogHeader,
+	Trigger as AlertDialogTrigger,
+	Overlay as AlertDialogOverlay,
+	Content as AlertDialogContent,
+	Description as AlertDialogDescription,
+};
+
+```
+
+## `src/lib/components/ui/alert-dialog/alert-dialog-cancel.svelte`
+```
+<script lang="ts">
+	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
+	import { buttonVariants } from "$lib/components/ui/button/index.js";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: AlertDialogPrimitive.CancelProps = $props();
+</script>
+
+<AlertDialogPrimitive.Cancel
+	bind:ref
+	data-slot="alert-dialog-cancel"
+	class={cn(buttonVariants({ variant: "outline" }), className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/sonner/index.ts`
+```
+export { default as Toaster } from "./sonner.svelte";
+
+```
+
+## `src/lib/components/ui/sonner/sonner.svelte`
+```
+<script lang="ts">
+	import { Toaster as Sonner, type ToasterProps as SonnerProps } from "svelte-sonner";
+	import { mode } from "mode-watcher";
+
+	let { ...restProps }: SonnerProps = $props();
+</script>
+
+<Sonner
+	theme={mode.current}
+	class="toaster group"
+	style="--normal-bg: var(--color-popover); --normal-text: var(--color-popover-foreground); --normal-border: var(--color-border);"
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/select/select-group.svelte`
+```
+<script lang="ts">
+	import { Select as SelectPrimitive } from "bits-ui";
+
+	let { ref = $bindable(null), ...restProps }: SelectPrimitive.GroupProps = $props();
+</script>
+
+<SelectPrimitive.Group data-slot="select-group" {...restProps} />
+
+```
+
+## `src/lib/components/ui/select/select-scroll-down-button.svelte`
+```
+<script lang="ts">
+	import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+	import { Select as SelectPrimitive } from "bits-ui";
+	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: WithoutChildrenOrChild<SelectPrimitive.ScrollDownButtonProps> = $props();
+</script>
+
+<SelectPrimitive.ScrollDownButton
+	bind:ref
+	data-slot="select-scroll-down-button"
+	class={cn("flex cursor-default items-center justify-center py-1", className)}
+	{...restProps}
+>
+	<ChevronDownIcon class="size-4" />
+</SelectPrimitive.ScrollDownButton>
+
+```
+
+## `src/lib/components/ui/select/select-scroll-up-button.svelte`
+```
+<script lang="ts">
+	import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
+	import { Select as SelectPrimitive } from "bits-ui";
+	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: WithoutChildrenOrChild<SelectPrimitive.ScrollUpButtonProps> = $props();
+</script>
+
+<SelectPrimitive.ScrollUpButton
+	bind:ref
+	data-slot="select-scroll-up-button"
+	class={cn("flex cursor-default items-center justify-center py-1", className)}
+	{...restProps}
+>
+	<ChevronUpIcon class="size-4" />
+</SelectPrimitive.ScrollUpButton>
+
+```
+
+## `src/lib/components/ui/select/select-group-heading.svelte`
+```
+<script lang="ts">
+	import { Select as SelectPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+	import type { ComponentProps } from "svelte";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: ComponentProps<typeof SelectPrimitive.GroupHeading> = $props();
+</script>
+
+<SelectPrimitive.GroupHeading
+	bind:ref
+	data-slot="select-group-heading"
+	class={cn("text-muted-foreground px-2 py-1.5 text-xs", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</SelectPrimitive.GroupHeading>
+
+```
+
+## `src/lib/components/ui/select/select-label.svelte`
+```
+<script lang="ts">
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {} = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="select-label"
+	class={cn("text-muted-foreground px-2 py-1.5 text-xs", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/select/select-content.svelte`
+```
+<script lang="ts">
+	import { Select as SelectPrimitive } from "bits-ui";
+	import SelectScrollUpButton from "./select-scroll-up-button.svelte";
+	import SelectScrollDownButton from "./select-scroll-down-button.svelte";
+	import { cn, type WithoutChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		sideOffset = 4,
+		portalProps,
+		children,
+		...restProps
+	}: WithoutChild<SelectPrimitive.ContentProps> & {
+		portalProps?: SelectPrimitive.PortalProps;
+	} = $props();
+</script>
+
+<SelectPrimitive.Portal {...portalProps}>
+	<SelectPrimitive.Content
+		bind:ref
+		{sideOffset}
+		data-slot="select-content"
+		class={cn(
+			"bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 max-h-(--bits-select-content-available-height) origin-(--bits-select-content-transform-origin) relative z-50 min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border shadow-md data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+			className
+		)}
+		{...restProps}
+	>
+		<SelectScrollUpButton />
+		<SelectPrimitive.Viewport
+			class={cn(
+				"h-(--bits-select-anchor-height) min-w-(--bits-select-anchor-width) w-full scroll-my-1 p-1"
+			)}
+		>
+			{@render children?.()}
+		</SelectPrimitive.Viewport>
+		<SelectScrollDownButton />
+	</SelectPrimitive.Content>
+</SelectPrimitive.Portal>
+
+```
+
+## `src/lib/components/ui/select/select-separator.svelte`
+```
+<script lang="ts">
+	import type { Separator as SeparatorPrimitive } from "bits-ui";
+	import { Separator } from "$lib/components/ui/separator/index.js";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: SeparatorPrimitive.RootProps = $props();
+</script>
+
+<Separator
+	bind:ref
+	data-slot="select-separator"
+	class={cn("bg-border pointer-events-none -mx-1 my-1 h-px", className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/select/select-item.svelte`
+```
+<script lang="ts">
+	import CheckIcon from "@lucide/svelte/icons/check";
+	import { Select as SelectPrimitive } from "bits-ui";
+	import { cn, type WithoutChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		value,
+		label,
+		children: childrenProp,
+		...restProps
+	}: WithoutChild<SelectPrimitive.ItemProps> = $props();
+</script>
+
+<SelectPrimitive.Item
+	bind:ref
+	{value}
+	data-slot="select-item"
+	class={cn(
+		"data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground outline-hidden *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2 relative flex w-full cursor-default select-none items-center gap-2 rounded-sm py-1.5 pl-2 pr-8 text-sm data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+		className
+	)}
+	{...restProps}
+>
+	{#snippet children({ selected, highlighted })}
+		<span class="absolute right-2 flex size-3.5 items-center justify-center">
+			{#if selected}
+				<CheckIcon class="size-4" />
+			{/if}
+		</span>
+		{#if childrenProp}
+			{@render childrenProp({ selected, highlighted })}
+		{:else}
+			{label || value}
+		{/if}
+	{/snippet}
+</SelectPrimitive.Item>
+
+```
+
+## `src/lib/components/ui/select/index.ts`
+```
+import { Select as SelectPrimitive } from "bits-ui";
+
+import Group from "./select-group.svelte";
+import Label from "./select-label.svelte";
+import Item from "./select-item.svelte";
+import Content from "./select-content.svelte";
+import Trigger from "./select-trigger.svelte";
+import Separator from "./select-separator.svelte";
+import ScrollDownButton from "./select-scroll-down-button.svelte";
+import ScrollUpButton from "./select-scroll-up-button.svelte";
+import GroupHeading from "./select-group-heading.svelte";
+
+const Root = SelectPrimitive.Root;
+
+export {
+	Root,
+	Group,
+	Label,
+	Item,
+	Content,
+	Trigger,
+	Separator,
+	ScrollDownButton,
+	ScrollUpButton,
+	GroupHeading,
+	//
+	Root as Select,
+	Group as SelectGroup,
+	Label as SelectLabel,
+	Item as SelectItem,
+	Content as SelectContent,
+	Trigger as SelectTrigger,
+	Separator as SelectSeparator,
+	ScrollDownButton as SelectScrollDownButton,
+	ScrollUpButton as SelectScrollUpButton,
+	GroupHeading as SelectGroupHeading,
+};
+
+```
+
+## `src/lib/components/ui/select/select-trigger.svelte`
+```
+<script lang="ts">
+	import { Select as SelectPrimitive } from "bits-ui";
+	import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+	import { cn, type WithoutChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		size = "default",
+		...restProps
+	}: WithoutChild<SelectPrimitive.TriggerProps> & {
+		size?: "sm" | "default";
+	} = $props();
+</script>
+
+<SelectPrimitive.Trigger
+	bind:ref
+	data-slot="select-trigger"
+	data-size={size}
+	class={cn(
+		"border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 shadow-xs flex w-fit select-none items-center justify-between gap-2 whitespace-nowrap rounded-md border bg-transparent px-3 py-2 text-sm outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+	<ChevronDownIcon class="size-4 opacity-50" />
+</SelectPrimitive.Trigger>
+
+```
+
+## `src/lib/components/ui/dialog/dialog-footer.svelte`
+```
+<script lang="ts">
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="dialog-footer"
+	class={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/dialog/dialog-close.svelte`
+```
+<script lang="ts">
+	import { Dialog as DialogPrimitive } from "bits-ui";
+
+	let { ref = $bindable(null), ...restProps }: DialogPrimitive.CloseProps = $props();
+</script>
+
+<DialogPrimitive.Close bind:ref data-slot="dialog-close" {...restProps} />
+
+```
+
+## `src/lib/components/ui/dialog/dialog-trigger.svelte`
+```
+<script lang="ts">
+	import { Dialog as DialogPrimitive } from "bits-ui";
+
+	let { ref = $bindable(null), ...restProps }: DialogPrimitive.TriggerProps = $props();
+</script>
+
+<DialogPrimitive.Trigger bind:ref data-slot="dialog-trigger" {...restProps} />
+
+```
+
+## `src/lib/components/ui/dialog/dialog-content.svelte`
+```
+<script lang="ts">
+	import { Dialog as DialogPrimitive } from "bits-ui";
+	import XIcon from "@lucide/svelte/icons/x";
+	import type { Snippet } from "svelte";
+	import * as Dialog from "./index.js";
+	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		portalProps,
+		children,
+		showCloseButton = true,
+		...restProps
+	}: WithoutChildrenOrChild<DialogPrimitive.ContentProps> & {
+		portalProps?: DialogPrimitive.PortalProps;
+		children: Snippet;
+		showCloseButton?: boolean;
+	} = $props();
+</script>
+
+<Dialog.Portal {...portalProps}>
+	<Dialog.Overlay />
+	<DialogPrimitive.Content
+		bind:ref
+		data-slot="dialog-content"
+		class={cn(
+			"bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed left-[50%] top-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+			className
+		)}
+		{...restProps}
+	>
+		{@render children?.()}
+		{#if showCloseButton}
+			<DialogPrimitive.Close
+				class="ring-offset-background focus:ring-ring rounded-xs focus:outline-hidden absolute end-4 top-4 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
+			>
+				<XIcon />
+				<span class="sr-only">Close</span>
+			</DialogPrimitive.Close>
+		{/if}
+	</DialogPrimitive.Content>
+</Dialog.Portal>
+
+```
+
+## `src/lib/components/ui/dialog/dialog-description.svelte`
+```
+<script lang="ts">
+	import { Dialog as DialogPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: DialogPrimitive.DescriptionProps = $props();
+</script>
+
+<DialogPrimitive.Description
+	bind:ref
+	data-slot="dialog-description"
+	class={cn("text-muted-foreground text-sm", className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/dialog/dialog-overlay.svelte`
+```
+<script lang="ts">
+	import { Dialog as DialogPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: DialogPrimitive.OverlayProps = $props();
+</script>
+
+<DialogPrimitive.Overlay
+	bind:ref
+	data-slot="dialog-overlay"
+	class={cn(
+		"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/dialog/dialog-title.svelte`
+```
+<script lang="ts">
+	import { Dialog as DialogPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: DialogPrimitive.TitleProps = $props();
+</script>
+
+<DialogPrimitive.Title
+	bind:ref
+	data-slot="dialog-title"
+	class={cn("text-lg font-semibold leading-none", className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/dialog/dialog-header.svelte`
+```
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="dialog-header"
+	class={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/dialog/index.ts`
+```
+import { Dialog as DialogPrimitive } from "bits-ui";
+
+import Title from "./dialog-title.svelte";
+import Footer from "./dialog-footer.svelte";
+import Header from "./dialog-header.svelte";
+import Overlay from "./dialog-overlay.svelte";
+import Content from "./dialog-content.svelte";
+import Description from "./dialog-description.svelte";
+import Trigger from "./dialog-trigger.svelte";
+import Close from "./dialog-close.svelte";
+
+const Root = DialogPrimitive.Root;
+const Portal = DialogPrimitive.Portal;
+
+export {
+	Root,
+	Title,
+	Portal,
+	Footer,
+	Header,
+	Trigger,
+	Overlay,
+	Content,
+	Description,
+	Close,
+	//
+	Root as Dialog,
+	Title as DialogTitle,
+	Portal as DialogPortal,
+	Footer as DialogFooter,
+	Header as DialogHeader,
+	Trigger as DialogTrigger,
+	Overlay as DialogOverlay,
+	Content as DialogContent,
+	Description as DialogDescription,
+	Close as DialogClose,
+};
+
+```
+
+## `src/lib/components/ui/radio-group/radio-group.svelte`
+```
+<script lang="ts">
+	import { RadioGroup as RadioGroupPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		value = $bindable(""),
+		...restProps
+	}: RadioGroupPrimitive.RootProps = $props();
+</script>
+
+<RadioGroupPrimitive.Root
+	bind:ref
+	bind:value
+	data-slot="radio-group"
+	class={cn("grid gap-3", className)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/radio-group/radio-group-item.svelte`
+```
+<script lang="ts">
+	import { RadioGroup as RadioGroupPrimitive } from "bits-ui";
+	import CircleIcon from "@lucide/svelte/icons/circle";
+	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		...restProps
+	}: WithoutChildrenOrChild<RadioGroupPrimitive.ItemProps> = $props();
+</script>
+
+<RadioGroupPrimitive.Item
+	bind:ref
+	data-slot="radio-group-item"
+	class={cn(
+		"border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 shadow-xs aspect-square size-4 shrink-0 rounded-full border outline-none transition-[color,box-shadow] focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+		className
+	)}
+	{...restProps}
+>
+	{#snippet children({ checked })}
+		<div data-slot="radio-group-indicator" class="relative flex items-center justify-center">
+			{#if checked}
+				<CircleIcon
+					class="fill-primary absolute left-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2"
+				/>
+			{/if}
+		</div>
+	{/snippet}
+</RadioGroupPrimitive.Item>
+
+```
+
+## `src/lib/components/ui/radio-group/index.ts`
+```
+import Root from "./radio-group.svelte";
+import Item from "./radio-group-item.svelte";
+
+export {
+	Root,
+	Item,
+	//
+	Root as RadioGroup,
+	Item as RadioGroupItem,
+};
+
+```
+
+## `src/lib/components/ui/separator/separator.svelte`
+```
+<script lang="ts">
+	import { Separator as SeparatorPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		"data-slot": dataSlot = "separator",
+		...restProps
+	}: SeparatorPrimitive.RootProps = $props();
+</script>
+
+<SeparatorPrimitive.Root
+	bind:ref
+	data-slot={dataSlot}
+	class={cn(
+		"bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=vertical]:h-full data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px",
+		className
+	)}
+	{...restProps}
+/>
+
+```
+
+## `src/lib/components/ui/separator/index.ts`
+```
+import Root from "./separator.svelte";
+
+export {
+	Root,
+	//
+	Root as Separator,
+};
+
+```
+
+## `src/lib/components/ui/card/card-description.svelte`
+```
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLParagraphElement>> = $props();
+</script>
+
+<p
+	bind:this={ref}
+	data-slot="card-description"
+	class={cn("text-muted-foreground text-sm", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</p>
+
+```
+
+## `src/lib/components/ui/card/card.svelte`
+```
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="card"
+	class={cn(
+		"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/card/card-action.svelte`
+```
+<script lang="ts">
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="card-action"
+	class={cn("col-start-2 row-span-2 row-start-1 self-start justify-self-end", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/card/card-content.svelte`
+```
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div bind:this={ref} data-slot="card-content" class={cn("px-6", className)} {...restProps}>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/card/card-header.svelte`
+```
+<script lang="ts">
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="card-header"
+	class={cn(
+		"@container/card-header has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6",
+		className
+	)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/card/card-title.svelte`
+```
+<script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="card-title"
+	class={cn("font-semibold leading-none", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/card/card-footer.svelte`
+```
+<script lang="ts">
+	import { cn, type WithElementRef } from "$lib/utils.js";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+</script>
+
+<div
+	bind:this={ref}
+	data-slot="card-footer"
+	class={cn("[.border-t]:pt-6 flex items-center px-6", className)}
+	{...restProps}
+>
+	{@render children?.()}
+</div>
+
+```
+
+## `src/lib/components/ui/card/index.ts`
+```
+import Root from "./card.svelte";
+import Content from "./card-content.svelte";
+import Description from "./card-description.svelte";
+import Footer from "./card-footer.svelte";
+import Header from "./card-header.svelte";
+import Title from "./card-title.svelte";
+import Action from "./card-action.svelte";
+
+export {
+	Root,
+	Content,
+	Description,
+	Footer,
+	Header,
+	Title,
+	Action,
+	//
+	Root as Card,
+	Content as CardContent,
+	Description as CardDescription,
+	Footer as CardFooter,
+	Header as CardHeader,
+	Title as CardTitle,
+	Action as CardAction,
+};
+
+```
+
+## `src/lib/components/ui/badge/badge.svelte`
+```
+<script lang="ts" module>
+	import { type VariantProps, tv } from "tailwind-variants";
+
+	export const badgeVariants = tv({
+		base: "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium transition-[color,box-shadow] focus-visible:ring-[3px] [&>svg]:pointer-events-none [&>svg]:size-3",
+		variants: {
+			variant: {
+				default:
+					"bg-primary text-primary-foreground [a&]:hover:bg-primary/90 border-transparent",
+				secondary:
+					"bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 border-transparent",
+				destructive:
+					"bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 border-transparent text-white",
+				outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+			},
+		},
+		defaultVariants: {
+			variant: "default",
+		},
+	});
+
+	export type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
+</script>
+
+<script lang="ts">
+	import type { HTMLAnchorAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils.js";
+
+	let {
+		ref = $bindable(null),
+		href,
+		class: className,
+		variant = "default",
+		children,
+		...restProps
+	}: WithElementRef<HTMLAnchorAttributes> & {
+		variant?: BadgeVariant;
+	} = $props();
+</script>
+
+<svelte:element
+	this={href ? "a" : "span"}
+	bind:this={ref}
+	data-slot="badge"
+	{href}
+	class={cn(badgeVariants({ variant }), className)}
+	{...restProps}
+>
+	{@render children?.()}
+</svelte:element>
+
+```
+
+## `src/lib/components/ui/badge/index.ts`
+```
+export { default as Badge } from "./badge.svelte";
+export { badgeVariants, type BadgeVariant } from "./badge.svelte";
+
+```
+
+## `src/lib/utils/useItemFilters.ts`
+```
+// src/lib/utils/useItemFilters.ts
+import type { ItemTree, Item, Priority } from '$lib/types';
+
+export interface FilterOptions {
+  searchQuery: string;
+  selectedPriority: 'all' | Priority;
+  showCompleted: boolean;
+  selectedTags: string[];
+}
+
+export function filterItemTree(itemTree: ItemTree, filters: FilterOptions) {
+  const filtered: Record<string, Item[]> = {};
+
+  Object.entries(itemTree).forEach(([categoryName, items]) => {
+    const filteredItems = items.filter((item) => {
+      if (filters.searchQuery.trim()) {
+        const query = filters.searchQuery.toLowerCase();
+        const matchesSearch =
+          item.name.toLowerCase().includes(query) ||
+          item.text.toLowerCase().includes(query) ||
+          item.tags?.some((tag) => tag.toLowerCase().includes(query));
+        if (!matchesSearch) return false;
+      }
+
+      if (
+        filters.selectedPriority !== 'all' &&
+        item.priority !== filters.selectedPriority
+      ) {
+        return false;
+      }
+
+      if (!filters.showCompleted && item.isCompleted) {
+        return false;
+      }
+
+      if (filters.selectedTags.length > 0) {
+        const hasMatchingTag = filters.selectedTags.some((selectedTag) =>
+          item.tags?.includes(selectedTag),
+        );
+        if (!hasMatchingTag) return false;
+      }
+
+      return true;
+    });
+
+    if (filteredItems.length > 0) {
+      filtered[categoryName] = filteredItems;
+    }
+  });
+
+  return filtered;
+}
+
+export function getAllTags(itemTree: ItemTree): string[] {
+  const tags = new Set<string>();
+  Object.values(itemTree).forEach((items) => {
+    items.forEach((item) => {
+      item.tags?.forEach((tag) => tags.add(tag));
+    });
+  });
+  return Array.from(tags).sort();
+}
+
+export function useItemFilters(itemTree: ItemTree, filters: FilterOptions) {
+  const filteredItemTree = filterItemTree(itemTree, filters);
+  const allTags = getAllTags(itemTree);
+  
+  const hasActiveFilters = !!(
+    filters.searchQuery.trim() ||
+    filters.selectedPriority !== 'all' ||
+    !filters.showCompleted ||
+    filters.selectedTags.length > 0
+  );
+
+  return {
+    filteredItemTree,
+    allTags,
+    hasActiveFilters
+  };
+}
+```
+
+## `src/lib/utils/themeUpdater.ts`
+```
+// src/lib/utils/themeUpdater.ts
+import { onMount } from 'svelte';
+import { uiStore, type Theme } from '$lib/stores/uiStore';
+import { get } from 'svelte/store';
+
+export function useThemeUpdater() {
+  onMount(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function applyTheme(theme: Theme) {
+      const html = document.documentElement;
+      if (theme === 'system') {
+        const isDark = media.matches;
+        if (isDark) html.classList.add('dark');
+        else html.classList.remove('dark');
+      } else if (theme === 'dark') {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+    }
+
+    // initial
+    applyTheme(get(uiStore.theme));
+
+    const unsub = uiStore.theme.subscribe((t) => applyTheme(t));
+
+    const mediaListener = () => {
+      if (get(uiStore.theme) === 'system') {
+        applyTheme('system');
+      }
+    };
+
+    media.addEventListener('change', mediaListener);
+
+    return () => {
+      unsub();
+      media.removeEventListener('change', mediaListener);
+    };
+  });
+}
+```
+
+## `src/lib/utils/helpers.ts`
+```
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+```
+
+## `src/lib/stores/uiStore.ts`
+```
+// src/lib/stores/uiStore.ts
+import { writable, get } from 'svelte/store';
+import type { NotificationType, Item } from '$lib/types';
+import { toast } from 'svelte-sonner';
+
+export type Theme = 'light' | 'dark' | 'system';
+
+function createUiStore() {
+  const theme = writable<Theme>('system');
+  const isFormOpen = writable(false);
+  const preselectedCategory = writable<string | null>(null);
+  const editingItem = writable<Item | null>(null);
+
+  function openForm(item?: Item, categorySlug?: string) {
+    editingItem.set(item ?? null);
+    if (categorySlug) {
+      preselectedCategory.set(categorySlug);
+    } else if (item?.categorySlug) {
+      preselectedCategory.set(item.categorySlug);
+    }
+    isFormOpen.set(true);
+  }
+
+  function closeForm() {
+    isFormOpen.set(false);
+    preselectedCategory.set(null);
+    editingItem.set(null);
+  }
+
+  function toggleTheme() {
+    const current = get(theme);
+    if (current === 'light') theme.set('dark');
+    else if (current === 'dark') theme.set('system');
+    else theme.set('light');
+  }
+
+  function showNotification(type: NotificationType, message: string) {
+    switch (type) {
+      case 'success':
+        toast.success(message);
+        break;
+      case 'error':
+        toast.error(message);
+        break;
+      case 'warning':
+        toast.warning(message);
+        break;
+      case 'info':
+      default:
+        toast(message);
+        break;
+    }
+  }
+
+  return {
+    theme,
+    isFormOpen,
+    preselectedCategory,
+    editingItem,
+    openForm,
+    closeForm,
+    toggleTheme,
+    showNotification,
+  };
+}
+
+export const uiStore = createUiStore();
 ```
 
 ## `src/lib/utils.ts`
@@ -397,6 +2501,585 @@ export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?:
   count is {count}
 </button>
 
+```
+
+## `src/lib/schemas/itemSchema.ts`
+```
+import { z } from 'zod';
+import type { SingleCategory } from '$lib/types';
+
+export const itemFormSchema = z.object({
+  name: z.string()
+    .min(1, 'Name is required')
+    .min(3, 'Name must be at least 3 characters'),
+  text: z.string()
+    .min(1, 'Description is required'),
+  priority: z.enum(['low', 'mid', 'high']),
+  tags: z.array(z.string()).optional(),
+  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
+});
+
+export type ItemFormData = z.infer<typeof itemFormSchema>;
+```
+
+## `src/lib/router/Router.svelte`
+```
+<!-- src/lib/router/Router.svelte -->
+<script lang="ts">
+  import ItemPage from '$lib/pages/ItemPage.svelte';
+  import AboutPage from '$lib/pages/AboutPage.svelte';
+  import ItemDetailPage from '$lib/pages/ItemDetailPage.svelte';
+  import { resolveRoute, navigate as navFn, type Route } from '$lib/router/router';
+  import { onMount } from 'svelte';
+
+  let currentRoute: Route = $state(resolveRoute(window.location.pathname));
+
+  function handleNavigate(path: string) {
+    navFn(path);
+  }
+
+  onMount(() => {
+    const handler = (event: PopStateEvent | CustomEvent<string>) => {
+      const pathname =
+        event instanceof PopStateEvent
+          ? window.location.pathname
+          : (event.detail as string);
+      currentRoute = resolveRoute(pathname);
+    };
+
+    window.addEventListener('popstate', handler);
+    window.addEventListener('app:navigated', handler as EventListener);
+
+    return () => {
+      window.removeEventListener('popstate', handler);
+      window.removeEventListener('app:navigated', handler as EventListener);
+    };
+  });
+</script>
+
+{#if currentRoute.name === 'home'}
+  <ItemPage on:navigate={(e) => handleNavigate(e.detail)} />
+{:else if currentRoute.name === 'about'}
+  <AboutPage on:navigate={(e) => handleNavigate(e.detail)} />
+{:else if currentRoute.name === 'item-detail'}
+  <ItemDetailPage
+    categorySlug={currentRoute.categorySlug}
+    itemSlug={currentRoute.itemSlug}
+    on:navigate={(e) => handleNavigate(e.detail)}
+  />
+{/if}
+```
+
+## `src/lib/router/router.ts`
+```
+// src/lib/router/router.ts
+export type Route =
+  | { name: 'home' }
+  | { name: 'about' }
+  | { name: 'item-detail'; categorySlug: string; itemSlug: string };
+
+export function resolveRoute(pathname: string): Route {
+  if (pathname === '/' || pathname === '') {
+    return { name: 'home' };
+  }
+  if (pathname === '/about') {
+    return { name: 'about' };
+  }
+
+  const parts = pathname.split('/').filter(Boolean);
+  if (parts[0] === 'items' && parts.length === 3) {
+    const [, categorySlug, itemSlug] = parts;
+    return { name: 'item-detail', categorySlug, itemSlug };
+  }
+
+  // fallback: home
+  return { name: 'home' };
+}
+
+export function navigate(path: string) {
+  if (window.location.pathname !== path) {
+    history.pushState({}, '', path);
+    const event = new CustomEvent('app:navigated', { detail: path });
+    window.dispatchEvent(event);
+  }
+}
+```
+
+## `src/lib/types/index.ts`
+```
+// src/lib/types/index.ts
+export type Priority = 'low' | 'mid' | 'high';
+export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+
+export type SingleCategory<T = number> = [T];
+
+export interface Item {
+  id: number;
+  name: string;
+  text: string;
+  priority: Priority;
+  isCompleted: boolean;
+  slug: string;
+  tags?: string[];
+  categories: SingleCategory<number>;
+  categorySlug: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ItemTree {
+  [categorySlug: string]: Item[];
+}
+
+export interface CreateItemPayload {
+  name: string;
+  text: string;
+  priority: Priority;
+  tags?: string[];
+  // In Vue this is SingleCategory<string>; keep same payload shape.
+  categories: SingleCategory<string>;
+}
+
+export interface UpdateItemPayload extends Partial<CreateItemPayload> {
+  isCompleted?: boolean;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+}
+
+export interface ApiErrorData {
+  message: string;
+  statusCode: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  details?: any;
+}
+
+export type Result<T, E> =
+  | { success: true; data: T }
+  | { success: false; error: E };
+```
+
+## `src/lib/pages/AboutPage.svelte`
+```
+<!-- src/lib/pages/AboutPage.svelte -->
+<script lang="ts">
+  import MainLayout from '$lib/components/layout/MainLayout.svelte';
+  import { createEventDispatcher } from 'svelte';
+
+  export let navigate: (path: string) => void;
+
+  function handleNavigate(path: string) {
+    dispatch('navigate', path);
+  }
+
+  const dispatch = createEventDispatcher<{ navigate: string }>();
+</script>
+
+<MainLayout onNavigate={handleNavigate}>
+  <div class="space-y-6">
+    <header>
+      <h1 class="font-bold text-size-3xl">About This Application</h1>
+    </header>
+
+    <div class="p-6 border rounded-lg bg-surface border-border">
+      <p class="mb-4 text-text-secondary">
+        This is a modern, responsive Vue frontend for managing items, built to serve as a clean and robust boilerplate. It leverages the full power of TanStack suite and modern tooling for a superior developer experience and a fully type-safe workflow.
+      </p>
+
+      <h2 class="mb-3 font-semibold text-size-xl">Core Technologies Used:</h2>
+
+      <ul class="space-y-2 list-disc list-inside text-text-secondary">
+        <li>
+          <span class="font-medium text-text-primary">Vue 3:</span>
+          For building a reactive and performant user interface with Composition API.
+        </li>
+        <li>
+          <span class="font-medium text-text-primary">TanStack Query (Vue Query):</span>
+          Manages all server state, handling data fetching, caching, and synchronization effortlessly.
+        </li>
+        <li>
+          <span class="font-medium text-text-primary">TanStack Form (Vue Form):</span>
+          Ensures performant and 100% type-safe forms from validation to submission.
+        </li>
+        <li>
+          <span class="font-medium text-text-primary">Pinia:</span>
+          Provides simple and type-safe global state management for client-side UI state.
+        </li>
+        <li>
+          <span class="font-medium text-text-primary">shadcn-vue:</span>
+          A collection of beautifully designed, accessible, and unstyled components that are adapted to our custom design system.
+        </li>
+        <li>
+          <span class="font-medium text-text-primary">Tailwind CSS v4:</span>
+          Powers styling with a "CSS-first" approach, using a custom, token-based, and fluidly responsive design system.
+        </li>
+      </ul>
+    </div>
+  </div>
+</MainLayout>
+```
+
+## `src/lib/pages/ItemPage.svelte`
+```
+<script lang="ts">
+  import MainLayout from '$lib/components/layout/MainLayout.svelte';
+  import { useItemTree } from '$lib/api/itemsQuery';
+  import { useItemFilters } from '$lib/utils/useItemFilters';
+  import FilterBar from '$lib/components/layout/FilterBar.svelte';
+  import ItemItem from '$lib/components/items/ItemItem.svelte';
+  import ItemForm from '$lib/components/items/ItemForm.svelte';
+  import { uiStore } from '$lib/stores/uiStore';
+  import { isFormOpen } from '$lib/stores/uiStore';
+  import { Button } from '$lib/components/ui/button';
+  import { createEventDispatcher } from 'svelte';
+
+  const itemTreeQuery = useItemTree();
+  const dispatch = createEventDispatcher();
+
+  let filters = {
+    searchQuery: '',
+    selectedPriority: 'all' as const,
+    showCompleted: true,
+    selectedTags: [] as string[],
+  };
+
+  $: filterResults = useItemFilters(itemTreeQuery.data || {}, filters);
+  $: filteredItemTree = filterResults.filteredItemTree;
+  $: allTags = filterResults.allTags;
+  $: hasActiveFilters = filterResults.hasActiveFilters;
+
+  function clearFilters() {
+    filters = {
+      searchQuery: '',
+      selectedPriority: 'all',
+      showCompleted: true,
+      selectedTags: [],
+    };
+  }
+
+  function handleNavigate(path: string) {
+    dispatch('navigate', path);
+  }
+</script>
+
+<MainLayout onNavigate={handleNavigate}>
+  <header class="mb-6">
+    <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
+    <!-- The main "Add New Item" button remains in the sidebar -->
+  </header>
+
+  <FilterBar
+    bind:search={filters.searchQuery}
+    bind:priority={filters.selectedPriority}
+    bind:showCompleted={filters.showCompleted}
+    bind:selectedTags={filters.selectedTags}
+    {allTags}
+    {hasActiveFilters}
+    on:clear={clearFilters}
+  />
+
+  {#if itemTreeQuery.isLoading}
+    <div>Loading...</div>
+  {:else if itemTreeQuery.error}
+    <div>Error: {itemTreeQuery.error.message}</div>
+  {:else}
+    <div class="mt-6 space-y-8">
+      {#each Object.entries(filteredItemTree) as [category, items]}
+        <section>
+          <div class="flex items-center gap-2 mb-4">
+            <h2 class="font-semibold capitalize text-size-xl">{category}</h2>
+            <span class="text-sm text-text-muted">({items.length})</span>
+            <!-- Add "+" button here -->
+            <Button 
+              variant="ghost" 
+              size="icon-sm" 
+              onclick={() => uiStore.openForm(undefined, category)}
+            >
+              <icon-lucide-plus class="w-4 h-4"></icon-lucide-plus>
+            </Button>
+          </div>
+          <div class="grid gap-4">
+            {#each items as item (item.id)}
+              <ItemItem {item} />
+            {/each}
+          </div>
+        </section>
+      {/each}
+      {#if Object.keys(filteredItemTree).length === 0 && !itemTreeQuery.isLoading}
+        <div class="py-10 text-center text-text-muted">
+          <p>No items found.</p>
+          {#if hasActiveFilters}
+            <p>Try adjusting your filters.</p>
+          {/if}
+        </div>
+      {/if}
+    </div>
+  {/if}
+
+  <!-- The ItemForm is now aware of pre-selected category -->
+  {#if $uiStore.isFormOpen}
+    <ItemForm onClose={() => uiStore.closeForm()} />
+  {/if}
+</MainLayout>
+```
+
+## `src/lib/pages/ItemDetailPage.svelte`
+```
+<script lang="ts">
+  import { useItemDetail } from '$lib/api/itemsQuery';
+  import { formatDate } from '$lib/utils/helpers';
+  import type { Item } from '$lib/types';
+
+  export let categorySlug: string;
+  export let itemSlug: string;
+  export let navigate: (path: string) => void;
+
+  const { data: item, isLoading, error } = useItemDetail(() => categorySlug, () => itemSlug);
+
+  function goBack() {
+    navigate('/');
+  }
+</script>
+
+<div class="container mx-auto p-fluid-6">
+  <button onclick={goBack} class="mb-4 text-primary hover:underline">
+    ← Back
+  </button>
+
+  {#if isLoading}
+    <div>Loading...</div>
+  {:else if error}
+    <div>Error: {error.message}</div>
+  {:else if item}
+    <div class="bg-surface rounded-card p-card">
+      <h1 class="mb-4 font-bold text-size-2xl">{item.name}</h1>
+      <p class="mb-4 text-text-secondary">{item.text}</p>
+      <div class="flex gap-2 mb-4">
+        <span class="tag-priority-{item.priority}">{item.priority}</span>
+        {#if item.isCompleted}
+          <span class="tag-sm bg-success-light">Completed</span>
+        {/if}
+      </div>
+      <div class="text-size-sm text-text-muted">
+        <p>Created: {formatDate(item.createdAt)}</p>
+        <p>Updated: {formatDate(item.updatedAt)}</p>
+      </div>
+    </div>
+  {/if}
+</div>
+```
+
+## `src/lib/api/itemApi.ts`
+```
+// src/lib/api/itemApi.ts
+import { get, post, patch, del } from '$lib/api/apiClient';
+import type {
+  Item,
+  ItemTree,
+  CreateItemPayload,
+  UpdateItemPayload,
+} from '$lib/types';
+
+export const getItemTree = () => get<ItemTree>('/items/tree');
+
+export const getItemBySlug = (categorySlug: string, itemSlug: string) =>
+  get<Item>(`/items/${categorySlug}/${itemSlug}`);
+
+export const createItem = (payload: CreateItemPayload) =>
+  post<Item, CreateItemPayload>('/items', payload);
+
+export const updateItem = (id: number, payload: UpdateItemPayload) =>
+  patch<Item, UpdateItemPayload>(`/items/${id}`, payload);
+
+export const deleteItem = (id: number) =>
+  del<{ deleted: boolean }>(`/items/${id}`);
+```
+
+## `src/lib/api/apiClient.ts`
+```
+// src/lib/api/apiClient.ts
+import { ofetch } from 'ofetch';
+import type { ApiErrorData, Result } from '$lib/types';
+
+const API_URL_BASE = 'http://localhost:3000/api';
+
+export const apiClient = ofetch.create({
+  baseURL: API_URL_BASE,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  async onResponseError({ response }) {
+    console.error('API Error:', response.status, response._data);
+  },
+});
+
+const success = <T>(data: T): Result<T, ApiErrorData> => ({
+  success: true,
+  data,
+});
+
+const failure = (error: ApiErrorData): Result<any, ApiErrorData> => ({
+  success: false,
+  error,
+});
+
+const createApiError = (message: string, statusCode: number): ApiErrorData => ({
+  message,
+  statusCode,
+});
+
+const request = async <T>(
+  method: string,
+  endpoint: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body?: any,
+): Promise<Result<T, ApiErrorData>> => {
+  try {
+    const response = await apiClient.raw(endpoint, {
+      method,
+      body: body ? body : undefined,
+    });
+
+    const data = response._data;
+    return success(data.data ?? data) as Result<T, ApiErrorData>;
+  } catch (error: any) {
+    const statusCode = error.response?.status || 503;
+    const message = error.data?.message || error.message || 'Network request failed';
+    return failure(createApiError(message, statusCode));
+  }
+};
+
+const unwrapResult = async <T>(resultPromise: Promise<Result<T, ApiErrorData>>): Promise<T> => {
+  const result = await resultPromise;
+  if (!result.success) {
+    const error = new Error(result.error.message);
+    (error as any).statusCode = result.error.statusCode;
+    (error as any).details = result.error.details;
+    throw error;
+  }
+  return result.data;
+};
+
+export const get = <T>(endpoint: string) =>
+  unwrapResult(request<T>('GET', endpoint));
+
+export const post = <TResponse, TRequest = any>(endpoint: string, data: TRequest) =>
+  unwrapResult(request<TResponse>('POST', endpoint, data));
+
+export const patch = <TResponse, TRequest = any>(endpoint: string, data: TRequest) =>
+  unwrapResult(request<TResponse>('PATCH', endpoint, data));
+
+export const del = <TResponse = { deleted: boolean }>(endpoint: string) =>
+  unwrapResult(request<TResponse>('DELETE', endpoint));
+
+export const api = { get, post, patch, delete: del };
+```
+
+## `src/lib/api/itemsQuery.ts`
+```
+// src/lib/api/itemsQuery.ts
+import {
+  QueryClient,
+  createQuery,
+  createMutation,
+  useQueryClient,
+} from '@tanstack/svelte-query';
+import {
+  getItemTree,
+  getItemBySlug,
+  createItem,
+  updateItem,
+  deleteItem,
+} from '$lib/api/itemApi';
+import type { CreateItemPayload, UpdateItemPayload } from '$lib/types';
+import { uiStore } from '$lib/stores/uiStore';
+
+// shared query keys (same structure as Vue)
+export const itemKeys = {
+  all: ['items'] as const,
+  tree: () => [...itemKeys.all, 'tree'] as const,
+  detail: (categorySlug: string, itemSlug: string) =>
+    [...itemKeys.all, 'detail', categorySlug, itemSlug] as const,
+};
+
+// root-level query client creator (used in App.svelte)
+export function createAppQueryClient() {
+  return new QueryClient();
+}
+
+// hooks-equivalent functions for components
+
+export function useItemTree() {
+  return createQuery(() => ({
+    queryKey: itemKeys.tree(),
+    queryFn: getItemTree,
+    staleTime: 5 * 60 * 1000,
+  }));
+}
+
+export function useItemDetail(categorySlug: () => string, itemSlug: () => string) {
+  return createQuery(() => ({
+    queryKey: itemKeys.detail(categorySlug(), itemSlug()),
+    queryFn: () => getItemBySlug(categorySlug(), itemSlug()),
+    enabled: Boolean(categorySlug() && itemSlug()),
+  }));
+}
+
+export function useAddItem() {
+  const queryClient = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: (payload: CreateItemPayload) => createItem(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      uiStore.showNotification('success', 'Item created successfully');
+    },
+    onError: (error: any) => {
+      uiStore.showNotification('error', error.message ?? 'Failed to create item');
+    },
+  }));
+}
+
+export function useUpdateItem() {
+  const queryClient = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: (args: { id: number; payload: UpdateItemPayload }) =>
+      updateItem(args.id, args.payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      uiStore.showNotification('success', 'Item updated successfully');
+    },
+    onError: (error: any) => {
+      uiStore.showNotification('error', error.message ?? 'Failed to update item');
+    },
+  }));
+}
+
+export function useDeleteItem() {
+  const queryClient = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: (id: number) => deleteItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      uiStore.showNotification('success', 'Item deleted successfully');
+    },
+    onError: (error: any) => {
+      uiStore.showNotification('error', error.message ?? 'Failed to delete item');
+    },
+  }));
+}
 ```
 
 ## `src/app.css`
