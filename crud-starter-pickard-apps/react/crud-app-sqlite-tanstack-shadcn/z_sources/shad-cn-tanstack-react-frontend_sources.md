@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** pon, 17 lis 2025, 14:35:34 CET
+**Generated on:** wto, 18 lis 2025, 19:51:07 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/react/crud-app-sqlite-tanstack-shadcn/frontend
 
 ---
@@ -216,10 +216,6 @@ echo "3. Start development: npm run dev"
 
 ## `README.md`
 ```
-Of course, here is the updated, comprehensive technical documentation for the `crud-app-sqlite` frontend codebase. This new `README.md` reflects the integration of `shadcn/ui` and other changes based on the provided source files.
-
----
-
 # (Technical Documentation) Items App - Frontend
 
 **This document serves as a detailed technical guide for developers (human or AI) interacting with the `crud-app-sqlite` frontend codebase. Its purpose is to provide a comprehensive understanding of the architecture, design system, state management, and development practices.**
