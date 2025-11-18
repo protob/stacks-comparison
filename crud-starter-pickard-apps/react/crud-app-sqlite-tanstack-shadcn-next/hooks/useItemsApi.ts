@@ -6,14 +6,14 @@ import type { Item } from '@/types';
 
 export const itemKeys = {
   all: ['items'] as const,
-  items: () => [...itemKeys.all, 'list'] as const,
-  detail: (id: string) => [...itemKeys.all, 'detail', id] as const,
+  tree: () => [...itemKeys.all, 'tree'] as const,
+  detail: (category: string, slug: string) => [...itemKeys.all, 'detail', category, slug] as const,
 };
 
-export const useItems = () => {
+export const useGetItemTree = () => {
   return useQuery({
-    queryKey: itemKeys.items(),
-    queryFn: itemApi.getItems,
+    queryKey: itemKeys.tree(),
+    queryFn: itemApi.getItemTree,
   });
 };
 
@@ -23,12 +23,12 @@ export const useAddItem = () => {
 
   return useMutation({
     mutationFn: itemApi.createItem,
-    onSuccess: () => {
-      showSuccessToast('Item created successfully!');
-      queryClient.invalidateQueries({ queryKey: itemKeys.items() });
+    onSuccess: (newItem) => {
+      showSuccessToast(`Item "${newItem.name}" added.`);
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
     },
     onError: (error: any) => {
-      showErrorToast(error.message || 'Failed to create item.');
+      showErrorToast(error.message || 'Failed to add item.');
     },
   });
 };
@@ -38,11 +38,13 @@ export const useUpdateItem = () => {
   const { showSuccessToast, showErrorToast } = useUiStore();
 
   return useMutation({
-    mutationFn: (variables: { id: string; data: Partial<Item> }) =>
-      itemApi.updateItem(variables.id, variables.data),
-    onSuccess: () => {
-      showSuccessToast('Item updated successfully!');
-      queryClient.invalidateQueries({ queryKey: itemKeys.items() });
+    mutationFn: (variables: { categorySlug: string; itemSlug: string; payload: itemApi.UpdateItemPayload }) =>
+      itemApi.updateItem(variables.categorySlug, variables.itemSlug, variables.payload),
+    onSuccess: (updatedItem) => {
+      showSuccessToast(`Item "${updatedItem.name}" updated.`);
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      const categorySlug = slugify(updatedItem.categories[0]);
+      queryClient.invalidateQueries({ queryKey: itemKeys.detail(categorySlug, updatedItem.slug) });
     },
     onError: (error: any) => {
       showErrorToast(error.message || 'Failed to update item.');
@@ -50,35 +52,31 @@ export const useUpdateItem = () => {
   });
 };
 
+export const useToggleItemCompletion = () => {
+    const updateItemMutation = useUpdateItem();
+    return (item: Item) => {
+        const categorySlug = slugify(item.categories[0]);
+        updateItemMutation.mutate({
+            categorySlug,
+            itemSlug: item.slug,
+            payload: { isCompleted: !item.isCompleted },
+        });
+    };
+};
+
 export const useDeleteItem = () => {
   const queryClient = useQueryClient();
   const { showSuccessToast, showErrorToast } = useUiStore();
 
   return useMutation({
-    mutationFn: itemApi.deleteItem,
+    mutationFn: (variables: { categorySlug: string; itemSlug: string }) =>
+      itemApi.deleteItem(variables.categorySlug, variables.itemSlug),
     onSuccess: () => {
-      showSuccessToast('Item deleted successfully!');
-      queryClient.invalidateQueries({ queryKey: itemKeys.items() });
+      showSuccessToast('Item deleted.');
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
     },
     onError: (error: any) => {
       showErrorToast(error.message || 'Failed to delete item.');
     },
   });
-};
-
-// Combined hook for convenience
-export const useItemsApi = () => {
-  const itemsQuery = useItems();
-  const createItemMutation = useAddItem();
-  const updateItemMutation = useUpdateItem();
-  const deleteItemMutation = useDeleteItem();
-
-  return {
-    items: itemsQuery.data,
-    isLoading: itemsQuery.isLoading,
-    error: itemsQuery.error,
-    createItemMutation,
-    updateItemMutation,
-    deleteItemMutation,
-  };
 };

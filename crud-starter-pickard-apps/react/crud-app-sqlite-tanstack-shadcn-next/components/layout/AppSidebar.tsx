@@ -4,9 +4,15 @@ import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, List, Info } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function AppSidebar() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="w-64 bg-card border-r border-border flex flex-col h-[calc(100vh-2rem)] m-4 rounded-xl shadow-sm sticky top-4">
@@ -34,8 +40,12 @@ export function AppSidebar() {
           className="w-full justify-start gap-3"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-          {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          {mounted ? (
+            theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />
+          ) : (
+            <div className="size-4" /> // Placeholder to avoid layout shift/hydration mismatch
+          )}
+          <span className="capitalize">{mounted ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : 'Toggle Theme'}</span>
         </Button>
       </div>
     </div>

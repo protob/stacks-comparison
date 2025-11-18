@@ -7,238 +7,166 @@ import { ItemForm } from '@/components/items/ItemForm';
 import { ItemItem } from '@/components/items/ItemItem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Search, Filter } from 'lucide-react';
-import { useItemsApi } from '@/hooks/useItemsApi';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { useGetItemTree, useAddItem } from '@/hooks/useItemsApi';
 import { useItemFilters } from '@/hooks/useItemFilters';
-import { Item, Priority } from '@/types';
-import { useUiStore } from '@/stores/useUiStore';
+import type { Priority } from '@/types';
+import { Plus, Search, Filter } from 'lucide-react';
 
-export default function HomePage() {
-  const { items, isLoading, error } = useItemsApi();
-  const { 
-    searchQuery, 
-    setSearchQuery, 
-    selectedPriority, 
-    setSelectedPriority,
-    filteredItems 
-  } = useItemFilters(items || []);
-  
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<Item | null>(null);
-  const { showSuccessToast, showErrorToast } = useUiStore();
+export default function Home() {
+  const { data: itemTree, isLoading, error } = useGetItemTree();
+  const addItem = useAddItem();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleCreateSuccess = () => {
-    setShowCreateForm(false);
-    showSuccessToast('Item created successfully!');
+  const {
+    filteredItemTree,
+    allTags,
+    hasActiveFilters,
+    totalItems,
+    totalFilteredItems,
+    searchQuery, setSearchQuery,
+    selectedPriority, setSelectedPriority,
+    showCompleted, setShowCompleted,
+    selectedTags, setSelectedTags
+  } = useItemFilters(itemTree || {});
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
   };
-
-  const handleEditSuccess = () => {
-    setEditingItem(null);
-    showSuccessToast('Item updated successfully!');
-  };
-
-  const handleError = (message: string) => {
-    showErrorToast(message);
-  };
-
-  const priorities: Priority[] = ['low', 'medium', 'high'];
 
   if (error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="flex">
-          <AppSidebar />
-          <main className="flex-1 p-8">
-            <div className="max-w-4xl mx-auto">
-              <Card className="border-destructive">
-                <CardContent className="pt-6">
-                  <p className="text-destructive">Error loading items: {error.message}</p>
-                </CardContent>
-              </Card>
-            </div>
-          </main>
-        </div>
-      </div>
-    );
+     return <div className="p-8 text-red-500">Error loading items: {error.message}</div>
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        <AppSidebar />
-        <main className="flex-1 p-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Items Dashboard</h1>
-                <p className="text-muted-foreground mt-2">
-                  Manage and track your items with priority levels
-                </p>
-              </div>
-              <Button onClick={() => setShowCreateForm(true)} className="gap-2">
-                <Plus className="size-4" />
-                Add Item
-              </Button>
-            </div>
-
-            {/* Filters */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Filter className="size-5" />
-                  Filters
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
-                      <Input
-                        placeholder="Search items..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full sm:w-48">
-                    <Select
-                      value={selectedPriority}
-                      onValueChange={(value) => setSelectedPriority(value as Priority | 'all')}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Priorities</SelectItem>
-                        {priorities.map((priority) => (
-                          <SelectItem key={priority} value={priority}>
-                            {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                {/* Active Filters */}
-                {(searchQuery || selectedPriority !== 'all') && (
-                  <div className="flex items-center gap-2 mt-4">
-                    <span className="text-sm text-muted-foreground">Active filters:</span>
-                    {searchQuery && (
-                      <Badge variant="secondary" className="gap-1">
-                        Search: {searchQuery}
-                        <button
-                          onClick={() => setSearchQuery('')}
-                          className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    )}
-                    {selectedPriority !== 'all' && (
-                      <Badge variant="secondary" className="gap-1">
-                        Priority: {selectedPriority}
-                        <button
-                          onClick={() => setSelectedPriority('all')}
-                          className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{items?.length || 0}</div>
-                  <p className="text-sm text-muted-foreground">Total Items</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{filteredItems.length}</div>
-                  <p className="text-sm text-muted-foreground">Filtered Items</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">
-                    {items?.filter(item => item.priority === 'high').length || 0}
-                  </div>
-                  <p className="text-sm text-muted-foreground">High Priority</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Items List */}
-            {isLoading ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">Loading items...</p>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <p className="text-muted-foreground">
-                    {searchQuery || selectedPriority !== 'all'
-                      ? 'No items match your filters.'
-                      : 'No items yet. Create your first item!'}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredItems.map((item) => (
-                  <ItemItem
-                    key={item.id}
-                    item={item}
-                    onEdit={setEditingItem}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Create Item Dialog */}
-            <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Create New Item</DialogTitle>
-                </DialogHeader>
-                <ItemForm
-                  onSuccess={handleCreateSuccess}
-                  onCancel={() => setShowCreateForm(false)}
-                />
-              </DialogContent>
-            </Dialog>
-
-            {/* Edit Item Dialog */}
-            <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Edit Item</DialogTitle>
-                </DialogHeader>
-                {editingItem && (
-                  <ItemForm
-                    item={editingItem}
-                    onSuccess={handleEditSuccess}
-                    onCancel={() => setEditingItem(null)}
-                  />
-                )}
-              </DialogContent>
-            </Dialog>
+    <div className="flex min-h-screen bg-background">
+      <AppSidebar />
+      
+      <div className="flex-1 p-8 max-w-5xl mx-auto w-full">
+        {/* Header & Actions */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Items Dashboard</h2>
+            <p className="text-muted-foreground mt-1">
+              {isLoading ? 'Loading...' : `Showing ${totalFilteredItems} of ${totalItems} items`}
+            </p>
           </div>
-        </main>
+
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="size-4" />
+                New Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Item</DialogTitle>
+              </DialogHeader>
+              <ItemForm 
+                onSubmit={(data) => {
+                  addItem.mutate(data, {
+                    onSuccess: () => setIsOpen(false)
+                  });
+                }}
+                isSubmitting={addItem.isPending}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-card border border-border rounded-lg p-4 mb-8 space-y-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            
+            <Select value={selectedPriority} onValueChange={(v: any) => setSelectedPriority(v)}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="mid">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center space-x-2 bg-secondary/50 px-3 rounded-md">
+              <Checkbox 
+                id="completed" 
+                checked={showCompleted}
+                onCheckedChange={(c) => setShowCompleted(!!c)}
+              />
+              <Label htmlFor="completed" className="cursor-pointer">Show Completed</Label>
+            </div>
+          </div>
+
+          {allTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mr-2">
+                <Filter className="size-3" />
+                Tags:
+              </div>
+              {allTags.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`text-xs px-2 py-1 rounded-full transition-colors border ${
+                    selectedTags.includes(tag)
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background hover:bg-accent border-input'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* List Grouped by Category */}
+        <div className="space-y-8">
+          {isLoading ? (
+             <div className="text-center py-12 text-muted-foreground">Loading items...</div>
+          ) : Object.keys(filteredItemTree).length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
+              {hasActiveFilters ? 'No items match your filters.' : 'No items found. Create one!'}
+            </div>
+          ) : (
+            Object.entries(filteredItemTree).map(([category, items]) => (
+              <div key={category} className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground/80">
+                  <span className="w-1 h-6 bg-primary rounded-full"></span>
+                  {category}
+                  <span className="text-xs font-normal text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+                    {items.length}
+                  </span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {items.map(item => (
+                    <ItemItem key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

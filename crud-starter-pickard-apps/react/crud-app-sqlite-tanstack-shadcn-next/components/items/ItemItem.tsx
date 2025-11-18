@@ -1,93 +1,99 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Trash2, CheckCircle, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, ExternalLink } from 'lucide-react';
-import { Item } from '@/types';
-import { formatDate } from '@/utils/helpers';
-import { useItemsApi } from '@/hooks/useItemsApi';
+import { cn } from '@/lib/utils';
+import type { Item } from '@/types';
+import { useToggleItemCompletion, useDeleteItem } from '@/hooks/useItemsApi';
+import { slugify } from '@/utils/slugify';
 
 interface ItemItemProps {
   item: Item;
-  onEdit?: (item: Item) => void;
-  showActions?: boolean;
 }
 
-export function ItemItem({ item, onEdit, showActions = true }: ItemItemProps) {
-  const { deleteItemMutation } = useItemsApi();
+export function ItemItem({ item }: ItemItemProps) {
+  const toggleCompletion = useToggleItemCompletion();
+  const deleteItem = useDeleteItem();
+  const categorySlug = slugify(item.categories[0]);
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      deleteItemMutation.mutate(item.id);
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this item?')) {
+      deleteItem.mutate({ categorySlug, itemSlug: item.slug });
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-destructive text-destructive-foreground';
-      case 'medium':
-        return 'bg-warning text-warning-foreground';
-      case 'low':
-        return 'bg-success text-success-foreground';
-      default:
-        return 'bg-secondary text-secondary-foreground';
-    }
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleCompletion(item);
+  };
+
+  const priorityColor = {
+    high: 'text-red-500 bg-red-50 dark:bg-red-900/20',
+    mid: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20',
+    low: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20',
   };
 
   return (
-    <Card className="group hover:shadow-md transition-all duration-200 hover:-translate-y-1">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg leading-tight truncate group-hover:text-primary transition-colors">
-              {item.title}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {item.description}
-            </p>
-          </div>
-          <Badge className={`shrink-0 ${getPriorityColor(item.priority)}`}>
-            {item.priority}
-          </Badge>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="pt-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="truncate max-w-[120px]">{item.category}</span>
-            <span className="shrink-0">{formatDate(item.createdAt)}</span>
-          </div>
-          
-          {showActions && (
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Link href={`/items/${item.categorySlug}/${item.slug}`}>
-                <Button variant="ghost" size="sm">
-                  <ExternalLink className="size-4" />
-                </Button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => onEdit?.(item)}
-              >
-                <Pencil className="size-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={handleDelete}
-                disabled={deleteItemMutation.isPending}
-              >
-                <Trash2 className="size-4" />
-              </Button>
+    <Link 
+      href={`/items/${categorySlug}/${item.slug}`}
+      className="block group"
+    >
+      <div className={cn(
+        "p-4 rounded-lg border border-border bg-card hover:shadow-md transition-all",
+        item.isCompleted && "opacity-60"
+      )}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 flex-1">
+            <button 
+              onClick={handleToggle}
+              className="mt-1 text-muted-foreground hover:text-primary transition-colors"
+            >
+              {item.isCompleted ? (
+                <CheckCircle className="size-5 text-green-500" />
+              ) : (
+                <Circle className="size-5" />
+              )}
+            </button>
+            
+            <div className="space-y-1">
+              <h3 className={cn(
+                "font-medium text-foreground",
+                item.isCompleted && "line-through text-muted-foreground"
+              )}>
+                {item.name}
+              </h3>
+              <p className="text-sm text-muted-foreground line-clamp-2">{item.text}</p>
+              
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className={cn(
+                  "text-xs px-2 py-0.5 rounded-full font-medium uppercase tracking-wide",
+                  priorityColor[item.priority]
+                )}>
+                  {item.priority}
+                </span>
+                {item.tags?.map(tag => (
+                  <span key={tag} className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
             </div>
-          )}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="opacity-0 group-hover:opacity-100 text-destructive hover:bg-destructive/10"
+            onClick={handleDelete}
+          >
+            <Trash2 className="size-4" />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Link>
   );
 }

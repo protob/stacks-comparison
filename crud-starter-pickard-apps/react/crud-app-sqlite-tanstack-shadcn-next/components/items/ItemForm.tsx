@@ -1,179 +1,141 @@
 'use client';
 
 import { useForm } from '@tanstack/react-form';
+import { zodValidator } from '@tanstack/zod-form-adapter';
+import { itemFormSchema, type ItemFormData } from '@/schemas/itemSchema';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Item, Priority } from '@/types';
-import { useItemsApi } from '@/hooks/useItemsApi';
-import { slugify } from '@/utils/slugify';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface ItemFormProps {
-  item?: Item;
-  onSuccess?: () => void;
-  onCancel?: () => void;
+  defaultValues?: Partial<ItemFormData>;
+  onSubmit: (data: ItemFormData) => void;
+  isSubmitting?: boolean;
+  submitLabel?: string;
 }
 
-export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
-  const { createItemMutation, updateItemMutation } = useItemsApi();
-  const isEditing = !!item;
-
+export function ItemForm({ defaultValues, onSubmit, isSubmitting, submitLabel = 'Save' }: ItemFormProps) {
   const form = useForm({
     defaultValues: {
-      title: item?.title || '',
-      description: item?.description || '',
-      category: item?.category || '',
-      priority: item?.priority || 'medium' as Priority,
+      name: defaultValues?.name ?? '',
+      text: defaultValues?.text ?? '',
+      priority: defaultValues?.priority ?? 'mid',
+      categories: defaultValues?.categories ?? ['General'],
+      tags: defaultValues?.tags ?? [],
+    } as ItemFormData,
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChange: itemFormSchema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        const itemData = {
-          ...value,
-          categorySlug: slugify(value.category),
-          slug: slugify(value.title),
-        };
-
-        if (isEditing && item) {
-          await updateItemMutation.mutateAsync({ id: item.id, data: itemData });
-        } else {
-          await createItemMutation.mutateAsync(itemData);
-        }
-        
-        onSuccess?.();
-      } catch (error) {
-        console.error('Failed to save item:', error);
-      }
+      onSubmit(value);
     },
   });
 
-  const isPending = createItemMutation.isPending || updateItemMutation.isPending;
-
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>{isEditing ? 'Edit Item' : 'Create New Item'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-          className="space-y-6"
-        >
-          <form.Field
-            name="title"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Title</Label>
-                <Input
-                  id={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Enter item title"
-                />
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="description"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Description</Label>
-                <Textarea
-                  id={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Enter item description"
-                  rows={3}
-                />
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="category"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Category</Label>
-                <Input
-                  id={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Enter category"
-                />
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="priority"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Priority</Label>
-                <Select
-                  value={field.state.value}
-                  onValueChange={(value) => field.handleChange(value as Priority)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="flex-1"
-            >
-              {isPending ? 'Saving...' : (isEditing ? 'Update Item' : 'Create Item')}
-            </Button>
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-            )}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+      className="space-y-6"
+    >
+      <form.Field
+        name="name"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+              placeholder="Item name..."
+            />
+            {field.state.meta.errors ? (
+              <p className="text-sm text-destructive">{field.state.meta.errors.join(', ')}</p>
+            ) : null}
           </div>
-        </form>
-      </CardContent>
-    </Card>
+        )}
+      />
+
+      <form.Field
+        name="text"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="text">Description</Label>
+            <Textarea
+              id="text"
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              rows={3}
+              placeholder="Details..."
+            />
+          </div>
+        )}
+      />
+
+      <form.Field
+        name="categories"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Input
+              id="category"
+              value={field.state.value[0]}
+              onChange={(e) => field.handleChange([e.target.value])}
+              placeholder="Category..."
+            />
+          </div>
+        )}
+      />
+      
+      <form.Field
+        name="priority"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label>Priority</Label>
+            <RadioGroup
+              value={field.state.value}
+              onValueChange={(val: any) => field.handleChange(val)}
+              className="flex gap-4"
+            >
+              {['low', 'mid', 'high'].map((p) => (
+                <div key={p} className="flex items-center space-x-2">
+                  <RadioGroupItem value={p} id={p} />
+                  <Label htmlFor={p} className="capitalize cursor-pointer">{p}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        )}
+      />
+
+      <form.Field
+        name="tags"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags (comma separated)</Label>
+            <Input
+              id="tags"
+              value={field.state.value?.join(', ')}
+              onChange={(e) => 
+                field.handleChange(e.target.value.split(',').map(t => t.trim()).filter(Boolean))
+              }
+              placeholder="work, urgent, todo"
+            />
+          </div>
+        )}
+      />
+
+      <div className="flex justify-end pt-4">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : submitLabel}
+        </Button>
+      </div>
+    </form>
   );
 }
