@@ -48,19 +48,7 @@ Your Svelte app already has `Button` wired under `$lib/components/ui/button`.[1]
 In the Svelte project root run:[10][9][8][1]
 
 ```bash
-bun x shadcn-svelte@latest add \
-  button \
-  input \
-  label \
-  checkbox \
-  badge \
-  card \
-  dialog \
-  alert-dialog \
-  separator \
-  select \
-  radio-group \
-  sonner
+bun x shadcn-svelte@latest add button input label checkbox badge card dialog alert-dialog separator select radio-group sonner
 ```
 
 This will generate Svelte versions under `$lib/components/ui/*` matching the API style of your existing Svelte `Button` component, so you can keep the same class-based design system you already configured via `src/app.css`.[9][8][10][1]
