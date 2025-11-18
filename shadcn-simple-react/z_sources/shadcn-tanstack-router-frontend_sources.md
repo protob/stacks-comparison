@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** pon, 17 lis 2025, 11:10:18 CET
+**Generated on:** wto, 18 lis 2025, 20:22:42 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/shadcn-simple-react/shadcn-simple-tanstack-router-react
 
 ---
