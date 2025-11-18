@@ -3,7 +3,7 @@
 ### 0. Preconditions (what the agent starts with)
 
 1. Ensure the Svelte app exists at:  
-   `/home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-vite`.[1]
+   `/home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-vite`.
 
 2. Confirm it is a Vite + Svelte 5 app with Tailwind v4 and shadcn-svelte already configured (you have `components.json`, `src/app.css`, and a `Button` component from shadcn-svelte).[1]
 
