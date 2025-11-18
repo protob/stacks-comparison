@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query";
 import { getItemTree, getItemBySlug, createItem, updateItem, deleteItem } from "~/api/itemApi";
 import { useUiStore } from "~/stores/uiStore";
-import type { CreateItemPayload, UpdateItemPayload } from "~/types";
+import type { CreateItemPayload, UpdateItemPayload, Item } from "~/types";
 
 export const itemKeys = {
   all: ["items"] as const,
@@ -42,12 +42,36 @@ export function useUpdateItem() {
   return useMutation({
     mutationFn: ({ categorySlug, itemSlug, payload }: { categorySlug: string; itemSlug: string; payload: UpdateItemPayload }) =>
       updateItem(categorySlug, itemSlug, payload),
+    onMutate: async ({ categorySlug, itemSlug, payload }) => {
+      // Cancel ongoing queries
+      await queryClient.cancelQueries({ queryKey: itemKeys.tree });
+
+      // Get previous data
+      const previousData = queryClient.getQueryData(itemKeys.tree);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(itemKeys.tree, (old: any) => {
+        if (!old) return old;
+
+        const newData = { ...old };
+        if (newData[categorySlug]) {
+          newData[categorySlug] = newData[categorySlug].map((item: Item) => (item.slug === itemSlug ? { ...item, ...payload } : item));
+        }
+        return newData;
+      });
+
+      return { previousData };
+    },
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(itemKeys.tree, context.previousData);
+      }
+      uiStore.showNotification("error", error.message || "Failed to update item");
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item updated successfully");
-    },
-    onError: (error: any) => {
-      uiStore.showNotification("error", error.message || "Failed to update item");
     },
   });
 }
