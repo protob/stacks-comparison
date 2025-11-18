@@ -5,7 +5,7 @@
   import { Toaster } from 'svelte-sonner';
   import { createAppQueryClient } from '$lib/api/itemsQuery';
   import Router from '$lib/router/Router.svelte';
-  import { useThemeUpdater } from '$lib/utils/themeUpdater';
+  import { useThemeUpdater } from '$lib/utils/themeUpdater.svelte';
 
   const queryClient = createAppQueryClient();
 

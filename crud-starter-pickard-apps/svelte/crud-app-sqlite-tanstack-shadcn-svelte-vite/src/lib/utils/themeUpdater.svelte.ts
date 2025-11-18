@@ -1,16 +1,16 @@
-// src/lib/utils/themeUpdater.ts
+// src/lib/utils/themeUpdater.svelte.ts
 import { onMount } from 'svelte';
-import { uiStore, type Theme } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
+import { uiStore, type Theme } from '$lib/stores/uiStore.svelte';
 
 export function useThemeUpdater() {
   onMount(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
 
-    // Access theme via the effect derived from the store state
+    // react to uiStore.theme via rune effect
     $effect(() => {
-      const theme = uiStore.theme;
+      const theme = uiStore.theme as Theme;
       const html = document.documentElement;
-      
+
       if (theme === 'system') {
         const isDark = media.matches;
         if (isDark) html.classList.add('dark');
@@ -31,9 +31,6 @@ export function useThemeUpdater() {
     };
 
     media.addEventListener('change', mediaListener);
-
-    return () => {
-      media.removeEventListener('change', mediaListener);
-    };
+    return () => media.removeEventListener('change', mediaListener);
   });
 }
