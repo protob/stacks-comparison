@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 18:17:10 CET
+**Generated on:** wto, 18 lis 2025, 18:22:22 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-vite
 
 ---
@@ -611,13 +611,14 @@ export default defineConfig({
   import AppSidebar from '$lib/components/layout/AppSidebar.svelte';
   import TopBar from '$lib/components/layout/TopBar.svelte';
 
+  export let currentPath: string;
   export let onNavigate: (path: string) => void;
 </script>
 
 <div class="flex min-h-screen bg-background text-foreground">
   <AppSidebar on:navigate={(e) => onNavigate(e.detail)} />
   <div class="flex-1 max-w-5xl mx-auto p-fluid-6">
-    <TopBar on:navigate={(e) => onNavigate(e.detail)} />
+    <TopBar currentPath={currentPath} on:navigate={(e) => onNavigate(e.detail)} />
     <slot />
   </div>
 </div>
@@ -700,15 +701,16 @@ export default defineConfig({
 ## `src/lib/components/layout/TopBar.svelte`
 ```
 <script lang="ts">
-  export let currentPath = '';
+  import { createEventDispatcher } from 'svelte';
+
+  export let currentPath: string;
+
+  const dispatch = createEventDispatcher<{ navigate: string }>();
 
   function navigate(path: string) {
     // Dispatch navigate event to parent
-    dispatch('navigate', { path });
+    dispatch('navigate', path);
   }
-
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
 </script>
 
 <header class="flex justify-end items-center pb-4 mb-4 border-b border-border">
@@ -2663,7 +2665,7 @@ export type Result<T, E> =
   }
 </script>
 
-<MainLayout onNavigate={handleNavigate}>
+<MainLayout currentPath={window.location.pathname} onNavigate={handleNavigate}>
   <div class="space-y-6">
     <header>
       <h1 class="font-bold text-size-3xl">About This Application</h1>
@@ -2743,7 +2745,7 @@ export type Result<T, E> =
   }
 </script>
 
-<MainLayout onNavigate={handleNavigate}>
+<MainLayout currentPath={window.location.pathname} onNavigate={handleNavigate}>
   <header class="mb-6">
     <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
   </header>
