@@ -1,12 +1,12 @@
 <script lang="ts">
-  import MainLayout from '$lib/components/layout/layout/MainLayout.svelte';
-  import { useItemTree } from '$lib/api/itemsQuery';
-  import { useItemFilters } from '$lib/utils/useItemFilters';
-  import FilterBar from '$lib/components/layout/layout/FilterBar.svelte';
-  import ItemItem from '$lib/components/items/items/ItemItem.svelte';
-  import ItemForm from '$lib/components/items/items/ItemForm.svelte';
-  import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
-  import { Button } from '$lib/components/ui/button';
+  import MainLayout from 'lib/components/layout/MainLayout.svelte';
+  import { useItemTree } from 'lib/api/itemsQuery';
+  import { useItemFilters } from 'lib/utils/useItemFilters';
+  import FilterBar from 'lib/components/layout/FilterBar.svelte';
+  import ItemItem from 'lib/components/items/ItemItem.svelte';
+  import ItemForm from 'lib/components/items/ItemForm.svelte';
+  import { uiStore } from 'lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
+  import { Button } from 'lib/components/ui/button';
   import { Plus } from '@lucide/svelte'; // Import icon directly
 
   const itemTreeQuery = useItemTree();
