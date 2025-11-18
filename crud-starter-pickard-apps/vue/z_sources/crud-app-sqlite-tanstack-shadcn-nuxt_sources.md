@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 01:51:50 CET
+**Generated on:** wto, 18 lis 2025, 02:33:47 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -59,6 +59,7 @@
     "reka-ui": "^2.6.0",
     "shadcn-nuxt": "2.3.3",
     "tailwind-merge": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
     "vue": "^3.5.24",
     "vue-router": "^4.6.3",
     "vue-sonner": "^2.0.9",
@@ -396,71 +397,70 @@ const route = useRoute();
 ## `app/components/layout/AppSidebar.vue`
 ```
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { useUiStore } from '@/stores/uiStore';
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Separator } from "~/components/ui/separator";
+import { useUiStore } from "@/stores/uiStore";
 
-const searchQuery = ref('');
-const allTags = ref(['project', 'personal', 'work']);
+const searchQuery = ref("");
+const allTags = ref(["project", "personal", "work"]);
 const selectedTags = ref<string[]>([]);
 
 const uiStore = useUiStore();
 
 const toggleTag = (tag: string) => {
-  const index = selectedTags.value.indexOf(tag);
-  if (index > -1) {
-    selectedTags.value.splice(index, 1);
-  } else {
-    selectedTags.value.push(tag);
-  }
+    const index = selectedTags.value.indexOf(tag);
+    if (index > -1) {
+        selectedTags.value.splice(index, 1);
+    } else {
+        selectedTags.value.push(tag);
+    }
 };
 </script>
 
 <template>
-  <aside class="flex flex-col p-4 border-r bg-surface border-border">
-    <div class="p-2 mb-4">
-      <h2 class="text-xl font-bold">TodoApp</h2>
-    </div>
-
-    <div class="flex-1 space-y-4">
-      <div class="px-2">
-        <Input v-model="searchQuery" placeholder="Search tasks..." />
-      </div>
-
-      <Separator />
-
-      <div class="px-2">
-        <h3 class="mb-2 text-sm font-semibold text-text-muted">Tags</h3>
-        <div class="flex flex-wrap gap-2">
-          <Button
-            v-for="tag in allTags"
-            :key="tag"
-            @click="toggleTag(tag)"
-            :variant="selectedTags.includes(tag) ? 'default' : 'outline'"
-            size="sm"
-            class="rounded-full"
-          >
-            {{ tag }}
-          </Button>
+    <aside class="flex flex-col p-4 border-r bg-surface border-border">
+        <div class="p-2 mb-4">
+            <h2 class="text-xl font-bold">TodoApp</h2>
         </div>
-      </div>
 
-      <div class="px-2 mt-4">
-        <Button class="w-full" @click="uiStore.openForm()">
-          + Add Item
-        </Button>
-      </div>
-    </div>
+        <div class="flex-1 space-y-4">
+            <div class="px-2">
+                <Input v-model="searchQuery" placeholder="Search tasks..." />
+            </div>
 
-    <div class="mt-auto">
-      <Button variant="ghost" @click="uiStore.toggleTheme()" class="justify-start w-full">
-        <Icon v-if="!uiStore.isDark" name="lucide:sun" class="w-4 h-4" />
-        <Icon v-else name="lucide:moon" class="w-4 h-4" />
-      </Button>
-    </div>
-  </aside>
+            <Separator />
+
+            <div class="px-2">
+                <h3 class="mb-2 text-sm font-semibold text-text-muted">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                    <Button
+                        v-for="tag in allTags"
+                        :key="tag"
+                        @click="toggleTag(tag)"
+                        :variant="selectedTags.includes(tag) ? 'default' : 'outline'"
+                        size="sm"
+                        class="rounded-full"
+                    >
+                        {{ tag }}
+                    </Button>
+                </div>
+            </div>
+
+            <div class="px-2 mt-4">
+                <Button class="w-full" @click="uiStore.openForm()"> + Add Item </Button>
+            </div>
+        </div>
+
+        <div class="mt-auto">
+            <Button variant="ghost" @click="uiStore.toggleTheme()" class="justify-start w-full">
+                <Icon v-if="!uiStore.isDark" name="lucide:sun" class="w-4 h-4" />
+                <Icon v-else name="lucide:moon" class="w-4 h-4" />
+            </Button>
+        </div>
+    </aside>
 </template>
+
 ```
 
 ## `app/components/layout/FilterBar.vue`
@@ -1879,8 +1879,18 @@ export type Result<T, E> =
  * Clean, minimal, functional - inspired by Bauhaus & Swiss typography
  * Optimized for Vue with fluid responsiveness, vertical rhythm, proportions
  */
+/*
+ ---break---
+ */
+@plugin "tailwindcss-animate";
+
 @import "tailwindcss";
+
 @import "tw-animate-css";
+
+/*
+ ---break---
+ */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -1959,13 +1969,336 @@ export type Result<T, E> =
     --font-size-4xl: clamp(2.177rem, 2.052rem + 0.625vw, 2.488rem); /* 35-40px */
     --font-size-5xl: clamp(2.612rem, 2.462rem + 0.75vw, 2.986rem); /* 42-48px */
 
+    /* Spacing - Standard Fixed Scale (Tailwind Default) */
+    --spacing-0: 0px;
+    --spacing-px: 1px;
+    --spacing-0_5: 0.125rem; /* 2px */
+    --spacing-1: 0.25rem; /* 4px */
+    --spacing-1_5: 0.375rem; /* 6px */
+    --spacing-2: 0.5rem; /* 8px */
+    --spacing-2_5: 0.625rem; /* 10px */
+    --spacing-3: 0.75rem; /* 12px */
+    --spacing-3_5: 0.875rem; /* 14px */
+    --spacing-4: 1rem; /* 16px */
+    --spacing-5: 1.25rem; /* 20px */
+    --spacing-6: 1.5rem; /* 24px */
+    --spacing-7: 1.75rem; /* 28px */
+    --spacing-8: 2rem; /* 32px */
+    --spacing-9: 2.25rem; /* 36px */
+    --spacing-10: 2.5rem; /* 40px */
+    --spacing-11: 2.75rem; /* 44px */
+    --spacing-12: 3rem; /* 48px */
+    --spacing-14: 3.5rem; /* 56px */
+    --spacing-16: 4rem; /* 64px */
+    --spacing-20: 5rem; /* 80px */
+    --spacing-24: 6rem; /* 96px */
+
     /* Spacing - Custom Fluid Scale */
+    --spacing-fluid-0_5: clamp(0.125rem, 0.1rem + 0.125vw, 0.25rem);
+    --spacing-fluid-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+    --spacing-fluid-1_5: clamp(0.375rem, 0.3rem + 0.375vw, 0.75rem);
+    --spacing-fluid-2: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
+    --spacing-fluid-2_5: clamp(0.625rem, 0.5rem + 0.625vw, 1.25rem);
+    --spacing-fluid-3: clamp(0.75rem, 0.6rem + 0.75vw, 1.5rem);
     --spacing-fluid-4: clamp(1rem, 0.8rem + 1vw, 2rem);
+    --spacing-fluid-5: clamp(1.25rem, 1rem + 1.25vw, 2.5rem);
     --spacing-fluid-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
     --spacing-fluid-8: clamp(2rem, 1.6rem + 2vw, 4rem);
+    --spacing-fluid-10: clamp(2.5rem, 2rem + 2.5vw, 5rem);
+    --spacing-fluid-12: clamp(3rem, 2.4rem + 3vw, 6rem);
+    --spacing-fluid-16: clamp(4rem, 3.2rem + 4vw, 8rem);
+    --spacing-fluid-20: clamp(5rem, 4rem + 5vw, 10rem);
+    --spacing-fluid-24: clamp(6rem, 4.8rem + 6vw, 12rem);
+
+    /* Line Heights - Fluid for better rhythm */
+    --line-height-none: 1;
+    --line-height-tight: clamp(1.2, 1.15 + 0.25vw, 1.25);
+    --line-height-snug: clamp(1.325, 1.3 + 0.125vw, 1.375);
+    --line-height-normal: clamp(1.45, 1.4 + 0.25vw, 1.5);
+    --line-height-relaxed: clamp(1.575, 1.55 + 0.125vw, 1.625);
+    --line-height-loose: clamp(1.7, 1.675 + 0.125vw, 1.75);
+
+    /* Vertical Rhythm System - Based on base line-height multiple */
+    --rhythm-base: var(--line-height-normal); /* ~1.5 */
+    --rhythm-half: calc(var(--rhythm-base) / 2);
+    --rhythm-double: calc(var(--rhythm-base) * 2);
+    --rhythm-triple: calc(var(--rhythm-base) * 3);
+
+    /* Fluid Rhythm */
+    --rhythm-fluid: clamp(1.25rem, 1.125rem + 0.625vw, 1.5rem);
+    --rhythm-fluid-half: calc(var(--rhythm-fluid) / 2);
+    --rhythm-fluid-double: calc(var(--rhythm-fluid) * 2);
+    --rhythm-fluid-triple: calc(var(--rhythm-fluid) * 3);
+
+    /* Semantic Rhythm Tokens for Todo app */
+    --margin-after-heading: var(--rhythm-fluid);
+    --margin-after-paragraph: var(--rhythm-half);
+    --margin-between-sections: var(--rhythm-double);
+    --gap-grid-items: var(--rhythm-fluid);
+    --gap-component-internal: var(--spacing-2);
+
+    /* Font Weights */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Border Radius - Subtle for modernist aesthetic */
+    --radius-none: 0;
+    --radius-sm: 0.125rem; /* 2px */
+    --radius-md: 0.25rem; /* 4px */
+    --radius-lg: 0.375rem; /* 6px */
+    --radius-xl: 0.5rem; /* 8px */
+    --radius-2xl: 0.75rem; /* 12px */
+    --radius-3xl: 1rem; /* 16px */
+    --radius-full: 9999px; /* pills */
+
+    /* Shadows - Subtle depth */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-none: none;
+
+    /* =========================
+     2. SEMANTIC TOKENS - Context-aware
+     ========================= */
+
+    /* Background & Surface */
+    --color-background: var(--color-gray-0);
+    --color-surface: var(--color-gray-50);
+    --color-surface-hover: var(--color-gray-100);
+    --color-surface-active: var(--color-gray-200);
+
+    /* Text Hierarchy */
+    --color-text-primary: var(--color-gray-900);
+    --color-text-secondary: var(--color-gray-600);
+    --color-text-muted: var(--color-gray-500);
+    --color-text-inverse: var(--color-gray-0);
+
+    /* Brand Colors */
+    --color-primary: var(--color-blue-600);
+    --color-primary-hover: var(--color-blue-700);
+    --color-primary-active: var(--color-blue-800);
+    --color-primary-light: var(--color-blue-50);
+
+    /* Semantic States for Todo */
+    --color-success: var(--color-green-600);
+    --color-success-light: var(--color-green-50);
+    --color-danger: var(--color-red-600);
+    --color-danger-light: var(--color-red-50);
+    --color-warning: var(--color-amber-600);
+    --color-warning-light: var(--color-amber-50);
+
+    /* -- ADD THESE TWO NEW LINES FOR THE 'MID' PRIORITY BADGE -- */
+    --color-priority-mid-bg: var(--color-amber-50);
+    --color-priority-mid-text: var(--color-amber-600);
+
+    /* Borders */
+    --color-border: var(--color-gray-200);
+    --color-border-hover: var(--color-gray-300);
+    --color-border-focus: var(--color-blue-500);
+
+    /* Modal & Overlay */
+    --color-backdrop: rgb(0 0 0 / 0.7);
+    --color-modal-bg: var(--color-surface);
+    --color-modal-border: var(--color-border);
+
+    /* =========================
+     3. COMPONENT TOKENS - Specific use for Todo app
+     ========================= */
+
+    /* Button Components */
+    --button-radius: var(--radius-md);
+    --button-font-weight: var(--font-weight-medium);
+    --button-transition: 150ms;
+
+    /* Button Sizes - Icon Only */
+    --button-icon-xs: var(--spacing-1);
+    --button-icon-sm: var(--spacing-1_5);
+    --button-icon-md: var(--spacing-2);
+    --button-icon-lg: var(--spacing-2_5);
+
+    /* Button Sizes - With Text */
+    --button-xs-px: var(--spacing-2_5);
+    --button-xs-py: var(--spacing-1);
+    --button-xs-gap: var(--spacing-1);
+    --button-xs-text: var(--font-size-xs);
+
+    --button-sm-px: var(--spacing-3);
+    --button-sm-py: var(--spacing-1_5);
+    --button-sm-gap: var(--spacing-1_5);
+    --button-sm-text: var(--font-size-sm);
+
+    --button-md-px: var(--spacing-4);
+    --button-md-py: var(--spacing-2);
+    --button-md-gap: var(--spacing-2);
+    --button-md-text: var(--font-size-base);
+
+    --button-lg-px: var(--spacing-5);
+    --button-lg-py: var(--spacing-2_5);
+    --button-lg-gap: var(--spacing-2_5);
+    --button-lg-text: var(--font-size-lg);
+
+    /* Card/Item Components (uses FLUID spacing) */
+    --card-radius: var(--radius-lg);
+    --card-padding: var(--spacing-fluid-4);
+    --card-shadow: var(--shadow);
+
+    /* Input Components */
+    --input-radius: var(--radius-md);
+    --input-padding-x: var(--spacing-3);
+    --input-padding-y: var(--spacing-2);
+    --input-border-width: 1px;
+    --input-font-size: var(--font-size-base);
+
+    /* Checkbox/Radio sizing */
+    --checkbox-size: 1.125rem; /* 18px - reasonable, accessible size */
+    --radio-size: 1.125rem; /* 18px - same as checkbox for consistency */
+    --checkbox-radius: var(--radius-sm); /* Subtle rounded corners for checkboxes */
+
+    /* Navigation/Sidebar (uses FLUID spacing) */
+    --nav-height: clamp(3rem, 2.5rem + 2.5vw, 4rem);
+    --nav-padding: var(--spacing-fluid-4);
 
     /* Layout */
+    --container-max: 1280px;
     --sidebar-width: clamp(200px, 15vw, 280px);
+    --content-max: 65ch;
+}
+
+/* ============================================
+   CONTAINER QUERY UTILITIES - For component-based responsiveness
+   ============================================ */
+
+@layer utilities {
+    /* Container query utilities */
+    .container-aware {
+        container-type: inline-size;
+    }
+
+    .container-item {
+        container-type: inline-size;
+        container-name: item;
+    }
+
+    .container-sidebar {
+        container-type: inline-size;
+        container-name: sidebar;
+    }
+
+    /* Intrinsic grid for Todo items */
+    .grid-auto-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+        gap: var(--gap-grid-items);
+    }
+
+    /* Custom Fluid Spacing Utilities */
+    .p-fluid-1 {
+        padding: var(--spacing-fluid-1);
+    }
+    .p-fluid-2 {
+        padding: var(--spacing-fluid-2);
+    }
+    .p-fluid-3 {
+        padding: var(--spacing-fluid-3);
+    }
+    .p-fluid-4 {
+        padding: var(--spacing-fluid-4);
+    }
+    .p-fluid-5 {
+        padding: var(--spacing-fluid-5);
+    }
+    .p-fluid-6 {
+        padding: var(--spacing-fluid-6);
+    }
+    .p-fluid-8 {
+        padding: var(--spacing-fluid-8);
+    }
+
+    .px-fluid-4 {
+        padding-left: var(--spacing-fluid-4);
+        padding-right: var(--spacing-fluid-4);
+    }
+    .py-fluid-4 {
+        padding-top: var(--spacing-fluid-4);
+        padding-bottom: var(--spacing-fluid-4);
+    }
+
+    .m-fluid-4 {
+        margin: var(--spacing-fluid-4);
+    }
+    .mt-fluid-4 {
+        margin-top: var(--spacing-fluid-4);
+    }
+    .mb-fluid-4 {
+        margin-bottom: var(--spacing-fluid-4);
+    }
+
+    .gap-fluid-2 {
+        gap: var(--spacing-fluid-2);
+    }
+    .gap-fluid-4 {
+        gap: var(--spacing-fluid-4);
+    }
+    .gap-fluid-6 {
+        gap: var(--spacing-fluid-6);
+    }
+    .gap-fluid-8 {
+        gap: var(--spacing-fluid-8);
+    }
+
+    .space-y-fluid-2 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: var(--spacing-fluid-2);
+    }
+    .space-y-fluid-3 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: var(--spacing-fluid-3);
+    }
+    .space-y-fluid-6 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: var(--spacing-fluid-6);
+    }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS - Containment, visibility
+   ============================================ */
+
+@layer utilities {
+    /* CSS Containment */
+    .contain-strict {
+        contain: layout style paint;
+    }
+
+    /* For Todo list items */
+    .item-list {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 300px;
+    }
+
+    /* Hardware acceleration */
+    .hardware-accelerate {
+        transform: translateZ(0);
+    }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Aspect ratios for proportions */
+.aspect-square {
+    aspect-ratio: 1 / 1;
+}
+
+.aspect-todo {
+    aspect-ratio: 16 / 9;
 }
 
 /* ============================================
@@ -1973,50 +2306,117 @@ export type Result<T, E> =
    ============================================ */
 
 :root {
-    --radius: 0.5rem;
+    /* Export primitives as vars */
+    --color-gray-0: oklch(1 0 0);
+    --color-gray-50: oklch(0.985 0.002 247);
+    --color-gray-100: oklch(0.973 0.003 247);
+    --color-gray-200: oklch(0.935 0.006 247);
+    --color-gray-300: oklch(0.869 0.01 247);
+    --color-gray-400: oklch(0.707 0.015 247);
+    --color-gray-500: oklch(0.539 0.018 247);
+    --color-gray-600: oklch(0.428 0.02 247);
+    --color-gray-700: oklch(0.321 0.02 247);
+    --color-gray-800: oklch(0.215 0.019 247);
+    --color-gray-900: oklch(0.141 0.015 247);
+    --color-gray-950: oklch(0.075 0.01 247);
+
+    /* Blue */
+    --color-blue-50: oklch(0.96 0.025 240);
+    --color-blue-100: oklch(0.92 0.045 240);
+    --color-blue-200: oklch(0.86 0.075 240);
+    --color-blue-300: oklch(0.78 0.115 240);
+    --color-blue-400: oklch(0.68 0.165 240);
+    --color-blue-500: oklch(0.58 0.215 240);
+    --color-blue-600: oklch(0.5 0.22 240);
+    --color-blue-700: oklch(0.42 0.2 240);
+    --color-blue-800: oklch(0.35 0.175 240);
+    --color-blue-900: oklch(0.3 0.15 240);
+
+    /* Green */
+    --color-green-50: oklch(0.971 0.018 142);
+    --color-green-500: oklch(0.647 0.19 142);
+    --color-green-600: oklch(0.519 0.195 142);
+
+    /* Red */
+    --color-red-50: oklch(0.971 0.018 27);
+    --color-red-500: oklch(0.637 0.237 27);
+    --color-red-600: oklch(0.577 0.237 27);
+    --color-red-700: oklch(0.517 0.237 27);
+
+    /* Amber */
+    --color-amber-50: oklch(0.987 0.021 91);
+    --color-amber-500: oklch(0.769 0.183 84);
+    --color-amber-600: oklch(0.659 0.181 75);
+    --radius: 0.625rem;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.145 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
     --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.145 0 0);
+    --accent-foreground: oklch(0.205 0 0);
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.145 0 0);
-
-    /* Custom Semantic Tokens */
-    --color-text-primary: oklch(0.141 0.015 247);
-    --color-text-secondary: oklch(0.428 0.02 247);
-    --color-text-muted: oklch(0.539 0.018 247);
-    --color-surface: oklch(0.985 0.002 247);
-    --color-priority-low-bg: #d1fadf;
-    --color-priority-low-text: #16a34a;
-    --color-priority-mid-bg: oklch(0.987 0.021 91);
-    --color-priority-mid-text: oklch(0.659 0.181 75);
-    --color-priority-high-bg: #fed7d7;
-    --color-priority-high-text: #dc2626;
-    --color-success-light: oklch(0.971 0.018 142);
-    --radius-full: 9999px;
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Dark mode overrides (class strategy) */
 .dark {
+    --color-background: var(--color-gray-950);
+    --color-surface: var(--color-gray-900);
+    --color-surface-hover: var(--color-gray-800);
+    --color-surface-active: var(--color-gray-700);
+
+    --color-text-primary: var(--color-gray-50);
+    --color-text-secondary: var(--color-gray-400);
+    --color-text-muted: var(--color-gray-500);
+    --color-text-inverse: var(--color-gray-0);
+
+    --color-border: var(--color-gray-800);
+    --color-border-hover: var(--color-gray-700);
+
+    --color-input-bg: var(--color-gray-800);
+    --color-input-border: var(--color-gray-600);
+    --color-input-text: var(--color-gray-100);
+    --color-input-placeholder: var(--color-gray-500);
+
+    /* Modal & Overlay in dark mode */
+    --color-backdrop: rgb(0 0 0 / 0.85);
+    --color-modal-bg: var(--color-gray-800);
+    --color-modal-border: var(--color-gray-700);
+
+    /* -- ADD THESE TWO LINES TO FIX THE 'MID' PRIORITY BADGE -- */
+    --color-priority-mid-bg: var(--color-amber-500);
+    --color-priority-mid-text: var(--color-gray-950);
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
+    --card: oklch(0.205 0 0);
     --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
+    --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
     --muted: oklch(0.269 0 0);
@@ -2024,37 +2424,81 @@ export type Result<T, E> =
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
     --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.922 0 0);
-
-    /* Custom Semantic Tokens */
-    --color-text-primary: oklch(0.985 0.002 247);
-    --color-text-secondary: oklch(0.707 0.015 247);
-    --color-text-muted: oklch(0.539 0.018 247);
-    --color-surface: oklch(0.215 0.019 247);
-    --color-priority-low-bg: oklch(0.519 0.195 142);
-    --color-priority-low-text: oklch(0.971 0.018 142);
-    --color-priority-mid-bg: oklch(0.769 0.183 84);
-    --color-priority-mid-text: oklch(0.075 0.01 247);
-    --color-priority-high-bg: oklch(0.637 0.237 27);
-    --color-priority-high-text: oklch(0.971 0.018 27);
-    --color-success-light: oklch(0.519 0.195 142 / 20%);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* ============================================
+   BASE LAYER - Global defaults
+   ============================================ */
 
 @layer base {
     * {
         @apply border-border;
     }
+
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-text-primary antialiased;
         font-feature-settings:
             "rlig" 1,
             "calt" 1;
     }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-semibold text-text-primary;
+        line-height: var(--line-height-tight);
+    }
+
+    p {
+        line-height: var(--line-height-relaxed);
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-primary;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
 }
 
+/* ============================================
+   UTILITIES LAYER - Helper classes a
+   ============================================ */
+
 @layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+
+    ::selection {
+        @apply bg-primary/20 text-primary;
+    }
+
+    /* Text Size Utilities - Token-based */
     .text-size-xs {
         font-size: var(--font-size-xs);
     }
@@ -2070,48 +2514,151 @@ export type Result<T, E> =
     .text-size-xl {
         font-size: var(--font-size-xl);
     }
-    .text-size-2xl {
-        font-size: var(--font-size-2xl);
-    }
-    .text-size-3xl {
-        font-size: var(--font-size-3xl);
-    }
 
-    .p-fluid-4 {
-        padding: var(--spacing-fluid-4);
-    }
-    .p-fluid-6 {
-        padding: var(--spacing-fluid-6);
-    }
-    .p-fluid-8 {
-        padding: var(--spacing-fluid-8);
-    }
-
+    /* Tag/Chip Utilities */
     .tag-sm {
         display: inline-flex;
         align-items: center;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        padding-top: 0.125rem;
-        padding-bottom: 0.125rem;
+        vertical-align: middle;
+        padding-left: var(--spacing-2);
+        padding-right: var(--spacing-2);
+        padding-top: var(--spacing-0_5);
+        padding-bottom: var(--spacing-0_5);
         font-size: var(--font-size-xs);
-        font-weight: 500;
+        font-weight: var(--font-weight-medium);
+        line-height: var(--line-height-tight);
+        white-space: nowrap;
+        gap: var(--spacing-1);
     }
 
-    .tag-priority-low {
-        background-color: var(--color-priority-low-bg);
-        color: var(--color-priority-low-text);
-        border-radius: var(--radius-full);
-    }
+    /* -- ADD THIS NEW CLASS FOR THE 'MID' PRIORITY BADGE -- */
     .tag-priority-mid {
         background-color: var(--color-priority-mid-bg);
         color: var(--color-priority-mid-text);
         border-radius: var(--radius-full);
     }
-    .tag-priority-high {
-        background-color: var(--color-priority-high-bg);
-        color: var(--color-priority-high-text);
-        border-radius: var(--radius-full);
+
+    /* Button Size Utilities - Icon Only */
+    .btn-icon-xs {
+        padding: 0;
+        margin: 0;
+        margin-left: var(--spacing-1);
+        border: none;
+        background: none;
+        border-radius: 50%;
+        width: 1rem;
+        height: 1rem;
+        min-width: 1rem;
+        min-height: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        line-height: 0;
+        transition:
+            color 150ms,
+            background-color 150ms;
+    }
+    .btn-icon-sm {
+        padding: var(--button-icon-sm);
+    }
+    .btn-icon-md {
+        padding: var(--button-icon-md);
+    }
+    .btn-icon-lg {
+        padding: var(--button-icon-lg);
+    }
+
+    /* Button Size Utilities - With Text */
+    .btn-xs {
+        padding-left: var(--button-xs-px);
+        padding-right: var(--button-xs-px);
+        padding-top: var(--button-xs-py);
+        padding-bottom: var(--button-xs-py);
+        gap: var(--button-xs-gap);
+        font-size: var(--button-xs-text);
+    }
+
+    .btn-sm {
+        padding-left: var(--button-sm-px);
+        padding-right: var(--button-sm-px);
+        padding-top: var(--button-sm-py);
+        padding-bottom: var(--button-sm-py);
+        gap: var(--button-sm-gap);
+        font-size: var(--button-sm-text);
+    }
+
+    .btn-md {
+        padding-left: var(--button-md-px);
+        padding-right: var(--button-md-px);
+        padding-top: var(--button-md-py);
+        padding-bottom: var(--button-md-py);
+        gap: var(--button-md-gap);
+        font-size: var(--button-md-text);
+    }
+
+    .btn-lg {
+        padding-left: var(--button-lg-px);
+        padding-right: var(--button-lg-px);
+        padding-top: var(--button-lg-py);
+        padding-bottom: var(--button-lg-py);
+        gap: var(--button-lg-gap);
+        font-size: var(--button-lg-text);
+    }
+}
+
+/*
+ ---break---
+ */
+
+@theme inline {
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/*
+ ---break---
+ */
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+    body {
+        @apply bg-background text-foreground;
     }
 }
 
@@ -2477,20 +3024,16 @@ export default defineNuxtPlugin((nuxtApp) => {
 ## `nuxt.config.ts`
 ```
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from '@tailwindcss/vite'
+import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: [
-    '@nuxt/icon',
-    'shadcn-nuxt',
-    '@vueuse/nuxt',
-    '@pinia/nuxt',
-    '@peterbud/nuxt-query'
-  ],
+  modules: ["@nuxt/icon", "shadcn-nuxt", "@vueuse/nuxt", "@pinia/nuxt", "@peterbud/nuxt-query"],
+  css: ["~/assets/css/tailwind.css", "~/assets/css/main.css"],
+  // css: ["~/assets/css/tailwind.css"],
 
   nuxtQuery: {
-    autoImports: ['useQuery', 'useMutation', 'useQueryClient'],
+    autoImports: ["useQuery", "useMutation", "useQueryClient"],
     queryClientOptions: {
       defaultOptions: {
         queries: {
@@ -2499,28 +3042,27 @@ export default defineNuxtConfig({
         },
       },
     },
- },
-   shadcn: {
+  },
+  shadcn: {
     /**
      * Prefix for all the imported component.
      * @default "Ui"
      */
-    prefix: '',
+    prefix: "",
     /**
      * Directory that the component lives in.
      * Will respect the Nuxt aliases.
      * @link https://nuxt.com/docs/api/nuxt-config#alias
      * @default "@/components/ui"
      */
-    componentDir: '@/components/ui'
+    componentDir: "@/components/ui",
   },
-   css: ['~/assets/css/tailwind.css'],
+
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
   },
-})
+});
+
 ```
 
 ## `components.json`
