@@ -13,7 +13,7 @@ import {
   deleteItem,
 } from '$lib/api/itemApi';
 import type { CreateItemPayload, UpdateItemPayload } from '$lib/types';
-import { uiStore } from '$lib/stores/uiStore';
+import { uiStore } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
 
 // shared query keys (same structure as Vue)
 export const itemKeys = {

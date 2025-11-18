@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 17:51:44 CET
+**Generated on:** wto, 18 lis 2025, 18:05:23 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-vite
 
 ---
@@ -278,8 +278,9 @@ export default defineConfig({
    import { formatDate } from '$lib/utils/helpers';
    import { uiStore } from '$lib/stores/uiStore';
    import type { Item } from '$lib/types';
+   import { Pencil, Trash2 } from '@lucide/svelte';
  
-   export let item: Item;
+   let { item } = $props<{ item: Item }>();
  
    const { mutate: updateItem } = useUpdateItem();
    const { mutate: deleteItem } = useDeleteItem();
@@ -298,7 +299,7 @@ export default defineConfig({
    }
  </script>
  
-<div class="border rounded-lg bg-card p-4 flex items-start gap-4 opacity-60" class:opacity-100={!item.isCompleted}>
+<div class="flex items-start gap-4 p-4 border rounded-lg bg-card opacity-60" class:opacity-100={!item.isCompleted}>
     <div class="mt-1">
       <Checkbox
         checked={item.isCompleted}
@@ -308,7 +309,7 @@ export default defineConfig({
     <div class="flex-1">
       <div class="flex items-center justify-between">
           <h3 
-            class="font-semibold text-lg"
+            class="text-lg font-semibold"
             class:line-through={item.isCompleted}
             class:text-muted-foreground={item.isCompleted}
           >
@@ -324,10 +325,10 @@ export default defineConfig({
           <p class="text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
           <div class="flex gap-2">
               <Button size="sm" variant="ghost" onclick={() => uiStore.openForm(item)}>
-                  <icon-lucide-pencil class="w-4 h-4"></icon-lucide-pencil>
+                  <Pencil class="w-4 h-4" />
               </Button>
               <Button size="sm" variant="destructive" onclick={handleDelete}>
-                  <icon-lucide-trash-2 class="w-4 h-4"></icon-lucide-trash-2>
+                  <Trash2 class="w-4 h-4" />
               </Button>
           </div>
       </div>
@@ -350,70 +351,73 @@ export default defineConfig({
   import { Label } from '$lib/components/ui/label';
   import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group';
   import { Badge } from '$lib/components/ui/badge';
-  import { useAddItem } from '$lib/api/itemsQuery';
+  import { useAddItem, useUpdateItem } from '$lib/api/itemsQuery'; // Import update hook
   import { itemFormSchema } from '$lib/schemas/itemSchema';
   import { uiStore } from '$lib/stores/uiStore';
-  import { createEventDispatcher } from 'svelte';
 
-  export let onClose: () => void;
+  let { onClose } = $props<{ onClose: () => void }>();
 
-  const dispatch = createEventDispatcher();
   const { mutate: addItem } = useAddItem();
+  const { mutate: updateItem } = useUpdateItem();
 
-  let currentTag = '';
-  let formData = {
-    name: '',
-    text: '',
-    priority: 'mid' as const,
-    tags: [] as string[],
-    categories: [$uiStore.preselectedCategory || 'general'] as [string],
-  };
+  let currentTag = $state('');
+  
+  // Initialize form data based on uiStore.editingItem
+  let formData = $state({
+    name: uiStore.editingItem?.name || '',
+    text: uiStore.editingItem?.text || '',
+    priority: (uiStore.editingItem?.priority || 'mid') as 'low' | 'mid' | 'high',
+    tags: uiStore.editingItem?.tags ? [...uiStore.editingItem.tags] : [] as string[],
+    categories: [uiStore.preselectedCategory || (uiStore.editingItem?.categories?.[0] ? String(uiStore.editingItem.categories[0]) : 'general')] as [string],
+  });
 
-  let errors: Record<string, string> = {};
+  let errors = $state<Record<string, string>>({});
 
   function validateForm() {
     errors = {};
+    const result = itemFormSchema.safeParse(formData);
     
-    try {
-      itemFormSchema.parse(formData);
-    } catch (e: any) {
-      if (e.errors) {
-        e.errors.forEach((error: any) => {
-          errors[error.path[0]] = error.message;
-        });
-      }
+    if (!result.success) {
+      result.error.errors.forEach((error) => {
+        errors[error.path[0] as string] = error.message;
+      });
+      return false;
     }
-    
-    return Object.keys(errors).length === 0;
+    return true;
   }
 
   function handleSubmit() {
     if (!validateForm()) return;
 
-    addItem(formData, {
-      onSuccess: () => {
-        dispatch('close');
-        if (onClose) onClose();
-      },
-    });
+    const payload = {
+      ...formData,
+      categories: [formData.categories[0]] as [string] // Ensure tuple type for API
+    };
+
+    const onSuccess = () => {
+      if (onClose) onClose();
+    };
+
+    if (uiStore.editingItem) {
+      updateItem({
+        id: uiStore.editingItem.id,
+        payload: payload
+      }, { onSuccess });
+    } else {
+      addItem(payload, { onSuccess });
+    }
   }
 
   function addTag() {
     const newTag = currentTag.trim();
     if (newTag && !formData.tags.includes(newTag)) {
-      formData = {
-        ...formData,
-        tags: [...formData.tags, newTag]
-      };
+      formData.tags = [...formData.tags, newTag];
     }
     currentTag = '';
   }
 
   function removeTag(tagToRemove: string) {
-    formData = {
-      ...formData,
-      tags: formData.tags.filter(tag => tag !== tagToRemove)
-    };
+    formData.tags = formData.tags.filter(tag => tag !== tagToRemove);
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -424,13 +428,13 @@ export default defineConfig({
   }
 </script>
 
-<Dialog open={true} on:openChange={() => dispatch('close')}>
+<Dialog open={true} onOpenChange={(open) => !open && onClose()}>
   <DialogContent>
     <DialogHeader>
-      <DialogTitle>Add New Task</DialogTitle>
+      <DialogTitle>{uiStore.editingItem ? 'Edit Task' : 'Add New Task'}</DialogTitle>
     </DialogHeader>
     
-    <form on:submit|preventDefault={handleSubmit} class="space-y-4">
+    <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-4">
       <!-- Name Field -->
       <div>
         <Label for="name">Task Name</Label>
@@ -498,7 +502,7 @@ export default defineConfig({
         <div class="flex items-center gap-2 mt-2">
           <Input
             bind:value={currentTag}
-            on:keydown={handleKeydown}
+            onkeydown={handleKeydown}
             placeholder="Add a tag..."
           />
           <Button type="button" variant="outline" onclick={addTag}>Add</Button>
@@ -518,8 +522,8 @@ export default defineConfig({
 
       <!-- Action Buttons -->
       <div class="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onclick={() => dispatch('close')}>Cancel</Button>
-        <Button type="submit">Create Task</Button>
+        <Button type="button" variant="outline" onclick={onClose}>Cancel</Button>
+        <Button type="submit">{uiStore.editingItem ? 'Update' : 'Create'} Task</Button>
       </div>
     </form>
   </DialogContent>
@@ -535,24 +539,16 @@ export default defineConfig({
   import { Button } from '$lib/components/ui/button';
   import { createEventDispatcher } from 'svelte';
 
-  export let priority: string = 'all';
-  export let showCompleted: boolean = true;
-  export let hasActiveFilters: boolean = false;
-  export let allTags: string[] = [];
-  export let selectedTags: string[] = [];
-  export let search: string = '';
+  let { 
+    priority = $bindable('all'),
+    showCompleted = $bindable(true),
+    hasActiveFilters = false,
+    allTags = [],
+    selectedTags = $bindable([]),
+    search = $bindable('')
+  } = $props();
 
   const dispatch = createEventDispatcher();
-
-  function handlePriorityChange(value: string) {
-    priority = value;
-    dispatch('update:priority', value);
-  }
-
-  function handleShowCompletedChange(checked: boolean) {
-    showCompleted = checked;
-    dispatch('update:showCompleted', checked);
-  }
 
   function handleClear() {
     dispatch('clear');
@@ -634,11 +630,11 @@ export default defineConfig({
   import { Input } from '$lib/components/ui/input';
   import { Separator } from '$lib/components/ui/separator';
   import { uiStore } from '$lib/stores/uiStore';
+  import { Sun, Moon } from '@lucide/svelte';
 
-  // These would eventually be props or come from a store
-  let searchQuery = '';
-  let allTags = ['project', 'personal', 'work']; // Example tags
-  let selectedTags: string[] = [];
+  let searchQuery = $state('');
+  let allTags = ['project', 'personal', 'work'];
+  let selectedTags = $state<string[]>([]);
 
   function toggleTag(tag: string) {
     const index = selectedTags.indexOf(tag);
@@ -691,10 +687,10 @@ export default defineConfig({
   <!-- Footer / Theme Toggle -->
   <div class="mt-auto">
     <Button variant="ghost" onclick={() => uiStore.toggleTheme()} class="justify-start w-full">
-      {#if !$uiStore.isDark}
-        <icon-lucide-sun class="w-4 h-4" />
+      {#if uiStore.theme !== 'dark'}
+        <Sun class="w-4 h-4" />
       {:else}
-        <icon-lucide-moon class="w-4 h-4" />
+        <Moon class="w-4 h-4" />
       {/if}
     </Button>
   </div>
@@ -2345,14 +2341,16 @@ export function useItemFilters(itemTree: ItemTree, filters: FilterOptions) {
 // src/lib/utils/themeUpdater.ts
 import { onMount } from 'svelte';
 import { uiStore, type Theme } from '$lib/stores/uiStore';
-import { get } from 'svelte/store';
 
 export function useThemeUpdater() {
   onMount(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
 
-    function applyTheme(theme: Theme) {
+    // Access theme via the effect derived from the store state
+    $effect(() => {
+      const theme = uiStore.theme;
       const html = document.documentElement;
+      
       if (theme === 'system') {
         const isDark = media.matches;
         if (isDark) html.classList.add('dark');
@@ -2362,23 +2360,19 @@ export function useThemeUpdater() {
       } else {
         html.classList.remove('dark');
       }
-    }
-
-    // initial
-    applyTheme(get(uiStore.theme));
-
-    const unsub = uiStore.theme.subscribe((t) => applyTheme(t));
+    });
 
     const mediaListener = () => {
-      if (get(uiStore.theme) === 'system') {
-        applyTheme('system');
+      if (uiStore.theme === 'system') {
+        const html = document.documentElement;
+        if (media.matches) html.classList.add('dark');
+        else html.classList.remove('dark');
       }
     };
 
     media.addEventListener('change', mediaListener);
 
     return () => {
-      unsub();
       media.removeEventListener('change', mediaListener);
     };
   });
@@ -2402,42 +2396,42 @@ export const formatDate = (dateString: string): string => {
 ## `src/lib/stores/uiStore.ts`
 ```
 // src/lib/stores/uiStore.ts
-import { writable, get } from 'svelte/store';
-import type { NotificationType, Item } from '$lib/types';
 import { toast } from 'svelte-sonner';
+import type { NotificationType, Item } from '$lib/types';
 
 export type Theme = 'light' | 'dark' | 'system';
 
-function createUiStore() {
-  const theme = writable<Theme>('system');
-  const isFormOpen = writable(false);
-  const preselectedCategory = writable<string | null>(null);
-  const editingItem = writable<Item | null>(null);
+class UiStore {
+  // State
+  theme = $state<Theme>('system');
+  isFormOpen = $state(false);
+  preselectedCategory = $state<string | null>(null);
+  editingItem = $state<Item | null>(null);
 
-  function openForm(item?: Item, categorySlug?: string) {
-    editingItem.set(item ?? null);
+  // Actions
+  openForm(item?: Item, categorySlug?: string) {
+    this.editingItem = item ?? null;
     if (categorySlug) {
-      preselectedCategory.set(categorySlug);
+      this.preselectedCategory = categorySlug;
     } else if (item?.categorySlug) {
-      preselectedCategory.set(item.categorySlug);
+      this.preselectedCategory = item.categorySlug;
     }
-    isFormOpen.set(true);
+    this.isFormOpen = true;
   }
 
-  function closeForm() {
-    isFormOpen.set(false);
-    preselectedCategory.set(null);
-    editingItem.set(null);
+  closeForm() {
+    this.isFormOpen = false;
+    this.preselectedCategory = null;
+    this.editingItem = null;
   }
 
-  function toggleTheme() {
-    const current = get(theme);
-    if (current === 'light') theme.set('dark');
-    else if (current === 'dark') theme.set('system');
-    else theme.set('light');
+  toggleTheme() {
+    if (this.theme === 'light') this.theme = 'dark';
+    else if (this.theme === 'dark') this.theme = 'system';
+    else this.theme = 'light';
   }
 
-  function showNotification(type: NotificationType, message: string) {
+  showNotification(type: NotificationType, message: string) {
     switch (type) {
       case 'success':
         toast.success(message);
@@ -2450,24 +2444,13 @@ function createUiStore() {
         break;
       case 'info':
       default:
-        toast(message);
+        toast.info(message);
         break;
     }
   }
-
-  return {
-    theme,
-    isFormOpen,
-    preselectedCategory,
-    editingItem,
-    openForm,
-    closeForm,
-    toggleTheme,
-    showNotification,
-  };
 }
 
-export const uiStore = createUiStore();
+export const uiStore = new UiStore();
 ```
 
 ## `src/lib/utils.ts`
@@ -2676,13 +2659,11 @@ export type Result<T, E> =
   import MainLayout from '$lib/components/layout/MainLayout.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let navigate: (path: string) => void;
+  const dispatch = createEventDispatcher<{ navigate: string }>();
 
   function handleNavigate(path: string) {
     dispatch('navigate', path);
   }
-
-  const dispatch = createEventDispatcher<{ navigate: string }>();
 </script>
 
 <MainLayout onNavigate={handleNavigate}>
@@ -2693,35 +2674,27 @@ export type Result<T, E> =
 
     <div class="p-6 border rounded-lg bg-surface border-border">
       <p class="mb-4 text-text-secondary">
-        This is a modern, responsive Vue frontend for managing items, built to serve as a clean and robust boilerplate. It leverages the full power of TanStack suite and modern tooling for a superior developer experience and a fully type-safe workflow.
+        This is a modern, responsive Svelte 5 frontend for managing items.
       </p>
 
       <h2 class="mb-3 font-semibold text-size-xl">Core Technologies Used:</h2>
 
       <ul class="space-y-2 list-disc list-inside text-text-secondary">
         <li>
-          <span class="font-medium text-text-primary">Vue 3:</span>
-          For building a reactive and performant user interface with Composition API.
+          <span class="font-medium text-text-primary">Svelte 5:</span>
+          For building a reactive and performant user interface with Runes.
         </li>
         <li>
-          <span class="font-medium text-text-primary">TanStack Query (Vue Query):</span>
-          Manages all server state, handling data fetching, caching, and synchronization effortlessly.
+          <span class="font-medium text-text-primary">TanStack Query (Svelte Query):</span>
+          Manages all server state.
         </li>
         <li>
-          <span class="font-medium text-text-primary">TanStack Form (Vue Form):</span>
-          Ensures performant and 100% type-safe forms from validation to submission.
-        </li>
-        <li>
-          <span class="font-medium text-text-primary">Pinia:</span>
-          Provides simple and type-safe global state management for client-side UI state.
-        </li>
-        <li>
-          <span class="font-medium text-text-primary">shadcn-vue:</span>
-          A collection of beautifully designed, accessible, and unstyled components that are adapted to our custom design system.
+          <span class="font-medium text-text-primary">shadcn-svelte:</span>
+          UI Component library.
         </li>
         <li>
           <span class="font-medium text-text-primary">Tailwind CSS v4:</span>
-          Powers styling with a "CSS-first" approach, using a custom, token-based, and fluidly responsive design system.
+          Styling.
         </li>
       </ul>
     </div>
@@ -2738,25 +2711,26 @@ export type Result<T, E> =
   import FilterBar from '$lib/components/layout/FilterBar.svelte';
   import ItemItem from '$lib/components/items/ItemItem.svelte';
   import ItemForm from '$lib/components/items/ItemForm.svelte';
-  import { uiStore } from '$lib/stores/uiStore';
-  import { isFormOpen } from '$lib/stores/uiStore';
+  import { uiStore } from '$lib/stores/uiStore'; // <-- Only import the singleton
   import { Button } from '$lib/components/ui/button';
   import { createEventDispatcher } from 'svelte';
+  import { Plus } from '@lucide/svelte'; // Import icon directly
 
   const itemTreeQuery = useItemTree();
   const dispatch = createEventDispatcher();
 
-  let filters = {
+  let filters = $state({
     searchQuery: '',
     selectedPriority: 'all' as const,
     showCompleted: true,
     selectedTags: [] as string[],
-  };
+  });
 
-  $: filterResults = useItemFilters(itemTreeQuery.data || {}, filters);
-  $: filteredItemTree = filterResults.filteredItemTree;
-  $: allTags = filterResults.allTags;
-  $: hasActiveFilters = filterResults.hasActiveFilters;
+  // Use derived for reactive calculations in Svelte 5
+  let filterResults = $derived(useItemFilters(itemTreeQuery.data || {}, filters));
+  let filteredItemTree = $derived(filterResults.filteredItemTree);
+  let allTags = $derived(filterResults.allTags);
+  let hasActiveFilters = $derived(filterResults.hasActiveFilters);
 
   function clearFilters() {
     filters = {
@@ -2775,9 +2749,9 @@ export type Result<T, E> =
 <MainLayout onNavigate={handleNavigate}>
   <header class="mb-6">
     <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
-    <!-- The main "Add New Item" button remains in the sidebar -->
   </header>
 
+  <!-- Bind props using Svelte 5 syntax -->
   <FilterBar
     bind:search={filters.searchQuery}
     bind:priority={filters.selectedPriority}
@@ -2799,13 +2773,12 @@ export type Result<T, E> =
           <div class="flex items-center gap-2 mb-4">
             <h2 class="font-semibold capitalize text-size-xl">{category}</h2>
             <span class="text-sm text-text-muted">({items.length})</span>
-            <!-- Add "+" button here -->
             <Button 
               variant="ghost" 
               size="icon-sm" 
               onclick={() => uiStore.openForm(undefined, category)}
             >
-              <icon-lucide-plus class="w-4 h-4"></icon-lucide-plus>
+              <Plus class="w-4 h-4" />
             </Button>
           </div>
           <div class="grid gap-4">
@@ -2826,8 +2799,8 @@ export type Result<T, E> =
     </div>
   {/if}
 
-  <!-- The ItemForm is now aware of pre-selected category -->
-  {#if $uiStore.isFormOpen}
+  <!-- Access store property directly -->
+  {#if uiStore.isFormOpen}
     <ItemForm onClose={() => uiStore.closeForm()} />
   {/if}
 </MainLayout>
