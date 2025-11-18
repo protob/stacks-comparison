@@ -5,70 +5,73 @@
   import { Label } from '$lib/components/ui/label';
   import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group';
   import { Badge } from '$lib/components/ui/badge';
-  import { useAddItem } from '$lib/api/itemsQuery';
+  import { useAddItem, useUpdateItem } from '$lib/api/itemsQuery'; // Import update hook
   import { itemFormSchema } from '$lib/schemas/itemSchema';
   import { uiStore } from '$lib/stores/uiStore';
-  import { createEventDispatcher } from 'svelte';
 
-  export let onClose: () => void;
+  let { onClose } = $props<{ onClose: () => void }>();
 
-  const dispatch = createEventDispatcher();
   const { mutate: addItem } = useAddItem();
+  const { mutate: updateItem } = useUpdateItem();
 
-  let currentTag = '';
-  let formData = {
-    name: '',
-    text: '',
-    priority: 'mid' as const,
-    tags: [] as string[],
-    categories: [$uiStore.preselectedCategory || 'general'] as [string],
-  };
+  let currentTag = $state('');
+  
+  // Initialize form data based on uiStore.editingItem
+  let formData = $state({
+    name: uiStore.editingItem?.name || '',
+    text: uiStore.editingItem?.text || '',
+    priority: (uiStore.editingItem?.priority || 'mid') as 'low' | 'mid' | 'high',
+    tags: uiStore.editingItem?.tags ? [...uiStore.editingItem.tags] : [] as string[],
+    categories: [uiStore.preselectedCategory || (uiStore.editingItem?.categories?.[0] ? String(uiStore.editingItem.categories[0]) : 'general')] as [string],
+  });
 
-  let errors: Record<string, string> = {};
+  let errors = $state<Record<string, string>>({});
 
   function validateForm() {
     errors = {};
+    const result = itemFormSchema.safeParse(formData);
     
-    try {
-      itemFormSchema.parse(formData);
-    } catch (e: any) {
-      if (e.errors) {
-        e.errors.forEach((error: any) => {
-          errors[error.path[0]] = error.message;
-        });
-      }
+    if (!result.success) {
+      result.error.errors.forEach((error) => {
+        errors[error.path[0] as string] = error.message;
+      });
+      return false;
     }
-    
-    return Object.keys(errors).length === 0;
+    return true;
   }
 
   function handleSubmit() {
     if (!validateForm()) return;
 
-    addItem(formData, {
-      onSuccess: () => {
-        dispatch('close');
-        if (onClose) onClose();
-      },
-    });
+    const payload = {
+      ...formData,
+      categories: [formData.categories[0]] as [string] // Ensure tuple type for API
+    };
+
+    const onSuccess = () => {
+      if (onClose) onClose();
+    };
+
+    if (uiStore.editingItem) {
+      updateItem({
+        id: uiStore.editingItem.id,
+        payload: payload
+      }, { onSuccess });
+    } else {
+      addItem(payload, { onSuccess });
+    }
   }
 
   function addTag() {
     const newTag = currentTag.trim();
     if (newTag && !formData.tags.includes(newTag)) {
-      formData = {
-        ...formData,
-        tags: [...formData.tags, newTag]
-      };
+      formData.tags = [...formData.tags, newTag];
     }
     currentTag = '';
   }
 
   function removeTag(tagToRemove: string) {
-    formData = {
-      ...formData,
-      tags: formData.tags.filter(tag => tag !== tagToRemove)
-    };
+    formData.tags = formData.tags.filter(tag => tag !== tagToRemove);
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -79,13 +82,13 @@
   }
 </script>
 
-<Dialog open={true} on:openChange={() => dispatch('close')}>
+<Dialog open={true} onOpenChange={(open) => !open && onClose()}>
   <DialogContent>
     <DialogHeader>
-      <DialogTitle>Add New Task</DialogTitle>
+      <DialogTitle>{uiStore.editingItem ? 'Edit Task' : 'Add New Task'}</DialogTitle>
     </DialogHeader>
     
-    <form on:submit|preventDefault={handleSubmit} class="space-y-4">
+    <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-4">
       <!-- Name Field -->
       <div>
         <Label for="name">Task Name</Label>
@@ -153,7 +156,7 @@
         <div class="flex items-center gap-2 mt-2">
           <Input
             bind:value={currentTag}
-            on:keydown={handleKeydown}
+            onkeydown={handleKeydown}
             placeholder="Add a tag..."
           />
           <Button type="button" variant="outline" onclick={addTag}>Add</Button>
@@ -173,8 +176,8 @@
 
       <!-- Action Buttons -->
       <div class="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onclick={() => dispatch('close')}>Cancel</Button>
-        <Button type="submit">Create Task</Button>
+        <Button type="button" variant="outline" onclick={onClose}>Cancel</Button>
+        <Button type="submit">{uiStore.editingItem ? 'Update' : 'Create'} Task</Button>
       </div>
     </form>
   </DialogContent>

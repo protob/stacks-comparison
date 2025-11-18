@@ -3,13 +3,11 @@
   import MainLayout from '$lib/components/layout/MainLayout.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let navigate: (path: string) => void;
+  const dispatch = createEventDispatcher<{ navigate: string }>();
 
   function handleNavigate(path: string) {
     dispatch('navigate', path);
   }
-
-  const dispatch = createEventDispatcher<{ navigate: string }>();
 </script>
 
 <MainLayout onNavigate={handleNavigate}>
@@ -20,35 +18,27 @@
 
     <div class="p-6 border rounded-lg bg-surface border-border">
       <p class="mb-4 text-text-secondary">
-        This is a modern, responsive Vue frontend for managing items, built to serve as a clean and robust boilerplate. It leverages the full power of TanStack suite and modern tooling for a superior developer experience and a fully type-safe workflow.
+        This is a modern, responsive Svelte 5 frontend for managing items.
       </p>
 
       <h2 class="mb-3 font-semibold text-size-xl">Core Technologies Used:</h2>
 
       <ul class="space-y-2 list-disc list-inside text-text-secondary">
         <li>
-          <span class="font-medium text-text-primary">Vue 3:</span>
-          For building a reactive and performant user interface with Composition API.
+          <span class="font-medium text-text-primary">Svelte 5:</span>
+          For building a reactive and performant user interface with Runes.
         </li>
         <li>
-          <span class="font-medium text-text-primary">TanStack Query (Vue Query):</span>
-          Manages all server state, handling data fetching, caching, and synchronization effortlessly.
+          <span class="font-medium text-text-primary">TanStack Query (Svelte Query):</span>
+          Manages all server state.
         </li>
         <li>
-          <span class="font-medium text-text-primary">TanStack Form (Vue Form):</span>
-          Ensures performant and 100% type-safe forms from validation to submission.
-        </li>
-        <li>
-          <span class="font-medium text-text-primary">Pinia:</span>
-          Provides simple and type-safe global state management for client-side UI state.
-        </li>
-        <li>
-          <span class="font-medium text-text-primary">shadcn-vue:</span>
-          A collection of beautifully designed, accessible, and unstyled components that are adapted to our custom design system.
+          <span class="font-medium text-text-primary">shadcn-svelte:</span>
+          UI Component library.
         </li>
         <li>
           <span class="font-medium text-text-primary">Tailwind CSS v4:</span>
-          Powers styling with a "CSS-first" approach, using a custom, token-based, and fluidly responsive design system.
+          Styling.
         </li>
       </ul>
     </div>

@@ -6,8 +6,9 @@
    import { formatDate } from '$lib/utils/helpers';
    import { uiStore } from '$lib/stores/uiStore';
    import type { Item } from '$lib/types';
+   import { Pencil, Trash2 } from '@lucide/svelte';
  
-   export let item: Item;
+   let { item } = $props<{ item: Item }>();
  
    const { mutate: updateItem } = useUpdateItem();
    const { mutate: deleteItem } = useDeleteItem();
@@ -26,7 +27,7 @@
    }
  </script>
  
-<div class="border rounded-lg bg-card p-4 flex items-start gap-4 opacity-60" class:opacity-100={!item.isCompleted}>
+<div class="flex items-start gap-4 p-4 border rounded-lg bg-card opacity-60" class:opacity-100={!item.isCompleted}>
     <div class="mt-1">
       <Checkbox
         checked={item.isCompleted}
@@ -36,7 +37,7 @@
     <div class="flex-1">
       <div class="flex items-center justify-between">
           <h3 
-            class="font-semibold text-lg"
+            class="text-lg font-semibold"
             class:line-through={item.isCompleted}
             class:text-muted-foreground={item.isCompleted}
           >
@@ -52,10 +53,10 @@
           <p class="text-xs text-muted-foreground">{formatDate(item.createdAt)}</p>
           <div class="flex gap-2">
               <Button size="sm" variant="ghost" onclick={() => uiStore.openForm(item)}>
-                  <icon-lucide-pencil class="w-4 h-4"></icon-lucide-pencil>
+                  <Pencil class="w-4 h-4" />
               </Button>
               <Button size="sm" variant="destructive" onclick={handleDelete}>
-                  <icon-lucide-trash-2 class="w-4 h-4"></icon-lucide-trash-2>
+                  <Trash2 class="w-4 h-4" />
               </Button>
           </div>
       </div>

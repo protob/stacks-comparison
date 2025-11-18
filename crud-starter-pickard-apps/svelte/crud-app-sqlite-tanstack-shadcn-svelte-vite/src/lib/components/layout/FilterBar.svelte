@@ -5,24 +5,16 @@
   import { Button } from '$lib/components/ui/button';
   import { createEventDispatcher } from 'svelte';
 
-  export let priority: string = 'all';
-  export let showCompleted: boolean = true;
-  export let hasActiveFilters: boolean = false;
-  export let allTags: string[] = [];
-  export let selectedTags: string[] = [];
-  export let search: string = '';
+  let { 
+    priority = $bindable('all'),
+    showCompleted = $bindable(true),
+    hasActiveFilters = false,
+    allTags = [],
+    selectedTags = $bindable([]),
+    search = $bindable('')
+  } = $props();
 
   const dispatch = createEventDispatcher();
-
-  function handlePriorityChange(value: string) {
-    priority = value;
-    dispatch('update:priority', value);
-  }
-
-  function handleShowCompletedChange(checked: boolean) {
-    showCompleted = checked;
-    dispatch('update:showCompleted', checked);
-  }
 
   function handleClear() {
     dispatch('clear');
