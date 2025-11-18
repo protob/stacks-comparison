@@ -1,6 +1,4 @@
-Of course, here is a `README.md` file that has been adapted for your Nuxt.js project, based on the structure of the Vue README you provided and the source code of the Nuxt application.
 
----
 
 # Items App - Nuxt Frontend
 
