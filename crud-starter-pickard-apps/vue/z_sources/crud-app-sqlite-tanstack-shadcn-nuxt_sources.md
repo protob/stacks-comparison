@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 00:49:29 CET
+**Generated on:** wto, 18 lis 2025, 01:29:58 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -158,241 +158,202 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 ## `app/components/items/ItemForm.vue`
 ```
 <script setup lang="ts">
-import { useForm } from '@tanstack/vue-form';
-import { zodValidator } from '@tanstack/zod-form-adapter';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Badge } from '@/components/ui/badge';
-import { useAddItem } from '@/composables/useItemsApi';
-import { itemFormSchema } from '@/schemas/itemSchema';
-import { useUiStore } from '@/stores/uiStore';
+import { useForm } from "@tanstack/vue-form";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { useAddItem } from "@/composables/useItemsApi";
+import { itemFormSchema } from "@/schemas/itemSchema";
+import { useUiStore } from "@/stores/uiStore";
 
 const emit = defineEmits<{ close: [] }>();
 const { mutate: addItem } = useAddItem();
 const uiStore = useUiStore();
 
-const currentTag = ref('');
+const currentTag = ref("");
 
 const form = useForm({
-  defaultValues: {
-    name: '',
-    text: '',
-    priority: 'mid' as const,
-    tags: [] as string[],
-    categories: [uiStore.preselectedCategory || 'general'] as [string],
-  },
-  onSubmit: async ({ value }) => {
-    addItem(value, {
-      onSuccess: () => emit('close'),
-    });
-  },
-  validatorAdapter: zodValidator(),
+    defaultValues: {
+        name: "",
+        text: "",
+        priority: "mid" as const,
+        tags: [] as string[],
+        categories: [uiStore.preselectedCategory || "general"] as [string],
+    },
+    onSubmit: async ({ value }) => {
+        addItem(value, {
+            onSuccess: () => emit("close"),
+        });
+    },
+    validatorAdapter: zodValidator(),
 });
 
 const addTag = () => {
-  const newTag = currentTag.value.trim();
-  if (newTag && !form.state.values.tags.includes(newTag)) {
-    form.setFieldValue('tags', [...form.state.values.tags, newTag]);
-  }
-  currentTag.value = '';
+    const newTag = currentTag.value.trim();
+    if (newTag && !form.state.values.tags.includes(newTag)) {
+        form.setFieldValue("tags", [...form.state.values.tags, newTag]);
+    }
+    currentTag.value = "";
 };
 
 const removeTag = (tagToRemove: string) => {
-  form.setFieldValue('tags', form.state.values.tags.filter(tag => tag !== tagToRemove));
+    form.setFieldValue(
+        "tags",
+        form.state.values.tags.filter((tag) => tag !== tagToRemove),
+    );
 };
 </script>
 
 <template>
-  <Dialog :open="true" @update:open="emit('close')">
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Add New Task</DialogTitle>
-      </DialogHeader>
-      
-      <form @submit.prevent="form.handleSubmit()" class="space-y-4">
-        <form.Field name="name" :validators="{ onChange: itemFormSchema.shape.name }">
-          <template #default="{ field }">
-            <div>
-              <Label>Task Name</Label>
-              <Input
-                :model-value="field.state.value"
-                @update:model-value="field.handleChange"
-                placeholder="e.g., Finalize project report"
-              />
-              <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
-                {{ field.state.meta.errors[0] }}
-              </p>
-            </div>
-          </template>
-        </form.Field>
+    <Dialog :open="true" @update:open="emit('close')">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Add New Task</DialogTitle>
+            </DialogHeader>
 
-        <form.Field name="text" :validators="{ onChange: itemFormSchema.shape.text }">
-          <template #default="{ field }">
-            <div>
-              <Label>Description</Label>
-              <Input
-                :model-value="field.state.value"
-                @update:model-value="field.handleChange"
-                placeholder="Add more details about the task..."
-              />
-               <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
-                {{ field.state.meta.errors[0] }}
-              </p>
-            </div>
-          </template>
-        </form.Field>
+            <form @submit.prevent="form.handleSubmit()" class="space-y-4">
+                <form.Field name="name" :validators="{ onChange: itemFormSchema.shape.name }">
+                    <template #default="{ field }">
+                        <div>
+                            <Label>Task Name</Label>
+                            <Input :model-value="field.state.value" @update:model-value="field.handleChange" placeholder="e.g., Finalize project report" />
+                            <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
+                                {{ field.state.meta.errors[0] }}
+                            </p>
+                        </div>
+                    </template>
+                </form.Field>
 
-        <form.Field name="categories" :validators="{ onChange: itemFormSchema.shape.categories }">
-           <template #default="{ field }">
-             <div>
-               <Label>Category</Label>
-               <Input
-                 :model-value="field.state.value[0]"
-                 @update:model-value="field.handleChange([$event])"
-                 placeholder="e.g., Work"
-               />
-               <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
-                {{ field.state.meta.errors[0] }}
-              </p>
-             </div>
-           </template>
-        </form.Field>
+                <form.Field name="text" :validators="{ onChange: itemFormSchema.shape.text }">
+                    <template #default="{ field }">
+                        <div>
+                            <Label>Description</Label>
+                            <Input :model-value="field.state.value" @update:model-value="field.handleChange" placeholder="Add more details about the task..." />
+                            <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
+                                {{ field.state.meta.errors[0] }}
+                            </p>
+                        </div>
+                    </template>
+                </form.Field>
 
-        <form.Field name="priority">
-          <template #default="{ field }">
-            <div>
-              <Label>Priority</Label>
-              <RadioGroup
-                :model-value="field.state.value"
-                @update:model-value="field.handleChange"
-                class="flex items-center gap-4 mt-2"
-              >
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem id="p-low" value="low" />
-                  <Label for="p-low">Low</Label>
+                <form.Field name="categories" :validators="{ onChange: itemFormSchema.shape.categories }">
+                    <template #default="{ field }">
+                        <div>
+                            <Label>Category</Label>
+                            <Input :model-value="field.state.value[0]" @update:model-value="field.handleChange([$event])" placeholder="e.g., Work" />
+                            <p v-if="field.state.meta.errors.length" class="mt-1 text-sm text-destructive">
+                                {{ field.state.meta.errors[0] }}
+                            </p>
+                        </div>
+                    </template>
+                </form.Field>
+
+                <form.Field name="priority">
+                    <template #default="{ field }">
+                        <div>
+                            <Label>Priority</Label>
+                            <RadioGroup :model-value="field.state.value" @update:model-value="field.handleChange" class="flex items-center gap-4 mt-2">
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="p-low" value="low" />
+                                    <Label for="p-low">Low</Label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="p-mid" value="mid" />
+                                    <Label for="p-mid">Mid</Label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="p-high" value="high" />
+                                    <Label for="p-high">High</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                    </template>
+                </form.Field>
+
+                <div>
+                    <Label>Tags</Label>
+                    <div class="flex items-center gap-2 mt-2">
+                        <Input v-model="currentTag" @keydown.enter.prevent="addTag" placeholder="Add a tag..." />
+                        <Button type="button" variant="outline" @click="addTag">Add</Button>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <Badge v-for="tag in form.state.values.tags" :key="tag" variant="secondary" class="cursor-pointer" @click="removeTag(tag)">
+                            {{ tag }} &times;
+                        </Badge>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem id="p-mid" value="mid" />
-                  <Label for="p-mid">Mid</Label>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem id="p-high" value="high" />
-                  <Label for="p-high">High</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </template>
-        </form.Field>
 
-        <div>
-          <Label>Tags</Label>
-          <div class="flex items-center gap-2 mt-2">
-            <Input
-              v-model="currentTag"
-              @keydown.enter.prevent="addTag"
-              placeholder="Add a tag..."
-            />
-            <Button type="button" variant="outline" @click="addTag">Add</Button>
-          </div>
-          <div class="flex flex-wrap gap-2 mt-2">
-            <Badge
-              v-for="tag in form.state.values.tags"
-              :key="tag"
-              variant="secondary"
-              class="cursor-pointer"
-              @click="removeTag(tag)"
-            >
-              {{ tag }} &times;
-            </Badge>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" @click="emit('close')">Cancel</Button>
-          <Button type="submit">Create Task</Button>
-        </div>
-      </form>
-    </DialogContent>
-  </Dialog>
+                <div class="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" @click="emit('close')">Cancel</Button>
+                    <Button type="submit">Create Task</Button>
+                </div>
+            </form>
+        </DialogContent>
+    </Dialog>
 </template>
+
 ```
 
 ## `app/components/items/ItemItem.vue`
 ```
 <script setup lang="ts">
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useUpdateItem, useDeleteItem } from '@/composables/useItemsApi';
-import { formatDate } from '@/utils/helpers';
-import { useUiStore } from '@/stores/uiStore';
-import type { Item } from '@/types';
+import Card from "@/components/ui/card";
+import CardContent from "@/components/ui/card/CardContent.vue";
+import Badge from "@/components/ui/badge";
+import Button from "@/components/ui/button";
+import Checkbox from "@/components/ui/checkbox";
+import { useUpdateItem, useDeleteItem } from "@/composables/useItemsApi";
+import { formatDate } from "@/utils/helpers";
+import { useUiStore } from "@/stores/uiStore";
+import type { Item } from "~/types";
 
 const props = defineProps<{ item: Item }>();
-
-const { mutate: updateItem } = useUpdateItem();
-const { mutate: deleteItem } = useDeleteItem();
+const mutateUpdate = useUpdateItem();
+const mutateDelete = useDeleteItem();
 const uiStore = useUiStore();
 
-const toggleComplete = () => {
-  updateItem({
-    id: props.item.id,
-    payload: { isCompleted: !props.item.isCompleted },
-  });
-};
+const toggleComplete = () => mutateUpdate.mutateAsync({ id: props.item.id, payload: { isCompleted: !props.item.isCompleted } });
 
 const handleDelete = () => {
-  if (confirm('Are you sure you want to delete this item?')) {
-    deleteItem(props.item.id);
-  }
+    if (confirm("Are you sure you want to delete this item?")) {
+        mutateDelete.mutateAsync(props.item.id);
+    }
 };
 </script>
 
 <template>
-  <Card :class="{ 'opacity-60': item.isCompleted }">
-    <CardContent class="flex items-start gap-4 p-4">
-      <Checkbox
-        :checked="item.isCompleted"
-        @update:checked="toggleComplete"
-        class="mt-1"
-      />
-      <div class="flex-1">
-        <div class="flex items-center justify-between">
-            <h3 
-              class="font-semibold text-size-lg"
-              :class="{ 'line-through text-text-muted': item.isCompleted }"
-            >
-              {{ item.name }}
-            </h3>
-             <Badge :class="`tag-priority-${item.priority} tag-sm`" variant="outline">
-               {{ item.priority }}
-             </Badge>
-        </div>
-        <p class="mb-3 text-text-secondary">{{ item.text }}</p>
-
-        <div class="flex items-center justify-between">
-            <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
-            <div class="flex gap-2">
-                <Button size="sm" variant="ghost" @click="uiStore.openForm(item)">
-                    <Icon name="lucide:pencil" class="w-4 h-4" />
-                </Button>
-                <Button size="sm" variant="destructive" @click="handleDelete">
-                    <Icon name="lucide:trash-2" class="w-4 h-4" />
-                </Button>
+    <Card :class="{ 'opacity-60': item.isCompleted }">
+        <CardContent class="flex items-start gap-4 p-4">
+            <Checkbox :checked="item.isCompleted" @update:checked="toggleComplete" class="mt-1" />
+            <div class="flex-1">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-semibold text-size-lg" :class="{ 'line-through text-text-muted': item.isCompleted }">{{ item.name }}</h3>
+                    <Badge :class="`tag-priority-${item.priority} tag-sm`" variant="outline">{{ item.priority }}</Badge>
+                </div>
+                <p class="mb-3 text-text-secondary">{{ item.text }}</p>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-text-muted">{{ formatDate(item.createdAt) }}</p>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <Badge v-for="tag in item.tags" :key="tag" variant="secondary">{{ tag }}</Badge>
+                </div>
+                <div class="flex gap-2 mt-2">
+                    <Button size="sm" variant="ghost" @click="uiStore.openForm(item)">
+                        <Icon name="lucide:pencil" class="w-4 h-4" />
+                    </Button>
+                    <Button size="sm" variant="destructive" @click="handleDelete">
+                        <Icon name="lucide:trash-2" class="w-4 h-4" />
+                    </Button>
+                </div>
             </div>
-        </div>
-
-        <div class="flex gap-2 mt-3">
-          <Badge v-for="tag in item.tags" :key="tag" variant="secondary">{{ tag }}</Badge>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
+        </CardContent>
+    </Card>
 </template>
+
 ```
 
 ## `app/components/layout/TopBar.vue`
@@ -1445,62 +1406,57 @@ export { default as CardTitle } from "./CardTitle.vue"
 ## `app/components/ui/badge/Badge.vue`
 ```
 <script setup lang="ts">
-import type { PrimitiveProps } from "reka-ui"
-import type { HTMLAttributes } from "vue"
-import type { BadgeVariants } from "."
-import { reactiveOmit } from "@vueuse/core"
-import { Primitive } from "reka-ui"
-import { cn } from "@/lib/utils"
-import { badgeVariants } from "."
+import type { PrimitiveProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import type { BadgeVariants } from ".";
+import { reactiveOmit } from "@vueuse/core";
+import { Primitive } from "reka-ui";
+import { cn } from "@/lib/utils";
+import { badgeVariants } from ".";
 
-const props = defineProps<PrimitiveProps & {
-  variant?: BadgeVariants["variant"]
-  class?: HTMLAttributes["class"]
-}>()
+const props = defineProps<
+    PrimitiveProps & {
+        variant?: BadgeVariants["variant"];
+        class?: HTMLAttributes["class"];
+    }
+>();
 
-const delegatedProps = reactiveOmit(props, "class")
+const delegatedProps = reactiveOmit(props, "class");
 </script>
 
 <template>
-  <Primitive
-    data-slot="badge"
-    :class="cn(badgeVariants({ variant }), props.class)"
-    v-bind="delegatedProps"
-  >
-    <slot />
-  </Primitive>
+    <Primitive data-slot="badge" :class="cn(badgeVariants({ variant }), props.class)" v-bind="delegatedProps">
+        <slot />
+    </Primitive>
 </template>
 
 ```
 
 ## `app/components/ui/badge/index.ts`
 ```
-import type { VariantProps } from "class-variance-authority"
-import { cva } from "class-variance-authority"
+import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
-export { default as Badge } from "./Badge.vue"
+export { default as Badge } from "./Badge.vue";
 
 export const badgeVariants = cva(
   "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+        default: "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        secondary: "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
         destructive:
-         "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
       },
     },
     defaultVariants: {
       variant: "default",
     },
   },
-)
-export type BadgeVariants = VariantProps<typeof badgeVariants>
+);
+export type BadgeVariants = VariantProps<typeof badgeVariants>;
 
 ```
 
@@ -1617,6 +1573,28 @@ export const useItemStore = defineStore('item', () => {
     setClientOnlyState,
   };
 });
+```
+
+## `app/layouts/MainLayout.vue`
+```
+<script setup lang="ts">
+import AppSidebar from "@/components/layout/AppSidebar.vue";
+import TopBar from "@/components/layout/TopBar.vue";
+</script>
+
+<template>
+    <!-- Layout as grid, matching Vue codebase -->
+    <div class="grid min-h-screen" style="grid-template-columns: var(--sidebar-width) 1fr">
+        <AppSidebar />
+        <main class="min-w-0 overflow-y-auto">
+            <div class="p-fluid-4 md:p-fluid-6 lg:p-fluid-8">
+                <TopBar />
+                <slot />
+            </div>
+        </main>
+    </div>
+</template>
+
 ```
 
 ## `app/app.vue`
@@ -1765,45 +1743,40 @@ export function useThemeUpdater() {
 
 ## `app/composables/useItemsApi.ts`
 ```
-import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query';
-import { getItemTree, getItemBySlug, createItem, updateItem, deleteItem } from '@/api/itemApi';
-import { useUiStore } from '@/stores/uiStore';
-import type { CreateItemPayload, UpdateItemPayload } from '@/types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query";
+import { getItemTree, getItemBySlug, createItem, updateItem, deleteItem } from "~/api/itemApi";
+import { useUiStore } from "~/stores/uiStore";
+import type { CreateItemPayload, UpdateItemPayload } from "~/types";
 
 export const itemKeys = {
-  all: ['items'] as const,
-  tree: () => [...itemKeys.all, 'tree'] as const,
-  detail: (categorySlug: string, itemSlug: string) =>
-    [...itemKeys.all, 'detail', categorySlug, itemSlug] as const,
+  all: ["items"] as const,
+  tree: ["items", "tree"] as const,
+  detail: (categorySlug: string, itemSlug: string) => ["items", "detail", categorySlug, itemSlug] as const,
 };
 
 export function useItemTree() {
-  return useQuery({
-    queryKey: itemKeys.tree(),
-    queryFn: getItemTree,
-  });
+  return useQuery({ queryKey: itemKeys.tree, queryFn: getItemTree });
 }
 
-export function useItemDetail(categorySlug: Ref<string>, itemSlug: Ref<string>) {
+export function useItemDetail(categorySlug: any, itemSlug: any) {
   return useQuery({
-    queryKey: computed(() => itemKeys.detail(categorySlug.value, itemSlug.value)),
+    queryKey: itemKeys.detail(categorySlug.value, itemSlug.value),
     queryFn: () => getItemBySlug(categorySlug.value, itemSlug.value),
-    enabled: computed(() => !!categorySlug.value && !!itemSlug.value),
+    enabled: !!categorySlug.value && !!itemSlug.value,
   });
 }
 
 export function useAddItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
-
   return useMutation({
-    mutationFn: (payload: CreateItemPayload) => createItem(payload),
+    mutationFn: createItem,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
-      uiStore.showNotification('success', 'Item created successfully');
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree });
+      uiStore.showNotification("success", "Item created successfully");
     },
     onError: (error: any) => {
-      uiStore.showNotification('error', error.message || 'Failed to create item');
+      uiStore.showNotification("error", error.message || "Failed to create item");
     },
   });
 }
@@ -1811,16 +1784,14 @@ export function useAddItem() {
 export function useUpdateItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
-
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateItemPayload }) =>
-      updateItem(id, payload),
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateItemPayload }) => updateItem(id, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
-      uiStore.showNotification('success', 'Item updated successfully');
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree });
+      uiStore.showNotification("success", "Item updated successfully");
     },
     onError: (error: any) => {
-      uiStore.showNotification('error', error.message || 'Failed to update item');
+      uiStore.showNotification("error", error.message || "Failed to update item");
     },
   });
 }
@@ -1828,18 +1799,18 @@ export function useUpdateItem() {
 export function useDeleteItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
-
   return useMutation({
-    mutationFn: (id: number) => deleteItem(id),
+    mutationFn: deleteItem,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
-      uiStore.showNotification('success', 'Item deleted successfully');
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree });
+      uiStore.showNotification("success", "Item deleted successfully");
     },
     onError: (error: any) => {
-      uiStore.showNotification('error', error.message || 'Failed to delete item');
+      uiStore.showNotification("error", error.message || "Failed to delete item");
     },
   });
 }
+
 ```
 
 ## `app/types/index.ts`
@@ -1909,13 +1880,13 @@ export type Result<T, E> =
    BASE CONSTRAINTS - Minimum viewport
    ============================================ */
 @layer base {
-  html {
-    min-width: 320px;
-  }
+    html {
+        min-width: 320px;
+    }
 
-  body {
-    min-width: 320px;
-  }
+    body {
+        min-width: 320px;
+    }
 }
 
 /* ============================================
@@ -1923,67 +1894,67 @@ export type Result<T, E> =
    ============================================ */
 
 @theme {
-  /* =========================
+    /* =========================
      1. PRIMITIVE TOKENS - Raw values
      ========================= */
 
-  /* Grayscale Palette - OKLCH for better perceptual uniformity */
-  --color-gray-0:   oklch(1.000 0.000 0);      /* Pure white */
-  --color-gray-50:  oklch(0.985 0.002 247);
-  --color-gray-100: oklch(0.973 0.003 247);
-  --color-gray-200: oklch(0.935 0.006 247);
-  --color-gray-300: oklch(0.869 0.010 247);
-  --color-gray-400: oklch(0.707 0.015 247);
-  --color-gray-500: oklch(0.539 0.018 247);
-  --color-gray-600: oklch(0.428 0.020 247);
-  --color-gray-700: oklch(0.321 0.020 247);
-  --color-gray-800: oklch(0.215 0.019 247);
-  --color-gray-900: oklch(0.141 0.015 247);
-  --color-gray-950: oklch(0.075 0.010 247);    /* Near black */
+    /* Grayscale Palette - OKLCH for better perceptual uniformity */
+    --color-gray-0: oklch(1 0 0); /* Pure white */
+    --color-gray-50: oklch(0.985 0.002 247);
+    --color-gray-100: oklch(0.973 0.003 247);
+    --color-gray-200: oklch(0.935 0.006 247);
+    --color-gray-300: oklch(0.869 0.01 247);
+    --color-gray-400: oklch(0.707 0.015 247);
+    --color-gray-500: oklch(0.539 0.018 247);
+    --color-gray-600: oklch(0.428 0.02 247);
+    --color-gray-700: oklch(0.321 0.02 247);
+    --color-gray-800: oklch(0.215 0.019 247);
+    --color-gray-900: oklch(0.141 0.015 247);
+    --color-gray-950: oklch(0.075 0.01 247); /* Near black */
 
-  /* Primary Palette - Blue for trust & professionalism */
-  --color-blue-50:  oklch(0.96 0.025 240);  /* Very light blue */
-  --color-blue-100: oklch(0.92 0.045 240);
-  --color-blue-200: oklch(0.86 0.075 240);
-  --color-blue-300: oklch(0.78 0.115 240);
-  --color-blue-400: oklch(0.68 0.165 240);
-  --color-blue-500: oklch(0.58 0.215 240);
-  --color-blue-600: oklch(0.50 0.220 240);
-  --color-blue-700: oklch(0.42 0.200 240);
-  --color-blue-800: oklch(0.35 0.175 240);
-  --color-blue-900: oklch(0.30 0.150 240);
+    /* Primary Palette - Blue for trust & professionalism */
+    --color-blue-50: oklch(0.96 0.025 240); /* Very light blue */
+    --color-blue-100: oklch(0.92 0.045 240);
+    --color-blue-200: oklch(0.86 0.075 240);
+    --color-blue-300: oklch(0.78 0.115 240);
+    --color-blue-400: oklch(0.68 0.165 240);
+    --color-blue-500: oklch(0.58 0.215 240);
+    --color-blue-600: oklch(0.5 0.22 240);
+    --color-blue-700: oklch(0.42 0.2 240);
+    --color-blue-800: oklch(0.35 0.175 240);
+    --color-blue-900: oklch(0.3 0.15 240);
 
-  /* Accent Colors - Semantic use for Todo app */
-  --color-green-50:  oklch(0.971 0.018 142);
-  --color-green-500: oklch(0.647 0.190 142);
-  --color-green-600: oklch(0.519 0.195 142);
+    /* Accent Colors - Semantic use for Todo app */
+    --color-green-50: oklch(0.971 0.018 142);
+    --color-green-500: oklch(0.647 0.19 142);
+    --color-green-600: oklch(0.519 0.195 142);
 
-  --color-red-50:   oklch(0.971 0.018 27);
-  --color-red-500:  oklch(0.637 0.237 27);
-  --color-red-600:  oklch(0.577 0.237 27);
+    --color-red-50: oklch(0.971 0.018 27);
+    --color-red-500: oklch(0.637 0.237 27);
+    --color-red-600: oklch(0.577 0.237 27);
 
-  --color-amber-50:  oklch(0.987 0.021 91);
-  --color-amber-500: oklch(0.769 0.183 84);
-  --color-amber-600: oklch(0.659 0.181 75);
+    --color-amber-50: oklch(0.987 0.021 91);
+    --color-amber-500: oklch(0.769 0.183 84);
+    --color-amber-600: oklch(0.659 0.181 75);
 
-  /* Typography Scale - Modular (1.2 ratio) - Fluid with clamp for auto scaling */
-  --font-size-xs:   clamp(0.625rem, 0.6rem + 0.125vw, 0.694rem);     /* 10-11px */
-  --font-size-sm:   clamp(0.75rem, 0.72rem + 0.14vw, 0.833rem);      /* 12-13px */
-  --font-size-base: clamp(0.875rem, 0.825rem + 0.25vw, 1rem);        /* 14-16px */
-  --font-size-lg:   clamp(1.05rem, 0.99rem + 0.3vw, 1.2rem);         /* 17-19px */
-  --font-size-xl:   clamp(1.26rem, 1.188rem + 0.36vw, 1.44rem);      /* 20-23px */
-  --font-size-2xl:  clamp(1.512rem, 1.425rem + 0.435vw, 1.728rem);   /* 24-28px */
-  --font-size-3xl:  clamp(1.814rem, 1.71rem + 0.52vw, 2.074rem);     /* 29-33px */
-  --font-size-4xl:  clamp(2.177rem, 2.052rem + 0.625vw, 2.488rem);   /* 35-40px */
-  --font-size-5xl:  clamp(2.612rem, 2.462rem + 0.75vw, 2.986rem);    /* 42-48px */
+    /* Typography Scale - Modular (1.2 ratio) - Fluid with clamp for auto scaling */
+    --font-size-xs: clamp(0.625rem, 0.6rem + 0.125vw, 0.694rem); /* 10-11px */
+    --font-size-sm: clamp(0.75rem, 0.72rem + 0.14vw, 0.833rem); /* 12-13px */
+    --font-size-base: clamp(0.875rem, 0.825rem + 0.25vw, 1rem); /* 14-16px */
+    --font-size-lg: clamp(1.05rem, 0.99rem + 0.3vw, 1.2rem); /* 17-19px */
+    --font-size-xl: clamp(1.26rem, 1.188rem + 0.36vw, 1.44rem); /* 20-23px */
+    --font-size-2xl: clamp(1.512rem, 1.425rem + 0.435vw, 1.728rem); /* 24-28px */
+    --font-size-3xl: clamp(1.814rem, 1.71rem + 0.52vw, 2.074rem); /* 29-33px */
+    --font-size-4xl: clamp(2.177rem, 2.052rem + 0.625vw, 2.488rem); /* 35-40px */
+    --font-size-5xl: clamp(2.612rem, 2.462rem + 0.75vw, 2.986rem); /* 42-48px */
 
-  /* Spacing - Custom Fluid Scale */
-  --spacing-fluid-4: clamp(1rem, 0.8rem + 1vw, 2rem);
-  --spacing-fluid-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
-  --spacing-fluid-8: clamp(2rem, 1.6rem + 2vw, 4rem);
-  
-  /* Layout */
-  --sidebar-width: clamp(200px, 15vw, 280px);
+    /* Spacing - Custom Fluid Scale */
+    --spacing-fluid-4: clamp(1rem, 0.8rem + 1vw, 2rem);
+    --spacing-fluid-6: clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
+    --spacing-fluid-8: clamp(2rem, 1.6rem + 2vw, 4rem);
+
+    /* Layout */
+    --sidebar-width: clamp(200px, 15vw, 280px);
 }
 
 /* ============================================
@@ -1991,112 +1962,148 @@ export type Result<T, E> =
    ============================================ */
 
 :root {
-  --radius: 0.5rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.145 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.145 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.145 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.145 0 0);
-  
-  /* Custom Semantic Tokens */
-  --color-text-primary: oklch(0.141 0.015 247);
-  --color-text-secondary: oklch(0.428 0.020 247);
-  --color-text-muted: oklch(0.539 0.018 247);
-  --color-surface: oklch(0.985 0.002 247);
-  --color-priority-mid-bg: oklch(0.987 0.021 91);
-  --color-priority-mid-text: oklch(0.659 0.181 75);
-  --color-success-light: oklch(0.971 0.018 142);
+    --radius: 0.5rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.145 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.145 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.145 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.145 0 0);
+
+    /* Custom Semantic Tokens */
+    --color-text-primary: oklch(0.141 0.015 247);
+    --color-text-secondary: oklch(0.428 0.02 247);
+    --color-text-muted: oklch(0.539 0.018 247);
+    --color-surface: oklch(0.985 0.002 247);
+    --color-priority-low-bg: #d1fadf;
+    --color-priority-low-text: #16a34a;
+    --color-priority-mid-bg: oklch(0.987 0.021 91);
+    --color-priority-mid-text: oklch(0.659 0.181 75);
+    --color-priority-high-bg: #fed7d7;
+    --color-priority-high-text: #dc2626;
+    --color-success-light: oklch(0.971 0.018 142);
+    --radius-full: 9999px;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.922 0 0);
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.145 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.145 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.985 0 0);
+    --primary-foreground: oklch(0.145 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(0.269 0 0);
+    --input: oklch(0.269 0 0);
+    --ring: oklch(0.922 0 0);
 
-  /* Custom Semantic Tokens */
-  --color-text-primary: oklch(0.985 0.002 247);
-  --color-text-secondary: oklch(0.707 0.015 247);
-  --color-text-muted: oklch(0.539 0.018 247);
-  --color-surface: oklch(0.215 0.019 247);
-  --color-priority-mid-bg: oklch(0.769 0.183 84);
-  --color-priority-mid-text: oklch(0.075 0.010 247);
-  --color-success-light: oklch(0.519 0.195 142 / 20%);
+    /* Custom Semantic Tokens */
+    --color-text-primary: oklch(0.985 0.002 247);
+    --color-text-secondary: oklch(0.707 0.015 247);
+    --color-text-muted: oklch(0.539 0.018 247);
+    --color-surface: oklch(0.215 0.019 247);
+    --color-priority-low-bg: oklch(0.519 0.195 142);
+    --color-priority-low-text: oklch(0.971 0.018 142);
+    --color-priority-mid-bg: oklch(0.769 0.183 84);
+    --color-priority-mid-text: oklch(0.075 0.01 247);
+    --color-priority-high-bg: oklch(0.637 0.237 27);
+    --color-priority-high-text: oklch(0.971 0.018 27);
+    --color-success-light: oklch(0.519 0.195 142 / 20%);
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
-  }
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1;
+    }
 }
 
 @layer utilities {
-  .text-size-xs { font-size: var(--font-size-xs); }
-  .text-size-sm { font-size: var(--font-size-sm); }
-  .text-size-base { font-size: var(--font-size-base); }
-  .text-size-lg { font-size: var(--font-size-lg); }
-  .text-size-xl { font-size: var(--font-size-xl); }
-  .text-size-2xl { font-size: var(--font-size-2xl); }
-  .text-size-3xl { font-size: var(--font-size-3xl); }
+    .text-size-xs {
+        font-size: var(--font-size-xs);
+    }
+    .text-size-sm {
+        font-size: var(--font-size-sm);
+    }
+    .text-size-base {
+        font-size: var(--font-size-base);
+    }
+    .text-size-lg {
+        font-size: var(--font-size-lg);
+    }
+    .text-size-xl {
+        font-size: var(--font-size-xl);
+    }
+    .text-size-2xl {
+        font-size: var(--font-size-2xl);
+    }
+    .text-size-3xl {
+        font-size: var(--font-size-3xl);
+    }
 
-  .p-fluid-4 { padding: var(--spacing-fluid-4); }
-  .p-fluid-6 { padding: var(--spacing-fluid-6); }
-  .p-fluid-8 { padding: var(--spacing-fluid-8); }
+    .p-fluid-4 {
+        padding: var(--spacing-fluid-4);
+    }
+    .p-fluid-6 {
+        padding: var(--spacing-fluid-6);
+    }
+    .p-fluid-8 {
+        padding: var(--spacing-fluid-8);
+    }
 
-  .tag-sm {
-    display: inline-flex;
-    align-items: center;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    padding-top: 0.125rem;
-    padding-bottom: 0.125rem;
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-  }
-  
-  .tag-priority-low {
-    @apply bg-green-500/20 text-green-400 rounded-full;
-  }
-  .tag-priority-mid {
-    background-color: var(--color-priority-mid-bg);
-    color: var(--color-priority-mid-text);
-    @apply rounded-full;
-  }
-  .tag-priority-high {
-    @apply bg-red-500/20 text-red-400 rounded-full;
-  }
+    .tag-sm {
+        display: inline-flex;
+        align-items: center;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-top: 0.125rem;
+        padding-bottom: 0.125rem;
+        font-size: var(--font-size-xs);
+        font-weight: 500;
+    }
+
+    .tag-priority-low {
+        background-color: var(--color-priority-low-bg);
+        color: var(--color-priority-low-text);
+        border-radius: var(--radius-full);
+    }
+    .tag-priority-mid {
+        background-color: var(--color-priority-mid-bg);
+        color: var(--color-priority-mid-text);
+        border-radius: var(--radius-full);
+    }
+    .tag-priority-high {
+        background-color: var(--color-priority-high-bg);
+        color: var(--color-priority-high-text);
+        border-radius: var(--radius-full);
+    }
 }
+
 ```
 
 ## `app/assets/css/tailwind.css`
@@ -2382,39 +2389,32 @@ const { filteredItemTree, allTags, hasActiveFilters, clearFilters } = useItemFil
 
 ## `app/api/itemApi.ts`
 ```
-import { get, post, patch, del } from './apiClient';
-import type { Item, ItemTree, CreateItemPayload, UpdateItemPayload } from '@/types';
+import { get, post, patch, del } from "./apiClient";
+import type { Item, ItemTree, CreateItemPayload, UpdateItemPayload } from "~/types";
 
-export const getItemTree = () => get<ItemTree>('/items/tree');
+export const getItemTree = () => get<ItemTree>("items/tree");
+export const getItemBySlug = (categorySlug: string, itemSlug: string) => get<Item>(`items/${categorySlug}/${itemSlug}`);
+export const createItem = (payload: CreateItemPayload) => post<Item, CreateItemPayload>("items", payload);
+export const updateItem = (id: number, payload: UpdateItemPayload) => patch<Item, UpdateItemPayload>(`items/${id}`, payload);
+export const deleteItem = (id: number) => del(`items/${id}`);
 
-export const getItemBySlug = (categorySlug: string, itemSlug: string) =>
-  get<Item>(`/items/${categorySlug}/${itemSlug}`);
-
-export const createItem = (payload: CreateItemPayload) =>
-  post<Item, CreateItemPayload>('/items', payload);
-
-export const updateItem = (id: number, payload: UpdateItemPayload) =>
-  patch<Item, UpdateItemPayload>(`/items/${id}`, payload);
-
-export const deleteItem = (id: number) =>
-  del<{ deleted: boolean }>(`/items/${id}`);
 ```
 
 ## `app/api/apiClient.ts`
 ```
-import { ofetch } from 'ofetch';
-import type { ApiErrorData, Result } from '@/types';
+import { ofetch } from "ofetch";
+import type { ApiErrorData, Result } from "@/types";
 
 // In a real app, this would come from an environment variable
-const API_URL_BASE = 'http://localhost:3000/api';
+const API_URL_BASE = "http://localhost:3000/api";
 
 export const apiClient = ofetch.create({
   baseURL: API_URL_BASE,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   async onResponseError({ response }) {
-    console.error('API Error:', response.status, response._data);
+    console.error("API Error:", response.status, response._data);
   },
 });
 
@@ -2424,7 +2424,7 @@ const unwrapResult = async <T>(resultPromise: Promise<T>): Promise<T> => {
     // The actual data is often nested in a 'data' property in standardized APIs
     return (result as any).data || result;
   } catch (error: any) {
-    const message = error.data?.message || error.message || 'An unknown error occurred';
+    const message = error.data?.message || error.message || "An unknown error occurred";
     const newError = new Error(message);
     (newError as any).statusCode = error.response?.status || 500;
     (newError as any).details = error.data?.details;
@@ -2432,17 +2432,14 @@ const unwrapResult = async <T>(resultPromise: Promise<T>): Promise<T> => {
   }
 };
 
-export const get = <T>(endpoint: string) =>
-  unwrapResult(apiClient.get<T>(endpoint));
+export const get = <T>(endpoint: string) => unwrapResult(apiClient.get<T>(endpoint));
 
-export const post = <TResponse, TRequest = any>(endpoint: string, data: TRequest) =>
-  unwrapResult(apiClient.post<TResponse>(endpoint, { body: data }));
+export const post = <TResponse, TRequest = any>(endpoint: string, data: TRequest) => unwrapResult(apiClient.post<TResponse>(endpoint, { body: data }));
 
-export const patch = <TResponse, TRequest = any>(endpoint: string, data: TRequest) =>
-  unwrapResult(apiClient.patch<TResponse>(endpoint, { body: data }));
+export const patch = <TResponse, TRequest = any>(endpoint: string, data: TRequest) => unwrapResult(apiClient.patch<TResponse>(endpoint, { body: data }));
 
-export const del = <TResponse = { deleted: boolean }>(endpoint: string) =>
-  unwrapResult(apiClient.delete<TResponse>(endpoint));
+export const del = <TResponse = { deleted: boolean }>(endpoint: string) => unwrapResult(apiClient.delete<TResponse>(endpoint));
+
 ```
 
 ## `app/plugins/ssr-width.ts`
