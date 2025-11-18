@@ -6,6 +6,7 @@
   import ItemItem from '$lib/components/items/ItemItem.svelte';
   import ItemForm from '$lib/components/items/ItemForm.svelte';
   import { uiStore } from '$lib/stores/uiStore';
+  import { isFormOpen } from '$lib/stores/uiStore';
   import { Button } from '$lib/components/ui/button';
   import { createEventDispatcher } from 'svelte';
 
@@ -34,11 +35,11 @@
   }
 
   function handleNavigate(path: string) {
-    dispatch('navigate', { path });
+    dispatch('navigate', path);
   }
 </script>
 
-<MainLayout on:navigate={handleNavigate}>
+<MainLayout onNavigate={handleNavigate}>
   <header class="mb-6">
     <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
     <!-- The main "Add New Item" button remains in the sidebar -->
@@ -93,7 +94,7 @@
   {/if}
 
   <!-- The ItemForm is now aware of pre-selected category -->
-  {#if uiStore.isFormOpen}
+  {#if $uiStore.isFormOpen}
     <ItemForm onClose={() => uiStore.closeForm()} />
   {/if}
 </MainLayout>
