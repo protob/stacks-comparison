@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 19:33:02 CET
+**Generated on:** wto, 18 lis 2025, 19:40:35 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-kit
 
 ---
@@ -3118,189 +3118,6 @@ export type Result<T, E> =
   | { success: false; error: E };
 ```
 
-## `src/lib/pages/AboutPage.svelte`
-```
-<!-- src/lib/pages/AboutPage.svelte -->
-<script lang="ts">
-  import MainLayout from '$lib/components/layout/layout/MainLayout.svelte';
-</script>
-
-<MainLayout>
-  <div class="space-y-6">
-    <header>
-      <h1 class="font-bold text-size-3xl">About This Application</h1>
-    </header>
-
-    <div class="p-6 border rounded-lg bg-surface border-border">
-      <p class="mb-4 text-text-secondary">
-        This is a modern, responsive Svelte 5 frontend for managing items.
-      </p>
-
-      <h2 class="mb-3 font-semibold text-size-xl">Core Technologies Used:</h2>
-
-      <ul class="space-y-2 list-disc list-inside text-text-secondary">
-        <li>
-          <span class="font-medium text-text-primary">Svelte 5:</span>
-          For building a reactive and performant user interface with Runes.
-        </li>
-        <li>
-          <span class="font-medium text-text-primary">TanStack Query (Svelte Query):</span>
-          Manages all server state.
-        </li>
-        <li>
-          <span class="font-medium text-text-primary">shadcn-svelte:</span>
-          UI Component library.
-        </li>
-        <li>
-          <span class="font-medium text-text-primary">Tailwind CSS v4:</span>
-          Styling.
-        </li>
-      </ul>
-</div>
-  </MainLayout>
-
-```
-
-## `src/lib/pages/ItemPage.svelte`
-```
-<script lang="ts">
-  import MainLayout from 'lib/components/layout/MainLayout.svelte';
-  import { useItemTree } from 'lib/api/itemsQuery';
-  import { useItemFilters } from 'lib/utils/useItemFilters';
-  import FilterBar from 'lib/components/layout/FilterBar.svelte';
-  import ItemItem from 'lib/components/items/ItemItem.svelte';
-  import ItemForm from 'lib/components/items/ItemForm.svelte';
-  import { uiStore } from 'lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
-  import { Button } from 'lib/components/ui/button';
-  import { Plus } from '@lucide/svelte'; // Import icon directly
-
-  const itemTreeQuery = useItemTree();
-
-  let filters = $state({
-    searchQuery: '',
-    selectedPriority: 'all' as const,
-    showCompleted: true,
-    selectedTags: [] as string[],
-  });
-
-  // Use derived for reactive calculations in Svelte 5
-  let filterResults = $derived(useItemFilters(itemTreeQuery.data || {}, filters));
-  let filteredItemTree = $derived(filterResults.filteredItemTree);
-  let allTags = $derived(filterResults.allTags);
-  let hasActiveFilters = $derived(filterResults.hasActiveFilters);
-
-  function clearFilters() {
-    filters = {
-      searchQuery: '',
-      selectedPriority: 'all',
-      showCompleted: true,
-      selectedTags: [],
-    };
-}
-</script>
-
-<MainLayout>
-  <header class="mb-6">
-    <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
-  </header>
-
-  <!-- Bind props using Svelte 5 syntax -->
-  <FilterBar
-    bind:search={filters.searchQuery}
-    bind:priority={filters.selectedPriority}
-    bind:showCompleted={filters.showCompleted}
-    bind:selectedTags={filters.selectedTags}
-    {allTags}
-    {hasActiveFilters}
-    on:clear={clearFilters}
-  />
-
-  {#if itemTreeQuery.isLoading}
-    <div>Loading...</div>
-  {:else if itemTreeQuery.error}
-    <div>Error: {itemTreeQuery.error.message}</div>
-  {:else}
-    <div class="mt-6 space-y-8">
-      {#each Object.entries(filteredItemTree) as [category, items]}
-        <section>
-          <div class="flex items-center gap-2 mb-4">
-            <h2 class="font-semibold capitalize text-size-xl">{category}</h2>
-            <span class="text-sm text-text-muted">({items.length})</span>
-            <Button 
-              variant="ghost" 
-              size="icon-sm" 
-              onclick={() => uiStore.openForm(undefined, category)}
-            >
-              <Plus class="w-4 h-4" />
-            </Button>
-          </div>
-          <div class="grid gap-4">
-            {#each items as item (item.id)}
-              <ItemItem {item} />
-            {/each}
-          </div>
-        </section>
-      {/each}
-      {#if Object.keys(filteredItemTree).length === 0 && !itemTreeQuery.isLoading}
-        <div class="py-10 text-center text-text-muted">
-          <p>No items found.</p>
-          {#if hasActiveFilters}
-            <p>Try adjusting your filters.</p>
-{/if}
-  </div>
-      {/if}
-    </div>
-  {/if}
-  </MainLayout>
-
-  <!-- Access store property directly -->
-  {#if uiStore.isFormOpen}
-    <ItemForm onClose={() => uiStore.closeForm()} />
-  {/if}
-
-```
-
-## `src/lib/pages/ItemDetailPage.svelte`
-```
-<script lang="ts">
-  import { useItemDetail } from '$lib/api/itemsQuery';
-  import { formatDate } from '$lib/utils/helpers';
-  import type { Item } from '$lib/types';
-
-  export let categorySlug: string;
-  export let itemSlug: string;
-
-  const { data: item, isLoading, error } = useItemDetail(() => categorySlug, () => itemSlug);
-</script>
-
-<div class="container mx-auto p-fluid-6">
-  <a href="/" class="mb-4 inline-block text-primary hover:underline">
-    ← Back
-  </a>
-
-  {#if isLoading}
-    <div>Loading...</div>
-  {:else if error}
-    <div>Error: {error.message}</div>
-  {:else if item}
-    <div class="bg-surface rounded-card p-card">
-      <h1 class="mb-4 font-bold text-size-2xl">{item.name}</h1>
-      <p class="mb-4 text-text-secondary">{item.text}</p>
-      <div class="flex gap-2 mb-4">
-        <span class="tag-priority-{item.priority}">{item.priority}</span>
-        {#if item.isCompleted}
-          <span class="tag-sm bg-success-light">Completed</span>
-        {/if}
-      </div>
-      <div class="text-size-sm text-text-muted">
-        <p>Created: {formatDate(item.createdAt)}</p>
-        <p>Updated: {formatDate(item.updatedAt)}</p>
-      </div>
-    </div>
-  {/if}
-</div>
-```
-
 ## `src/lib/index.ts`
 ```
 // place files you want to import through the `$lib` alias in this folder.
@@ -3668,7 +3485,6 @@ export const load: PageLoad = async ({ params }) => {
 
 ## `src/routes/items/[categorySlug]/[itemSlug]/+page.svelte`
 ```
-<!-- /src/routes/items/[categorySlug]/[itemSlug]/+page.svelte -->
 <script lang="ts">
   import type { PageData } from './$types';
   import { useItemDetail } from '$lib/api/itemsQuery';
@@ -3676,26 +3492,30 @@ export const load: PageLoad = async ({ params }) => {
 
   let { data }: { data: PageData } = $props();
 
-  const { data: item, isLoading, error } = useItemDetail(() => data.categorySlug, () => data.itemSlug);
+  // Reactively query based on route params provided by +page.ts
+  const itemQuery = $derived(useItemDetail(() => data.categorySlug, () => data.itemSlug));
 </script>
 
 <div class="container mx-auto p-fluid-6">
-  <a href="/" class="mb-4 inline-block text-primary hover:underline">
+  <a href="/" class="inline-block mb-4 text-primary hover:underline">
     ← Back
   </a>
 
-  {#if isLoading}
-    <div>Loading...</div>
-  {:else if error}
-    <div>Error: {error.message}</div>
-  {:else if item}
-    <div class="bg-surface rounded-card p-card">
+  {#if itemQuery.isLoading}
+    <div class="py-10">Loading...</div>
+  {:else if itemQuery.error}
+    <div class="text-destructive">Error: {itemQuery.error.message}</div>
+  {:else if itemQuery.data}
+    {@const item = itemQuery.data}
+    <div class="border bg-surface rounded-card p-card border-border">
       <h1 class="mb-4 font-bold text-size-2xl">{item.name}</h1>
       <p class="mb-4 text-text-secondary">{item.text}</p>
       <div class="flex gap-2 mb-4">
-        <span class="tag-priority-{item.priority}">{item.priority}</span>
+        <span class="tag-priority-{item.priority} capitalize px-2 py-1 rounded border text-xs">
+          {item.priority}
+        </span>
         {#if item.isCompleted}
-          <span class="tag-sm bg-success-light">Completed</span>
+          <span class="px-2 py-1 text-xs rounded tag-sm bg-success/20 text-success">Completed</span>
         {/if}
       </div>
       <div class="text-size-sm text-text-muted">
@@ -3709,10 +3529,6 @@ export const load: PageLoad = async ({ params }) => {
 
 ## `src/routes/about/+page.svelte`
 ```
-<!-- /src/routes/about/+page.svelte -->
-<script lang="ts">
-</script>
-
 <div class="space-y-6">
   <header>
     <h1 class="font-bold text-size-3xl">About This Application</h1>
@@ -3720,7 +3536,7 @@ export const load: PageLoad = async ({ params }) => {
 
   <div class="p-6 border rounded-lg bg-surface border-border">
     <p class="mb-4 text-text-secondary">
-      This is a modern, responsive Svelte 5 frontend for managing items.
+      This is a modern, responsive Svelte 5 frontend for managing items, ported to SvelteKit.
     </p>
 
     <h2 class="mb-3 font-semibold text-size-xl">Core Technologies Used:</h2>
@@ -3731,7 +3547,11 @@ export const load: PageLoad = async ({ params }) => {
         For building a reactive and performant user interface with Runes.
       </li>
       <li>
-        <span class="font-medium text-text-primary">TanStack Query (Svelte Query):</span>
+        <span class="font-medium text-text-primary">SvelteKit:</span>
+        File-based routing and server-side rendering.
+      </li>
+      <li>
+        <span class="font-medium text-text-primary">TanStack Query:</span>
         Manages all server state.
       </li>
       <li>
@@ -3801,12 +3621,96 @@ export const load: PageLoad = async ({ params }) => {
 
 ## `src/routes/+page.svelte`
 ```
-<!-- /src/routes/+page.svelte -->
 <script lang="ts">
-  import ItemPage from 'lib/pages/ItemPage.svelte';
+  import { useItemTree } from '$lib/api/itemsQuery';
+  import { useItemFilters } from '$lib/utils/useItemFilters';
+  import FilterBar from '$lib/components/layout/FilterBar.svelte';
+  import ItemItem from '$lib/components/items/ItemItem.svelte';
+  import ItemForm from '$lib/components/items/ItemForm.svelte';
+  import { uiStore } from '$lib/stores/uiStore.svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { Plus } from '@lucide/svelte';
+
+  const itemTreeQuery = useItemTree();
+
+  let filters = $state({
+    searchQuery: '',
+    selectedPriority: 'all' as const,
+    showCompleted: true,
+    selectedTags: [] as string[],
+  });
+
+  // Use derived for reactive calculations in Svelte 5
+  let filterResults = $derived(useItemFilters(itemTreeQuery.data || {}, filters));
+  let filteredItemTree = $derived(filterResults.filteredItemTree);
+  let allTags = $derived(filterResults.allTags);
+  let hasActiveFilters = $derived(filterResults.hasActiveFilters);
+
+  function clearFilters() {
+    filters = {
+      searchQuery: '',
+      selectedPriority: 'all',
+      showCompleted: true,
+      selectedTags: [],
+    };
+  }
 </script>
 
-<ItemPage />
+<header class="mb-6">
+  <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
+</header>
+
+<FilterBar
+  bind:search={filters.searchQuery}
+  bind:priority={filters.selectedPriority}
+  bind:showCompleted={filters.showCompleted}
+  bind:selectedTags={filters.selectedTags}
+  allTags={allTags}
+  hasActiveFilters={hasActiveFilters}
+  on:clear={clearFilters}
+/>
+
+{#if itemTreeQuery.isLoading}
+  <div class="py-10">Loading...</div>
+{:else if itemTreeQuery.error}
+  <div class="text-destructive">Error: {itemTreeQuery.error.message}</div>
+{:else}
+  <div class="mt-6 space-y-8">
+    {#each Object.entries(filteredItemTree) as [category, items]}
+      <section>
+        <div class="flex items-center gap-2 mb-4">
+          <h2 class="font-semibold capitalize text-size-xl">{category}</h2>
+          <span class="text-sm text-text-muted">({items.length})</span>
+          <Button 
+            variant="ghost" 
+            size="icon-sm" 
+            onclick={() => uiStore.openForm(undefined, category)}
+          >
+            <Plus class="w-4 h-4" />
+          </Button>
+        </div>
+        <div class="grid gap-4">
+          {#each items as item (item.id)}
+            <ItemItem {item} />
+          {/each}
+        </div>
+      </section>
+    {/each}
+    {#if Object.keys(filteredItemTree).length === 0 && !itemTreeQuery.isLoading}
+      <div class="py-10 text-center text-text-muted">
+        <p>No items found.</p>
+        {#if hasActiveFilters}
+          <p>Try adjusting your filters.</p>
+        {/if}
+      </div>
+    {/if}
+  </div>
+{/if}
+
+<!-- Form Modal handled by global state, rendered here to access mutation context if needed -->
+{#if uiStore.isFormOpen}
+  <ItemForm onClose={() => uiStore.closeForm()} />
+{/if}
 ```
 
 ## `components.json`
