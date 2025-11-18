@@ -1,0 +1,1 @@
+buttons icons are currently added as plain svg rather than lucide icons
