@@ -24,8 +24,8 @@ is_binary() {
 is_included() {
     local file="$1"
     case "$file" in
-        # Frontend files (Vue, JS, TS, Styles)
-        *.vue|*.ts|*.js|*.html|*.css|*.scss|*.sass)
+        # Frontend files (Vue, Svelte, JS, TS, Styles)
+        *.vue|*.svelte|*.ts|*.js|*.html|*.css|*.scss|*.sass)
             return 0
             ;;
         # Configuration and documentation files
