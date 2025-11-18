@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 01:40:42 CET
+**Generated on:** wto, 18 lis 2025, 01:51:50 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -1586,11 +1586,11 @@ export const useItemStore = defineStore('item', () => {
 });
 ```
 
-## `app/layouts/MainLayout.vue`
+## `app/layouts/default.vue`
 ```
 <script setup lang="ts">
-import AppSidebar from "@/components/layout/AppSidebar.vue";
-import TopBar from "@/components/layout/TopBar.vue";
+import AppSidebar from "~/components/layout/AppSidebar.vue";
+import TopBar from "~/components/layout/TopBar.vue";
 </script>
 
 <template>
