@@ -1,6 +1,6 @@
 # Next.js Source Code Collection (shadcn-simple-next)
 
-**Generated on:** wto, 18 lis 2025, 22:07:14 CET
+**Generated on:** wto, 18 lis 2025, 22:26:38 CET
 **Next.js directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/react/crud-app-sqlite-tanstack-shadcn-next
 
 ---
@@ -33,180 +33,142 @@ import "./.next/dev/types/routes.d.ts";
 'use client';
 
 import { useForm } from '@tanstack/react-form';
+import { zodValidator } from '@tanstack/zod-form-adapter';
+import { itemFormSchema, type ItemFormData } from '@/schemas/itemSchema';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Item, Priority } from '@/types';
-import { useItemsApi } from '@/hooks/useItemsApi';
-import { slugify } from '@/utils/slugify';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface ItemFormProps {
-  item?: Item;
-  onSuccess?: () => void;
-  onCancel?: () => void;
+  defaultValues?: Partial<ItemFormData>;
+  onSubmit: (data: ItemFormData) => void;
+  isSubmitting?: boolean;
+  submitLabel?: string;
 }
 
-export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
-  const { createItemMutation, updateItemMutation } = useItemsApi();
-  const isEditing = !!item;
-
+export function ItemForm({ defaultValues, onSubmit, isSubmitting, submitLabel = 'Save' }: ItemFormProps) {
   const form = useForm({
     defaultValues: {
-      title: item?.title || '',
-      description: item?.description || '',
-      category: item?.category || '',
-      priority: item?.priority || 'medium' as Priority,
+      name: defaultValues?.name ?? '',
+      text: defaultValues?.text ?? '',
+      priority: defaultValues?.priority ?? 'mid',
+      categories: defaultValues?.categories ?? ['General'],
+      tags: defaultValues?.tags ?? [],
+    } as ItemFormData,
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChange: itemFormSchema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        const itemData = {
-          ...value,
-          categorySlug: slugify(value.category),
-          slug: slugify(value.title),
-        };
-
-        if (isEditing && item) {
-          await updateItemMutation.mutateAsync({ id: item.id, data: itemData });
-        } else {
-          await createItemMutation.mutateAsync(itemData);
-        }
-        
-        onSuccess?.();
-      } catch (error) {
-        console.error('Failed to save item:', error);
-      }
+      onSubmit(value);
     },
   });
 
-  const isPending = createItemMutation.isPending || updateItemMutation.isPending;
-
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>{isEditing ? 'Edit Item' : 'Create New Item'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-          className="space-y-6"
-        >
-          <form.Field
-            name="title"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Title</Label>
-                <Input
-                  id={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Enter item title"
-                />
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="description"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Description</Label>
-                <Textarea
-                  id={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Enter item description"
-                  rows={3}
-                />
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="category"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Category</Label>
-                <Input
-                  id={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Enter category"
-                />
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="priority"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Priority</Label>
-                <Select
-                  value={field.state.value}
-                  onValueChange={(value) => field.handleChange(value as Priority)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
-                  <p className="text-sm text-destructive">
-                    Error in this field
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="flex-1"
-            >
-              {isPending ? 'Saving...' : (isEditing ? 'Update Item' : 'Create Item')}
-            </Button>
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-            )}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+      className="space-y-6"
+    >
+      <form.Field
+        name="name"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+              placeholder="Item name..."
+            />
+            {field.state.meta.errors ? (
+              <p className="text-sm text-destructive">{field.state.meta.errors.join(', ')}</p>
+            ) : null}
           </div>
-        </form>
-      </CardContent>
-    </Card>
+        )}
+      />
+
+      <form.Field
+        name="text"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="text">Description</Label>
+            <Textarea
+              id="text"
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              rows={3}
+              placeholder="Details..."
+            />
+          </div>
+        )}
+      />
+
+      <form.Field
+        name="categories"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Input
+              id="category"
+              value={field.state.value[0]}
+              onChange={(e) => field.handleChange([e.target.value])}
+              placeholder="Category..."
+            />
+          </div>
+        )}
+      />
+      
+      <form.Field
+        name="priority"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label>Priority</Label>
+            <RadioGroup
+              value={field.state.value}
+              onValueChange={(val: any) => field.handleChange(val)}
+              className="flex gap-4"
+            >
+              {['low', 'mid', 'high'].map((p) => (
+                <div key={p} className="flex items-center space-x-2">
+                  <RadioGroupItem value={p} id={p} />
+                  <Label htmlFor={p} className="capitalize cursor-pointer">{p}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        )}
+      />
+
+      <form.Field
+        name="tags"
+        children={(field) => (
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags (comma separated)</Label>
+            <Input
+              id="tags"
+              value={field.state.value?.join(', ')}
+              onChange={(e) => 
+                field.handleChange(e.target.value.split(',').map(t => t.trim()).filter(Boolean))
+              }
+              placeholder="work, urgent, todo"
+            />
+          </div>
+        )}
+      />
+
+      <div className="flex justify-end pt-4">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : submitLabel}
+        </Button>
+      </div>
+    </form>
   );
 }
 ```
@@ -216,94 +178,100 @@ export function ItemForm({ item, onSuccess, onCancel }: ItemFormProps) {
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Trash2, CheckCircle, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, ExternalLink } from 'lucide-react';
-import { Item } from '@/types';
-import { formatDate } from '@/utils/helpers';
-import { useItemsApi } from '@/hooks/useItemsApi';
+import { cn } from '@/lib/utils';
+import type { Item } from '@/types';
+import { useToggleItemCompletion, useDeleteItem } from '@/hooks/useItemsApi';
+import { slugify } from '@/utils/slugify';
 
 interface ItemItemProps {
   item: Item;
-  onEdit?: (item: Item) => void;
-  showActions?: boolean;
 }
 
-export function ItemItem({ item, onEdit, showActions = true }: ItemItemProps) {
-  const { deleteItemMutation } = useItemsApi();
+export function ItemItem({ item }: ItemItemProps) {
+  const toggleCompletion = useToggleItemCompletion();
+  const deleteItem = useDeleteItem();
+  const categorySlug = slugify(item.categories[0]);
 
-  const handleDelete = async () => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      deleteItemMutation.mutate(item.id);
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this item?')) {
+      deleteItem.mutate({ categorySlug, itemSlug: item.slug });
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-destructive text-destructive-foreground';
-      case 'medium':
-        return 'bg-warning text-warning-foreground';
-      case 'low':
-        return 'bg-success text-success-foreground';
-      default:
-        return 'bg-secondary text-secondary-foreground';
-    }
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleCompletion(item);
+  };
+
+  const priorityColor = {
+    high: 'text-red-500 bg-red-50 dark:bg-red-900/20',
+    mid: 'text-amber-500 bg-amber-50 dark:bg-amber-900/20',
+    low: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20',
   };
 
   return (
-    <Card className="group hover:shadow-md transition-all duration-200 hover:-translate-y-1">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg leading-tight truncate group-hover:text-primary transition-colors">
-              {item.title}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {item.description}
-            </p>
-          </div>
-          <Badge className={`shrink-0 ${getPriorityColor(item.priority)}`}>
-            {item.priority}
-          </Badge>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="pt-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span className="truncate max-w-[120px]">{item.category}</span>
-            <span className="shrink-0">{formatDate(item.createdAt)}</span>
-          </div>
-          
-          {showActions && (
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Link href={`/items/${item.categorySlug}/${item.slug}`}>
-                <Button variant="ghost" size="sm">
-                  <ExternalLink className="size-4" />
-                </Button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => onEdit?.(item)}
-              >
-                <Pencil className="size-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={handleDelete}
-                disabled={deleteItemMutation.isPending}
-              >
-                <Trash2 className="size-4" />
-              </Button>
+    <Link 
+      href={`/items/${categorySlug}/${item.slug}`}
+      className="block group"
+    >
+      <div className={cn(
+        "p-4 rounded-lg border border-border bg-card hover:shadow-md transition-all",
+        item.isCompleted && "opacity-60"
+      )}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 flex-1">
+            <button 
+              onClick={handleToggle}
+              className="mt-1 text-muted-foreground hover:text-primary transition-colors"
+            >
+              {item.isCompleted ? (
+                <CheckCircle className="size-5 text-green-500" />
+              ) : (
+                <Circle className="size-5" />
+              )}
+            </button>
+            
+            <div className="space-y-1">
+              <h3 className={cn(
+                "font-medium text-foreground",
+                item.isCompleted && "line-through text-muted-foreground"
+              )}>
+                {item.name}
+              </h3>
+              <p className="text-sm text-muted-foreground line-clamp-2">{item.text}</p>
+              
+              <div className="flex flex-wrap gap-2 mt-2">
+                <span className={cn(
+                  "text-xs px-2 py-0.5 rounded-full font-medium uppercase tracking-wide",
+                  priorityColor[item.priority]
+                )}>
+                  {item.priority}
+                </span>
+                {item.tags?.map(tag => (
+                  <span key={tag} className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
             </div>
-          )}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="opacity-0 group-hover:opacity-100 text-destructive hover:bg-destructive/10"
+            onClick={handleDelete}
+          >
+            <Trash2 className="size-4" />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </Link>
   );
 }
 ```
@@ -316,9 +284,15 @@ import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, List, Info } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function AppSidebar() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="w-64 bg-card border-r border-border flex flex-col h-[calc(100vh-2rem)] m-4 rounded-xl shadow-sm sticky top-4">
@@ -346,8 +320,12 @@ export function AppSidebar() {
           className="w-full justify-start gap-3"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-          {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          {mounted ? (
+            theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />
+          ) : (
+            <div className="size-4" /> // Placeholder to avoid layout shift/hydration mismatch
+          )}
+          <span className="capitalize">{mounted ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : 'Toggle Theme'}</span>
         </Button>
       </div>
     </div>
@@ -1363,37 +1341,55 @@ export function cn(...inputs: ClassValue[]) {
 ## `lib/api/itemApi.ts`
 ```
 import { get, post, patch, del } from './apiClient';
-import type { Item, Priority } from '@/types';
+import type { Item, Priority, SingleCategory } from '@/types';
 
 export interface CreateItemPayload {
-  title: string;
-  description: string;
-  category: string;
+  name: string;
+  text: string;
   priority: Priority;
-  categorySlug: string;
-  slug: string;
+  tags?: string[];
+  categories: SingleCategory<string>;
 }
 
-export type UpdateItemPayload = Partial<CreateItemPayload>;
+export type UpdateItemPayload = Partial<Omit<CreateItemPayload, 'categories'>> & {
+    isCompleted?: boolean;
+    categories?: SingleCategory<string>;
+};
 
-export async function getItems(): Promise<Item[]> {
-  return get<Item[]>('/items');
+export interface ItemTree {
+  [categorySlug: string]: Item[];
 }
 
-export async function getItem(id: string): Promise<Item> {
-  return get<Item>(`/items/${id}`);
+// Fix: Use /items/tree instead of /items
+export async function getItemTree(): Promise<ItemTree> {
+  return get<ItemTree>('/items/tree');
 }
 
 export async function createItem(payload: CreateItemPayload): Promise<Item> {
   return post<Item, CreateItemPayload>('/items', payload);
 }
 
-export async function updateItem(id: string, payload: UpdateItemPayload): Promise<Item> {
-  return patch<Item, UpdateItemPayload>(`/items/${id}`, payload);
+export async function getItem(categorySlug: string, itemSlug: string): Promise<Item> {
+  return get<Item>(`/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`);
 }
 
-export async function deleteItem(id: string): Promise<{ deleted: boolean }> {
-  return del<{ deleted: boolean }>(`/items/${id}`);
+// Fix: Use slugs instead of ID
+export async function updateItem(
+  categorySlug: string,
+  itemSlug: string,
+  payload: UpdateItemPayload
+): Promise<Item> {
+  return patch<Item, UpdateItemPayload>(
+    `/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`,
+    payload
+  );
+}
+
+// Fix: Use slugs instead of ID
+export async function deleteItem(categorySlug: string, itemSlug: string): Promise<{ deleted: boolean }> {
+  return del<{ deleted: boolean }>(
+    `/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`
+  );
 }
 ```
 
@@ -1669,61 +1665,120 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## `schemas/itemSchema.ts`
 ```
 import { z } from 'zod';
-import type { Priority } from '@/types';
+import type { SingleCategory } from '@/types';
 
-export const itemSchema = z.object({
-  title: z.string()
-    .min(1, 'Title is required')
-    .min(3, 'Title must be at least 3 characters'),
-  description: z.string()
+export const itemFormSchema = z.object({
+  name: z.string()
+    .min(1, 'Name is required')
+    .min(3, 'Name must be at least 3 characters'),
+  text: z.string()
     .min(1, 'Description is required'),
-  category: z.string()
-    .min(1, 'Category is required'),
-  priority: z.enum(['low', 'medium', 'high']) as z.ZodType<Priority>,
+  priority: z.enum(['low', 'mid', 'high']),
+  tags: z.array(z.string()).optional(),
+  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
 });
 
-export type ItemFormData = z.infer<typeof itemSchema>;
+export type ItemFormData = z.infer<typeof itemFormSchema>;
 ```
 
 ## `hooks/useItemFilters.ts`
 ```
 import { useMemo, useState } from 'react';
 import type { Item, Priority } from '@/types';
+import { ItemTree } from '@/lib/api/itemApi';
 
-export function useItemFilters(items: Item[] = []) {
+interface FilterOptions {
+  searchQuery: string;
+  selectedPriority: 'all' | Priority;
+  showCompleted: boolean;
+  selectedTags: string[];
+}
+
+export function useItemFilters(itemTree: ItemTree) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPriority, setSelectedPriority] = useState<'all' | Priority>('all');
+  const [showCompleted, setShowCompleted] = useState(true);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const filteredItems = useMemo(() => {
-    return items.filter(item => {
-      // Search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesSearch = 
-          item.title.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query);
-        if (!matchesSearch) return false;
-      }
-
-      // Priority filter
-      if (selectedPriority !== 'all' && item.priority !== selectedPriority) {
-        return false;
-      }
-
-      return true;
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    Object.values(itemTree).forEach(items => {
+      items.forEach(item => {
+        item.tags?.forEach(tag => tags.add(tag));
+      });
     });
-  }, [items, searchQuery, selectedPriority]);
+    return Array.from(tags).sort();
+  }, [itemTree]);
 
-  const hasActiveFilters = searchQuery.trim() !== '' || selectedPriority !== 'all';
+  const hasActiveFilters = useMemo(() => {
+    return searchQuery.trim() !== '' ||
+           selectedPriority !== 'all' ||
+           !showCompleted ||
+           selectedTags.length > 0;
+  }, [searchQuery, selectedPriority, showCompleted, selectedTags]);
+
+  const filteredItemTree = useMemo(() => {
+    const filtered: Record<string, Item[]> = {};
+    
+    Object.entries(itemTree).forEach(([categoryName, items]) => {
+      const filteredItems = items.filter(item => {
+        // Search filter
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase();
+          const matchesSearch = 
+            item.name.toLowerCase().includes(query) ||
+            item.text.toLowerCase().includes(query) ||
+            item.tags?.some(tag => tag.toLowerCase().includes(query));
+          if (!matchesSearch) return false;
+        }
+
+        // Priority filter
+        if (selectedPriority !== 'all' && item.priority !== selectedPriority) {
+          return false;
+        }
+
+        // Completion status filter
+        if (!showCompleted && item.isCompleted) {
+          return false;
+        }
+
+        // Tag filter
+        if (selectedTags.length > 0) {
+          const hasSelectedTag = selectedTags.some(tag => 
+            item.tags?.includes(tag)
+          );
+          if (!hasSelectedTag) return false;
+        }
+
+        return true;
+      });
+      
+      if (filteredItems.length > 0) {
+        filtered[categoryName] = filteredItems;
+      }
+    });
+    
+    return filtered;
+  }, [itemTree, searchQuery, selectedPriority, showCompleted, selectedTags]);
+
+  const totalItems = useMemo(() => {
+    return Object.values(itemTree).reduce((total, items) => total + items.length, 0);
+  }, [itemTree]);
+
+  const totalFilteredItems = useMemo(() => {
+    return Object.values(filteredItemTree).reduce((total, items) => total + items.length, 0);
+  }, [filteredItemTree]);
 
   return {
-    searchQuery,
-    setSearchQuery,
-    selectedPriority,
-    setSelectedPriority,
-    filteredItems,
+    searchQuery, setSearchQuery,
+    selectedPriority, setSelectedPriority,
+    showCompleted, setShowCompleted,
+    selectedTags, setSelectedTags,
+    allTags,
     hasActiveFilters,
+    filteredItemTree,
+    totalItems,
+    totalFilteredItems,
   };
 }
 ```
@@ -1738,14 +1793,14 @@ import type { Item } from '@/types';
 
 export const itemKeys = {
   all: ['items'] as const,
-  items: () => [...itemKeys.all, 'list'] as const,
-  detail: (id: string) => [...itemKeys.all, 'detail', id] as const,
+  tree: () => [...itemKeys.all, 'tree'] as const,
+  detail: (category: string, slug: string) => [...itemKeys.all, 'detail', category, slug] as const,
 };
 
-export const useItems = () => {
+export const useGetItemTree = () => {
   return useQuery({
-    queryKey: itemKeys.items(),
-    queryFn: itemApi.getItems,
+    queryKey: itemKeys.tree(),
+    queryFn: itemApi.getItemTree,
   });
 };
 
@@ -1755,12 +1810,12 @@ export const useAddItem = () => {
 
   return useMutation({
     mutationFn: itemApi.createItem,
-    onSuccess: () => {
-      showSuccessToast('Item created successfully!');
-      queryClient.invalidateQueries({ queryKey: itemKeys.items() });
+    onSuccess: (newItem) => {
+      showSuccessToast(`Item "${newItem.name}" added.`);
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
     },
     onError: (error: any) => {
-      showErrorToast(error.message || 'Failed to create item.');
+      showErrorToast(error.message || 'Failed to add item.');
     },
   });
 };
@@ -1770,11 +1825,13 @@ export const useUpdateItem = () => {
   const { showSuccessToast, showErrorToast } = useUiStore();
 
   return useMutation({
-    mutationFn: (variables: { id: string; data: Partial<Item> }) =>
-      itemApi.updateItem(variables.id, variables.data),
-    onSuccess: () => {
-      showSuccessToast('Item updated successfully!');
-      queryClient.invalidateQueries({ queryKey: itemKeys.items() });
+    mutationFn: (variables: { categorySlug: string; itemSlug: string; payload: itemApi.UpdateItemPayload }) =>
+      itemApi.updateItem(variables.categorySlug, variables.itemSlug, variables.payload),
+    onSuccess: (updatedItem) => {
+      showSuccessToast(`Item "${updatedItem.name}" updated.`);
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
+      const categorySlug = slugify(updatedItem.categories[0]);
+      queryClient.invalidateQueries({ queryKey: itemKeys.detail(categorySlug, updatedItem.slug) });
     },
     onError: (error: any) => {
       showErrorToast(error.message || 'Failed to update item.');
@@ -1782,37 +1839,33 @@ export const useUpdateItem = () => {
   });
 };
 
+export const useToggleItemCompletion = () => {
+    const updateItemMutation = useUpdateItem();
+    return (item: Item) => {
+        const categorySlug = slugify(item.categories[0]);
+        updateItemMutation.mutate({
+            categorySlug,
+            itemSlug: item.slug,
+            payload: { isCompleted: !item.isCompleted },
+        });
+    };
+};
+
 export const useDeleteItem = () => {
   const queryClient = useQueryClient();
   const { showSuccessToast, showErrorToast } = useUiStore();
 
   return useMutation({
-    mutationFn: itemApi.deleteItem,
+    mutationFn: (variables: { categorySlug: string; itemSlug: string }) =>
+      itemApi.deleteItem(variables.categorySlug, variables.itemSlug),
     onSuccess: () => {
-      showSuccessToast('Item deleted successfully!');
-      queryClient.invalidateQueries({ queryKey: itemKeys.items() });
+      showSuccessToast('Item deleted.');
+      queryClient.invalidateQueries({ queryKey: itemKeys.tree() });
     },
     onError: (error: any) => {
       showErrorToast(error.message || 'Failed to delete item.');
     },
   });
-};
-
-// Combined hook for convenience
-export const useItemsApi = () => {
-  const itemsQuery = useItems();
-  const createItemMutation = useAddItem();
-  const updateItemMutation = useUpdateItem();
-  const deleteItemMutation = useDeleteItem();
-
-  return {
-    items: itemsQuery.data,
-    isLoading: itemsQuery.isLoading,
-    error: itemsQuery.error,
-    createItemMutation,
-    updateItemMutation,
-    deleteItemMutation,
-  };
 };
 ```
 
@@ -1821,18 +1874,23 @@ export const useItemsApi = () => {
 import type { LucideIcon } from 'lucide-react';
 
 export type IconName = LucideIcon | string;
-export type Priority = 'low' | 'medium' | 'high';
+export type Priority = 'low' | 'mid' | 'high';
+export type SingleCategory<T> = [T];
 
 export interface Item {
   id: string;
-  title: string;
-  description: string;
-  category: string;
-  categorySlug: string;
   slug: string;
+  name: string;
+  text: string;
+  isCompleted: boolean;
   priority: Priority;
+  tags: string[];
+  categories: SingleCategory<string>;
   createdAt: string;
   updatedAt: string;
+  isEditing?: boolean;
+  // Helpers for the frontend logic
+  categorySlug?: string; 
 }
 
 export interface ApiResponse<T> {
@@ -2099,238 +2157,166 @@ import { ItemForm } from '@/components/items/ItemForm';
 import { ItemItem } from '@/components/items/ItemItem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Search, Filter } from 'lucide-react';
-import { useItemsApi } from '@/hooks/useItemsApi';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { useGetItemTree, useAddItem } from '@/hooks/useItemsApi';
 import { useItemFilters } from '@/hooks/useItemFilters';
-import { Item, Priority } from '@/types';
-import { useUiStore } from '@/stores/useUiStore';
+import type { Priority } from '@/types';
+import { Plus, Search, Filter } from 'lucide-react';
 
-export default function HomePage() {
-  const { items, isLoading, error } = useItemsApi();
-  const { 
-    searchQuery, 
-    setSearchQuery, 
-    selectedPriority, 
-    setSelectedPriority,
-    filteredItems 
-  } = useItemFilters(items || []);
-  
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<Item | null>(null);
-  const { showSuccessToast, showErrorToast } = useUiStore();
+export default function Home() {
+  const { data: itemTree, isLoading, error } = useGetItemTree();
+  const addItem = useAddItem();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleCreateSuccess = () => {
-    setShowCreateForm(false);
-    showSuccessToast('Item created successfully!');
+  const {
+    filteredItemTree,
+    allTags,
+    hasActiveFilters,
+    totalItems,
+    totalFilteredItems,
+    searchQuery, setSearchQuery,
+    selectedPriority, setSelectedPriority,
+    showCompleted, setShowCompleted,
+    selectedTags, setSelectedTags
+  } = useItemFilters(itemTree || {});
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
   };
-
-  const handleEditSuccess = () => {
-    setEditingItem(null);
-    showSuccessToast('Item updated successfully!');
-  };
-
-  const handleError = (message: string) => {
-    showErrorToast(message);
-  };
-
-  const priorities: Priority[] = ['low', 'medium', 'high'];
 
   if (error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="flex">
-          <AppSidebar />
-          <main className="flex-1 p-8">
-            <div className="max-w-4xl mx-auto">
-              <Card className="border-destructive">
-                <CardContent className="pt-6">
-                  <p className="text-destructive">Error loading items: {error.message}</p>
-                </CardContent>
-              </Card>
-            </div>
-          </main>
-        </div>
-      </div>
-    );
+     return <div className="p-8 text-red-500">Error loading items: {error.message}</div>
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        <AppSidebar />
-        <main className="flex-1 p-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Items Dashboard</h1>
-                <p className="text-muted-foreground mt-2">
-                  Manage and track your items with priority levels
-                </p>
-              </div>
-              <Button onClick={() => setShowCreateForm(true)} className="gap-2">
-                <Plus className="size-4" />
-                Add Item
-              </Button>
-            </div>
-
-            {/* Filters */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Filter className="size-5" />
-                  Filters
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
-                      <Input
-                        placeholder="Search items..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full sm:w-48">
-                    <Select
-                      value={selectedPriority}
-                      onValueChange={(value) => setSelectedPriority(value as Priority | 'all')}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Priorities</SelectItem>
-                        {priorities.map((priority) => (
-                          <SelectItem key={priority} value={priority}>
-                            {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                {/* Active Filters */}
-                {(searchQuery || selectedPriority !== 'all') && (
-                  <div className="flex items-center gap-2 mt-4">
-                    <span className="text-sm text-muted-foreground">Active filters:</span>
-                    {searchQuery && (
-                      <Badge variant="secondary" className="gap-1">
-                        Search: {searchQuery}
-                        <button
-                          onClick={() => setSearchQuery('')}
-                          className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    )}
-                    {selectedPriority !== 'all' && (
-                      <Badge variant="secondary" className="gap-1">
-                        Priority: {selectedPriority}
-                        <button
-                          onClick={() => setSelectedPriority('all')}
-                          className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{items?.length || 0}</div>
-                  <p className="text-sm text-muted-foreground">Total Items</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{filteredItems.length}</div>
-                  <p className="text-sm text-muted-foreground">Filtered Items</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">
-                    {items?.filter(item => item.priority === 'high').length || 0}
-                  </div>
-                  <p className="text-sm text-muted-foreground">High Priority</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Items List */}
-            {isLoading ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">Loading items...</p>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6 text-center">
-                  <p className="text-muted-foreground">
-                    {searchQuery || selectedPriority !== 'all'
-                      ? 'No items match your filters.'
-                      : 'No items yet. Create your first item!'}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredItems.map((item) => (
-                  <ItemItem
-                    key={item.id}
-                    item={item}
-                    onEdit={setEditingItem}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Create Item Dialog */}
-            <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Create New Item</DialogTitle>
-                </DialogHeader>
-                <ItemForm
-                  onSuccess={handleCreateSuccess}
-                  onCancel={() => setShowCreateForm(false)}
-                />
-              </DialogContent>
-            </Dialog>
-
-            {/* Edit Item Dialog */}
-            <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Edit Item</DialogTitle>
-                </DialogHeader>
-                {editingItem && (
-                  <ItemForm
-                    item={editingItem}
-                    onSuccess={handleEditSuccess}
-                    onCancel={() => setEditingItem(null)}
-                  />
-                )}
-              </DialogContent>
-            </Dialog>
+    <div className="flex min-h-screen bg-background">
+      <AppSidebar />
+      
+      <div className="flex-1 p-8 max-w-5xl mx-auto w-full">
+        {/* Header & Actions */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Items Dashboard</h2>
+            <p className="text-muted-foreground mt-1">
+              {isLoading ? 'Loading...' : `Showing ${totalFilteredItems} of ${totalItems} items`}
+            </p>
           </div>
-        </main>
+
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="size-4" />
+                New Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Item</DialogTitle>
+              </DialogHeader>
+              <ItemForm 
+                onSubmit={(data) => {
+                  addItem.mutate(data, {
+                    onSuccess: () => setIsOpen(false)
+                  });
+                }}
+                isSubmitting={addItem.isPending}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-card border border-border rounded-lg p-4 mb-8 space-y-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search items..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            
+            <Select value={selectedPriority} onValueChange={(v: any) => setSelectedPriority(v)}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="mid">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center space-x-2 bg-secondary/50 px-3 rounded-md">
+              <Checkbox 
+                id="completed" 
+                checked={showCompleted}
+                onCheckedChange={(c) => setShowCompleted(!!c)}
+              />
+              <Label htmlFor="completed" className="cursor-pointer">Show Completed</Label>
+            </div>
+          </div>
+
+          {allTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mr-2">
+                <Filter className="size-3" />
+                Tags:
+              </div>
+              {allTags.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`text-xs px-2 py-1 rounded-full transition-colors border ${
+                    selectedTags.includes(tag)
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background hover:bg-accent border-input'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* List Grouped by Category */}
+        <div className="space-y-8">
+          {isLoading ? (
+             <div className="text-center py-12 text-muted-foreground">Loading items...</div>
+          ) : Object.keys(filteredItemTree).length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
+              {hasActiveFilters ? 'No items match your filters.' : 'No items found. Create one!'}
+            </div>
+          ) : (
+            Object.entries(filteredItemTree).map(([category, items]) => (
+              <div key={category} className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground/80">
+                  <span className="w-1 h-6 bg-primary rounded-full"></span>
+                  {category}
+                  <span className="text-xs font-normal text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+                    {items.length}
+                  </span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {items.map(item => (
+                    <ItemItem key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
