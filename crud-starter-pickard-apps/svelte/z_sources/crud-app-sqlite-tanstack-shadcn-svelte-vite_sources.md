@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 18:11:24 CET
+**Generated on:** wto, 18 lis 2025, 18:17:10 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/svelte/crud-app-sqlite-tanstack-shadcn-svelte-vite
 
 ---
@@ -117,7 +117,7 @@
     "checkJs": true,
     "moduleDetection": "force"
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "src/**/*.svelte.ts"]
 }
 
 ```
@@ -253,7 +253,7 @@ export default defineConfig({
   import { Toaster } from 'svelte-sonner';
   import { createAppQueryClient } from '$lib/api/itemsQuery';
   import Router from '$lib/router/Router.svelte';
-  import { useThemeUpdater } from '$lib/utils/themeUpdater';
+  import { useThemeUpdater } from '$lib/utils/themeUpdater.svelte';
 
   const queryClient = createAppQueryClient();
 
@@ -2252,6 +2252,46 @@ export { badgeVariants, type BadgeVariant } from "./badge.svelte";
 
 ```
 
+## `src/lib/utils/themeUpdater.svelte.ts`
+```
+// src/lib/utils/themeUpdater.svelte.ts
+import { onMount } from 'svelte';
+import { uiStore, type Theme } from '$lib/stores/uiStore.svelte';
+
+export function useThemeUpdater() {
+  onMount(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // react to uiStore.theme via rune effect
+    $effect(() => {
+      const theme = uiStore.theme as Theme;
+      const html = document.documentElement;
+
+      if (theme === 'system') {
+        const isDark = media.matches;
+        if (isDark) html.classList.add('dark');
+        else html.classList.remove('dark');
+      } else if (theme === 'dark') {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+    });
+
+    const mediaListener = () => {
+      if (uiStore.theme === 'system') {
+        const html = document.documentElement;
+        if (media.matches) html.classList.add('dark');
+        else html.classList.remove('dark');
+      }
+    };
+
+    media.addEventListener('change', mediaListener);
+    return () => media.removeEventListener('change', mediaListener);
+  });
+}
+```
+
 ## `src/lib/utils/useItemFilters.ts`
 ```
 // src/lib/utils/useItemFilters.ts
@@ -2333,49 +2373,6 @@ export function useItemFilters(itemTree: ItemTree, filters: FilterOptions) {
     allTags,
     hasActiveFilters
   };
-}
-```
-
-## `src/lib/utils/themeUpdater.ts`
-```
-// src/lib/utils/themeUpdater.ts
-import { onMount } from 'svelte';
-import { uiStore, type Theme } from '$lib/stores/uiStore.svelte'; // FIX: Added .svelte extension
-
-export function useThemeUpdater() {
-  onMount(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-
-    // Access theme via the effect derived from the store state
-    $effect(() => {
-      const theme = uiStore.theme;
-      const html = document.documentElement;
-      
-      if (theme === 'system') {
-        const isDark = media.matches;
-        if (isDark) html.classList.add('dark');
-        else html.classList.remove('dark');
-      } else if (theme === 'dark') {
-        html.classList.add('dark');
-      } else {
-        html.classList.remove('dark');
-      }
-    });
-
-    const mediaListener = () => {
-      if (uiStore.theme === 'system') {
-        const html = document.documentElement;
-        if (media.matches) html.classList.add('dark');
-        else html.classList.remove('dark');
-      }
-    };
-
-    media.addEventListener('change', mediaListener);
-
-    return () => {
-      media.removeEventListener('change', mediaListener);
-    };
-  });
 }
 ```
 
