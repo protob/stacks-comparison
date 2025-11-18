@@ -7,10 +7,7 @@ export interface FilterOptions {
   selectedTags: string[];
 }
 
-export function useItemFilters(
-  itemTree: Ref<ItemTree | undefined>,
-  filters: ComputedRef<FilterOptions>, // Changed from Ref to ComputedRef
-) {
+export function useItemFilters(itemTree: Ref<ItemTree | undefined>, filters: ComputedRef<FilterOptions>) {
   const allTags = computed(() => {
     if (!itemTree.value) return [];
 
@@ -28,33 +25,38 @@ export function useItemFilters(
 
     const filtered: Record<string, Item[]> = {};
 
-    Object.entries(itemTree.value).forEach(([categoryName, items]) => {
-      const filteredItems = items.filter((item) => {
-        if (filters.value.searchQuery.trim()) {
-          const query = filters.value.searchQuery.toLowerCase();
-          const matchesSearch =
-            item.name.toLowerCase().includes(query) || item.text.toLowerCase().includes(query) || item.tags?.some((tag) => tag.toLowerCase().includes(query));
-          if (!matchesSearch) return false;
-        }
+    Object.entries(itemTree.value).forEach(([categorySlug, items]) => {
+      const filteredItems = items
+        .map((item) => ({
+          ...item,
+          categorySlug, // ADD categorySlug to each item
+        }))
+        .filter((item) => {
+          if (filters.value.searchQuery.trim()) {
+            const query = filters.value.searchQuery.toLowerCase();
+            const matchesSearch =
+              item.name.toLowerCase().includes(query) || item.text.toLowerCase().includes(query) || item.tags?.some((tag) => tag.toLowerCase().includes(query));
+            if (!matchesSearch) return false;
+          }
 
-        if (filters.value.selectedPriority !== "all" && item.priority !== filters.value.selectedPriority) {
-          return false;
-        }
+          if (filters.value.selectedPriority !== "all" && item.priority !== filters.value.selectedPriority) {
+            return false;
+          }
 
-        if (!filters.value.showCompleted && item.isCompleted) {
-          return false;
-        }
+          if (!filters.value.showCompleted && item.isCompleted) {
+            return false;
+          }
 
-        if (filters.value.selectedTags.length > 0) {
-          const hasMatchingTag = filters.value.selectedTags.some((selectedTag) => item.tags?.includes(selectedTag));
-          if (!hasMatchingTag) return false;
-        }
+          if (filters.value.selectedTags.length > 0) {
+            const hasMatchingTag = filters.value.selectedTags.some((selectedTag) => item.tags?.includes(selectedTag));
+            if (!hasMatchingTag) return false;
+          }
 
-        return true;
-      });
+          return true;
+        });
 
       if (filteredItems.length > 0) {
-        filtered[categoryName] = filteredItems;
+        filtered[categorySlug] = filteredItems;
       }
     });
 

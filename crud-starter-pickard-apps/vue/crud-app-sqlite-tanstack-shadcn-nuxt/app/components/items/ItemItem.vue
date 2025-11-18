@@ -18,7 +18,8 @@ const toggleComplete = (value: boolean) => {
     if (!props.item?.id) return;
 
     updateItem({
-        id: props.item.id,
+        categorySlug: props.item.categorySlug,
+        itemSlug: props.item.slug,
         payload: { isCompleted: value },
     });
 };
@@ -27,7 +28,10 @@ const handleDelete = () => {
     if (!props.item?.id) return;
 
     if (confirm("Are you sure you want to delete this item?")) {
-        deleteItem(props.item.id);
+        deleteItem({
+            categorySlug: props.item.categorySlug,
+            itemSlug: props.item.slug,
+        });
     }
 };
 </script>

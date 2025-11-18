@@ -1,17 +1,18 @@
 export type Priority = "low" | "mid" | "high";
 export type NotificationType = "success" | "error" | "warning" | "info";
 
-export type SingleCategory<T = string> = [T]; // Changed from number to string
+export type SingleCategory<T = string> = [T];
 
 export interface Item {
-  id: string; // Changed from number to string (UUID)
+  id: string;
   name: string;
   text: string;
   priority: Priority;
   isCompleted: boolean;
   slug: string;
   tags?: string[];
-  categories: string[]; // Changed from SingleCategory<number> to string[]
+  categories: string[];
+  categorySlug: string; // ADD THIS - the category slug from the tree key
   createdAt: string;
   updatedAt: string;
 }
@@ -32,7 +33,6 @@ export interface UpdateItemPayload extends Partial<CreateItemPayload> {
   isCompleted?: boolean;
 }
 
-// Add API response wrapper types
 export interface ApiResponse<T> {
   success: boolean;
   data: T;

@@ -40,7 +40,8 @@ export function useUpdateItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateItemPayload }) => updateItem(id, payload), // Changed from number to string
+    mutationFn: ({ categorySlug, itemSlug, payload }: { categorySlug: string; itemSlug: string; payload: UpdateItemPayload }) =>
+      updateItem(categorySlug, itemSlug, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item updated successfully");
@@ -55,7 +56,7 @@ export function useDeleteItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
   return useMutation({
-    mutationFn: deleteItem,
+    mutationFn: ({ categorySlug, itemSlug }: { categorySlug: string; itemSlug: string }) => deleteItem(categorySlug, itemSlug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item deleted successfully");
