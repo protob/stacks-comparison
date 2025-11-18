@@ -99,7 +99,7 @@ These are the base templates used by the Go CLI. They operate on **FileSystem/YA
 *   Elixir (`server-elixir`)
 *   Clojure (`server-clojure`)
 
-=====
+======================================================================
 
 ## 🚧 Roadmap & Planned Features
 
