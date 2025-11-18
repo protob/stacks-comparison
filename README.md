@@ -118,7 +118,7 @@ Introduction of "non-linear" stacks where frontend and backend are tightly coupl
 
 **The "Bleeding Edge" / Hyper-productive Stacks:**
 - [ ] **Bun Stack:** Bun + Elysia + SQLite + HTMX
-- [ ] **Go Fullstack:** Golang + sqlc + Go Templates + SQLite
+- [ ] **Go Fullstack:** Golang + sqlc + Go-Tmpl + SQLite
 - [ ] **Gleam Fullstack:** Gleam + Lustre + Squirrel + SQLite
 - [ ] **Elixir:** Phoenix LiveView
 
