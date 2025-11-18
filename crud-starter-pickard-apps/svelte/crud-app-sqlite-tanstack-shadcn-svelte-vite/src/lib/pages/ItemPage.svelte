@@ -5,25 +5,26 @@
   import FilterBar from '$lib/components/layout/FilterBar.svelte';
   import ItemItem from '$lib/components/items/ItemItem.svelte';
   import ItemForm from '$lib/components/items/ItemForm.svelte';
-  import { uiStore } from '$lib/stores/uiStore';
-  import { isFormOpen } from '$lib/stores/uiStore';
+  import { uiStore } from '$lib/stores/uiStore'; // <-- Only import the singleton
   import { Button } from '$lib/components/ui/button';
   import { createEventDispatcher } from 'svelte';
+  import { Plus } from '@lucide/svelte'; // Import icon directly
 
   const itemTreeQuery = useItemTree();
   const dispatch = createEventDispatcher();
 
-  let filters = {
+  let filters = $state({
     searchQuery: '',
     selectedPriority: 'all' as const,
     showCompleted: true,
     selectedTags: [] as string[],
-  };
+  });
 
-  $: filterResults = useItemFilters(itemTreeQuery.data || {}, filters);
-  $: filteredItemTree = filterResults.filteredItemTree;
-  $: allTags = filterResults.allTags;
-  $: hasActiveFilters = filterResults.hasActiveFilters;
+  // Use derived for reactive calculations in Svelte 5
+  let filterResults = $derived(useItemFilters(itemTreeQuery.data || {}, filters));
+  let filteredItemTree = $derived(filterResults.filteredItemTree);
+  let allTags = $derived(filterResults.allTags);
+  let hasActiveFilters = $derived(filterResults.hasActiveFilters);
 
   function clearFilters() {
     filters = {
@@ -42,9 +43,9 @@
 <MainLayout onNavigate={handleNavigate}>
   <header class="mb-6">
     <h1 class="mb-2 font-bold text-size-3xl">Items</h1>
-    <!-- The main "Add New Item" button remains in the sidebar -->
   </header>
 
+  <!-- Bind props using Svelte 5 syntax -->
   <FilterBar
     bind:search={filters.searchQuery}
     bind:priority={filters.selectedPriority}
@@ -66,13 +67,12 @@
           <div class="flex items-center gap-2 mb-4">
             <h2 class="font-semibold capitalize text-size-xl">{category}</h2>
             <span class="text-sm text-text-muted">({items.length})</span>
-            <!-- Add "+" button here -->
             <Button 
               variant="ghost" 
               size="icon-sm" 
               onclick={() => uiStore.openForm(undefined, category)}
             >
-              <icon-lucide-plus class="w-4 h-4"></icon-lucide-plus>
+              <Plus class="w-4 h-4" />
             </Button>
           </div>
           <div class="grid gap-4">
@@ -93,8 +93,8 @@
     </div>
   {/if}
 
-  <!-- The ItemForm is now aware of pre-selected category -->
-  {#if $uiStore.isFormOpen}
+  <!-- Access store property directly -->
+  {#if uiStore.isFormOpen}
     <ItemForm onClose={() => uiStore.closeForm()} />
   {/if}
 </MainLayout>

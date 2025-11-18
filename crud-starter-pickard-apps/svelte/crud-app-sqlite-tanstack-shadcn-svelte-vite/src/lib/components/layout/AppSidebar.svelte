@@ -3,11 +3,11 @@
   import { Input } from '$lib/components/ui/input';
   import { Separator } from '$lib/components/ui/separator';
   import { uiStore } from '$lib/stores/uiStore';
+  import { Sun, Moon } from '@lucide/svelte';
 
-  // These would eventually be props or come from a store
-  let searchQuery = '';
-  let allTags = ['project', 'personal', 'work']; // Example tags
-  let selectedTags: string[] = [];
+  let searchQuery = $state('');
+  let allTags = ['project', 'personal', 'work'];
+  let selectedTags = $state<string[]>([]);
 
   function toggleTag(tag: string) {
     const index = selectedTags.indexOf(tag);
@@ -60,10 +60,10 @@
   <!-- Footer / Theme Toggle -->
   <div class="mt-auto">
     <Button variant="ghost" onclick={() => uiStore.toggleTheme()} class="justify-start w-full">
-      {#if !$uiStore.isDark}
-        <icon-lucide-sun class="w-4 h-4" />
+      {#if uiStore.theme !== 'dark'}
+        <Sun class="w-4 h-4" />
       {:else}
-        <icon-lucide-moon class="w-4 h-4" />
+        <Moon class="w-4 h-4" />
       {/if}
     </Button>
   </div>
