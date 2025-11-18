@@ -1,15 +1,15 @@
 import { z } from 'zod';
-import type { Priority } from '@/types';
+import type { SingleCategory } from '@/types';
 
-export const itemSchema = z.object({
-  title: z.string()
-    .min(1, 'Title is required')
-    .min(3, 'Title must be at least 3 characters'),
-  description: z.string()
+export const itemFormSchema = z.object({
+  name: z.string()
+    .min(1, 'Name is required')
+    .min(3, 'Name must be at least 3 characters'),
+  text: z.string()
     .min(1, 'Description is required'),
-  category: z.string()
-    .min(1, 'Category is required'),
-  priority: z.enum(['low', 'medium', 'high']) as z.ZodType<Priority>,
+  priority: z.enum(['low', 'mid', 'high']),
+  tags: z.array(z.string()).optional(),
+  categories: z.tuple([z.string().min(1, 'Category is required')]) as z.ZodType<SingleCategory<string>>,
 });
 
-export type ItemFormData = z.infer<typeof itemSchema>;
+export type ItemFormData = z.infer<typeof itemFormSchema>;

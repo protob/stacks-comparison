@@ -1,33 +1,51 @@
 import { get, post, patch, del } from './apiClient';
-import type { Item, Priority } from '@/types';
+import type { Item, Priority, SingleCategory } from '@/types';
 
 export interface CreateItemPayload {
-  title: string;
-  description: string;
-  category: string;
+  name: string;
+  text: string;
   priority: Priority;
-  categorySlug: string;
-  slug: string;
+  tags?: string[];
+  categories: SingleCategory<string>;
 }
 
-export type UpdateItemPayload = Partial<CreateItemPayload>;
+export type UpdateItemPayload = Partial<Omit<CreateItemPayload, 'categories'>> & {
+    isCompleted?: boolean;
+    categories?: SingleCategory<string>;
+};
 
-export async function getItems(): Promise<Item[]> {
-  return get<Item[]>('/items');
+export interface ItemTree {
+  [categorySlug: string]: Item[];
 }
 
-export async function getItem(id: string): Promise<Item> {
-  return get<Item>(`/items/${id}`);
+// Fix: Use /items/tree instead of /items
+export async function getItemTree(): Promise<ItemTree> {
+  return get<ItemTree>('/items/tree');
 }
 
 export async function createItem(payload: CreateItemPayload): Promise<Item> {
   return post<Item, CreateItemPayload>('/items', payload);
 }
 
-export async function updateItem(id: string, payload: UpdateItemPayload): Promise<Item> {
-  return patch<Item, UpdateItemPayload>(`/items/${id}`, payload);
+export async function getItem(categorySlug: string, itemSlug: string): Promise<Item> {
+  return get<Item>(`/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`);
 }
 
-export async function deleteItem(id: string): Promise<{ deleted: boolean }> {
-  return del<{ deleted: boolean }>(`/items/${id}`);
+// Fix: Use slugs instead of ID
+export async function updateItem(
+  categorySlug: string,
+  itemSlug: string,
+  payload: UpdateItemPayload
+): Promise<Item> {
+  return patch<Item, UpdateItemPayload>(
+    `/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`,
+    payload
+  );
+}
+
+// Fix: Use slugs instead of ID
+export async function deleteItem(categorySlug: string, itemSlug: string): Promise<{ deleted: boolean }> {
+  return del<{ deleted: boolean }>(
+    `/items/${encodeURIComponent(categorySlug)}/${encodeURIComponent(itemSlug)}`
+  );
 }
