@@ -1,6 +1,6 @@
 # Next.js Source Code Collection (shadcn-simple-next)
 
-**Generated on:** wto, 18 lis 2025, 22:38:28 CET
+**Generated on:** wto, 18 lis 2025, 22:43:17 CET
 **Next.js directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/react/crud-app-sqlite-tanstack-shadcn-next
 
 ---
@@ -2260,7 +2260,6 @@ export default function ItemDetailPage() {
 
 ## `app/page.tsx`
 ```
-
 'use client';
 
 import { useState } from 'react';
@@ -2310,12 +2309,12 @@ export default function Home() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full">
+    <div className="w-full max-w-5xl p-8 mx-auto">
       {/* Header & Main Actions */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             {isLoading ? 'Loading...' : `Showing ${totalFilteredItems} of ${totalItems} items`}
           </p>
         </div>
@@ -2327,12 +2326,12 @@ export default function Home() {
       </div>
 
       {/* Filters Area */}
-      <div className="bg-card border border-border rounded-lg p-4 mb-8 space-y-4">
-        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+      <div className="p-4 mb-8 space-y-4 border rounded-lg bg-card border-border">
+        <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
           
           {/* Priority Filter - Radio Group */}
           <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase">Priority</Label>
+            {/* <Label className="text-xs font-semibold uppercase text-muted-foreground">Priority</Label> */}
             <RadioGroup 
               value={selectedPriority} 
               onValueChange={(v: any) => setSelectedPriority(v)}
@@ -2340,33 +2339,33 @@ export default function Home() {
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="all" id="r-all" />
-                <Label htmlFor="r-all" className="cursor-pointer font-normal">All</Label>
+                <Label htmlFor="r-all" className="font-normal cursor-pointer">All</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="high" id="r-high" />
-                <Label htmlFor="r-high" className="cursor-pointer font-normal">High</Label>
+                <Label htmlFor="r-high" className="font-normal cursor-pointer">High</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="mid" id="r-mid" />
-                <Label htmlFor="r-mid" className="cursor-pointer font-normal">Mid</Label>
+                <Label htmlFor="r-mid" className="font-normal cursor-pointer">Mid</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="low" id="r-low" />
-                <Label htmlFor="r-low" className="cursor-pointer font-normal">Low</Label>
+                <Label htmlFor="r-low" className="font-normal cursor-pointer">Low</Label>
               </div>
             </RadioGroup>
           </div>
 
-          <div className="hidden md:block h-8 w-px bg-border" />
+          <div className="hidden w-px h-8 md:block bg-border" />
 
           {/* Show Completed Checkbox */}
-          <div className="flex items-center space-x-2 pt-4 md:pt-0">
+          <div className="flex items-center pt-4 space-x-2 md:pt-0">
             <Checkbox 
               id="completed" 
               checked={showCompleted}
               onCheckedChange={(c) => setShowCompleted(!!c)}
             />
-            <Label htmlFor="completed" className="cursor-pointer font-medium">Show Completed Items</Label>
+            <Label htmlFor="completed" className="font-medium cursor-pointer">Show Completed Items</Label>
           </div>
         </div>
       </div>
@@ -2374,36 +2373,42 @@ export default function Home() {
       {/* Item List Grouped by Category */}
       <div className="space-y-8">
         {isLoading ? (
-           <div className="text-center py-12 text-muted-foreground">Loading items...</div>
+           <div className="py-12 text-center text-muted-foreground">Loading items...</div>
         ) : Object.keys(filteredItemTree).length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl bg-muted/30">
+          <div className="py-12 text-center border-2 border-dashed text-muted-foreground rounded-xl bg-muted/30">
             {hasActiveFilters ? 'No items match your filters.' : 'No items found. Create one!'}
           </div>
         ) : (
           Object.entries(filteredItemTree).map(([category, items]) => (
             <div key={category} className="space-y-4">
-              {/* Category Header with Add Button */}
-              <div className="flex items-center justify-between border-b border-border pb-2">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-                  <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-                  {category}
-                  <span className="text-xs font-normal text-muted-foreground bg-secondary px-2 py-0.5 rounded-full ml-1">
-                    {items.length}
-                  </span>
-                </h3>
+              {/* Category Header */}
+              <div className="flex items-center gap-3 pb-2 border-b border-border">
+                
+                {/* 1. The Marker (Fat Line) */}
+                <span className="w-1.5 h-6 bg-primary rounded-full shrink-0"></span>
+
+                {/* 2. The Plus Button */}
                 <Button 
                   variant="ghost" 
                   size="icon-sm" 
                   onClick={() => handleAddByCategory(category)}
                   title={`Add item to ${category}`}
-                  className="text-muted-foreground hover:text-primary"
+                  className="w-6 h-6 p-0 -ml-1 text-muted-foreground hover:text-primary"
                 >
                   <Plus className="size-4" />
                 </Button>
+                
+                {/* 3. The Title and Count */}
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                  {category}
+                  <span className="text-xs font-normal text-muted-foreground bg-secondary px-2 py-0.5 rounded-full ml-1">
+                    {items.length}
+                  </span>
+                </h3>
               </div>
 
               {/* Items Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {items.map(item => (
                   <ItemItem key={item.id} item={item} />
                 ))}
@@ -2420,7 +2425,7 @@ export default function Home() {
             <DialogTitle>{preSelectedCategory ? `Add to ${preSelectedCategory}` : 'Create New Item'}</DialogTitle>
           </DialogHeader>
           <ItemForm 
-            // Pass pre-selected category if available
+            // Pass the pre-selected category if available
             defaultValues={preSelectedCategory ? { categories: [preSelectedCategory] } : undefined}
             onSubmit={(data) => {
               addItem.mutate(data, {
@@ -2434,7 +2439,6 @@ export default function Home() {
     </div>
   );
 }
-
 ```
 
 ## `app/globals.css`
