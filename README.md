@@ -1,4 +1,3 @@
-Here is a structured overview of your **Pickard CLI** boilerplate projects, organized by category and framework.
 
 ## 🚀 Full CRUD Applications
 These are feature-complete applications demonstrating Create, Read, Update, Delete operations.
