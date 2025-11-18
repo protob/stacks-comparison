@@ -1,6 +1,6 @@
 # Frontend Source Code Collection (crud-app-sqlite)
 
-**Generated on:** wto, 18 lis 2025, 02:33:47 CET
+**Generated on:** wto, 18 lis 2025, 02:44:21 CET
 **Frontend directory:** /home/dtb/0-dev/00-nov-2025/shadcn-and-simiar/crud-starter-pickard-apps/vue/crud-app-sqlite-tanstack-shadcn-nuxt
 
 ---
@@ -2960,43 +2960,36 @@ export const deleteItem = (id: number) => del(`items/${id}`);
 
 ## `app/api/apiClient.ts`
 ```
-import { ofetch } from "ofetch";
-import type { ApiErrorData, Result } from "@/types";
+import { createFetch } from "ofetch";
 
-// In a real app, this would come from an environment variable
 const API_URL_BASE = "http://localhost:3000/api";
 
-export const apiClient = ofetch.create({
+export const apiClient = createFetch({
   baseURL: API_URL_BASE,
   headers: {
     "Content-Type": "application/json",
   },
-  async onResponseError({ response }) {
-    console.error("API Error:", response.status, response._data);
+  async onResponseError(response) {
+    console.error("API Error:", response.status, response.statusText);
   },
 });
 
-const unwrapResult = async <T>(resultPromise: Promise<T>): Promise<T> => {
-  try {
-    const result = await resultPromise;
-    // The actual data is often nested in a 'data' property in standardized APIs
-    return (result as any).data || result;
-  } catch (error: any) {
-    const message = error.data?.message || error.message || "An unknown error occurred";
-    const newError = new Error(message);
-    (newError as any).statusCode = error.response?.status || 500;
-    (newError as any).details = error.data?.details;
-    throw newError;
-  }
-};
+// Wrapper functions exported explicitly for consistency
+export function get<T>(endpoint: string) {
+  return apiClient<T>(endpoint); // Calls GET by default
+}
 
-export const get = <T>(endpoint: string) => unwrapResult(apiClient.get<T>(endpoint));
+export function post<T, V>(endpoint: string, data: V) {
+  return apiClient<T>(endpoint, { method: "POST", body: data });
+}
 
-export const post = <TResponse, TRequest = any>(endpoint: string, data: TRequest) => unwrapResult(apiClient.post<TResponse>(endpoint, { body: data }));
+export function patch<T, V>(endpoint: string, data: V) {
+  return apiClient<T>(endpoint, { method: "PATCH", body: data });
+}
 
-export const patch = <TResponse, TRequest = any>(endpoint: string, data: TRequest) => unwrapResult(apiClient.patch<TResponse>(endpoint, { body: data }));
-
-export const del = <TResponse = { deleted: boolean }>(endpoint: string) => unwrapResult(apiClient.delete<TResponse>(endpoint));
+export function del<T>(endpoint: string) {
+  return apiClient<T>(endpoint, { method: "DELETE" });
+}
 
 ```
 

@@ -16,18 +16,17 @@ const uiStore = useUiStore();
 
 const toggleComplete = () => {
     updateItem({
-        id: props.item.id,
+        id: props.item.id, // Already a string UUID
         payload: { isCompleted: !props.item.isCompleted },
     });
 };
 
 const handleDelete = () => {
     if (confirm("Are you sure you want to delete this item?")) {
-        deleteItem(props.item.id);
+        deleteItem(props.item.id); // Already a string UUID
     }
 };
 </script>
-
 <template>
     <Card :class="{ 'opacity-60': item.isCompleted }">
         <CardContent class="flex items-start gap-4 p-4">

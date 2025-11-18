@@ -40,7 +40,7 @@ export function useUpdateItem() {
   const queryClient = useQueryClient();
   const uiStore = useUiStore();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateItemPayload }) => updateItem(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateItemPayload }) => updateItem(id, payload), // Changed from number to string
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.tree });
       uiStore.showNotification("success", "Item updated successfully");
