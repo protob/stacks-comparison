@@ -141,7 +141,6 @@ As the matrix of choices grows (e.g., HTMX stacks vs. SPA stacks), a simple CLI 
 
 ========== OTHER TODOS =====================
 
-Here are the additional sections for your Roadmap/To-Do list, focusing on quality assurance, styling engines, and your custom UI library.
 
 ### 4. Maintenance & Quality Assurance
 *Crucial for boilerplates: If the seed code is bad, the user's project starts bad.*
