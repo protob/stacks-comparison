@@ -69,7 +69,7 @@ export default function Home() {
           
           {/* Priority Filter - Radio Group */}
           <div className="space-y-2">
-            <Label className="text-xs font-semibold uppercase text-muted-foreground">Priority</Label>
+            {/* <Label className="text-xs font-semibold uppercase text-muted-foreground">Priority</Label> */}
             <RadioGroup 
               value={selectedPriority} 
               onValueChange={(v: any) => setSelectedPriority(v)}
@@ -119,20 +119,25 @@ export default function Home() {
         ) : (
           Object.entries(filteredItemTree).map(([category, items]) => (
             <div key={category} className="space-y-4">
-              {/* Category Header with Left-aligned Add Button */}
-              <div className="flex items-center gap-2 pb-2 border-b border-border">
+              {/* Category Header */}
+              <div className="flex items-center gap-3 pb-2 border-b border-border">
+                
+                {/* 1. The Marker (Fat Line) */}
+                <span className="w-1.5 h-6 bg-primary rounded-full shrink-0"></span>
+
+                {/* 2. The Plus Button */}
                 <Button 
                   variant="ghost" 
                   size="icon-sm" 
                   onClick={() => handleAddByCategory(category)}
                   title={`Add item to ${category}`}
-                  className="-ml-2 text-muted-foreground hover:text-primary"
+                  className="w-6 h-6 p-0 -ml-1 text-muted-foreground hover:text-primary"
                 >
                   <Plus className="size-4" />
                 </Button>
                 
+                {/* 3. The Title and Count */}
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                  <span className="w-1.5 h-6 bg-primary rounded-full"></span>
                   {category}
                   <span className="text-xs font-normal text-muted-foreground bg-secondary px-2 py-0.5 rounded-full ml-1">
                     {items.length}
